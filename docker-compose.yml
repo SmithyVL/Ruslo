@@ -1,0 +1,50 @@
+services:
+  blimfy:
+    depends_on:
+      - db
+    build:
+      context: .
+    container_name: blimfy
+    ports:
+      - "8080:8080"
+    networks:
+      - blimfy_network
+    command:
+      - java
+      - -jar
+      - blimfy.jar
+    environment:
+      BLIMFY_FULL_DEBUG: true
+      BLIMFY_DB_HOST: db
+
+  db:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: blimfy_admin
+      POSTGRES_PASSWORD: blimfy_password
+      POSTGRES_DB: blimfy
+    ports:
+      - "5432:5432"
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    networks:
+      - blimfy_network
+
+  liquibase:
+    image: liquibase:latest
+    container_name: liquibase_migration
+    depends_on:
+      - db
+    volumes:
+      - ./liquibase/changelog/:/liquibase/changelog
+    command: --defaults-file=/liquibase/changelog/liquibase.properties update
+    networks:
+      - blimfy_network
+
+volumes:
+  db_data:
+
+networks:
+  blimfy_network:
+    driver: bridge

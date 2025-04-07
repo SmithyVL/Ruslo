@@ -1,0 +1,15 @@
+package ru.blimfy.persistence.repository
+
+import java.util.UUID
+import org.springframework.data.repository.kotlin.CoroutineCrudRepository
+import org.springframework.stereotype.Repository
+import ru.blimfy.persistence.entity.Role
+
+/**
+ * Репозиторий для работы с сущностью роли сервера в базе данных.
+ *
+ * @author Владислав Кузнецов.
+ * @since 0.0.1.
+ */
+@Repository
+interface RoleRepository : CoroutineCrudRepository<Role, UUID>

@@ -1,0 +1,40 @@
+# Количество логов. При "true" будет отображено больше логов.
+debug: ${BLIMFY_FULL_DEBUG:false}
+
+# Логирование запросов к БД.
+logging:
+  level:
+    ru:
+      blimfy: ${BLIMFY_LOGGING_LEVEL:debug}
+    org:
+      springframework:
+        # Логирование SQL запросов.
+        r2dbc: ${BLIMFY_LOGGING_LEVEL_R2DBC:debug}
+    io:
+      r2dbc:
+        postgresql:
+          # Логирование параметров SQL запросов.
+          PARAM: ${BLIMFY_LOGGING_LEVEL_R2DBC:debug}
+
+# Настройки для создания токенов авторизации. Сейчас используются JWT токены.
+jwt:
+  issuer: Blimfy
+  key: ${BLIMFY_JWT_KEY:secret_key_is_very_well_and_good}
+
+spring:
+  # Настройки реактивности.
+  webflux:
+    base-path: /blimfy
+
+  # Общие настройки Spring.
+  main:
+    # Выключить баннер в логах.
+    banner-mode: off
+    # Уменьшение количества начальных логов.
+    log-startup-info: false
+
+  # Настройки реактивной БД.
+  r2dbc:
+    url: r2dbc:postgresql://${BLIMFY_DB_HOST:localhost}:${BLIMFY_DB_PORT:5432}/blimfy
+    username: ${BLIMFY_DB_USERNAME:blimfy_admin}
+    password: ${BLIMFY_DB_PASSWORD:blimfy_password}

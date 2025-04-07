@@ -1,0 +1,41 @@
+[versions]
+springBoot = "3.4.3"
+kotlin = "2.1.10"
+dependencyManagement = "1.1.7"
+jwt = "0.12.6"
+# TODO: обновить как только выйдет следующая версия и проверить, что пропадет "WARN": "Appended trailing slash to static
+#  resource location".
+springDoc = "2.8.6"
+
+[libraries]
+# Spring Boot.
+springBootStarterWebflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
+springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+
+# Документация.
+springDocWebflux = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springDoc" }
+
+# Безопасность.
+springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
+jwtJackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jwt" }
+jwtImpl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jwt" }
+
+# Работа с базой данных.
+springBootStarterDataR2dbc = { module = "org.springframework.boot:spring-boot-starter-data-r2dbc" }
+databasePostgresR2dbc = { module = "org.postgresql:r2dbc-postgresql" }
+
+# Котлин.
+kotlinxCoroutinesReactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }
+kotlinReactorExtension = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions" }
+kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
+
+# Тесты.
+springBooStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
+mockito = { module = "org.mockito:mockito-core" }
+
+[plugins]
+springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
+dependencyManagement = { id = "io.spring.dependency-management", version.ref = "dependencyManagement" }
+kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
+kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }

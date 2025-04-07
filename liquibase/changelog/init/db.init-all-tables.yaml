@@ -1,0 +1,729 @@
+databaseChangeLog:
+  - changeSet:
+      id: 0
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: users # Так как просто "user" использовать нельзя - будет "users".
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с пользователями
+      changes:
+        - createTable:
+            tableName: users
+            remarks: Пользователи
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: users_id_pkey
+              - column:
+                  name: username
+                  type: varchar
+                  remarks: Логин пользователя
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: email
+                  type: varchar
+                  remarks: Электронная почта
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: avatar_url
+                  type: varchar
+                  remarks: Ссылка на аватарку
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+  - changeSet:
+      id: 1
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: password
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с паролями
+      changes:
+        - createTable:
+            tableName: password
+            remarks: Пароли
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: password_id_pkey
+              - column:
+                  name: user_id
+                  type: uuid
+                  remarks: Идентификатор пользователя
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: hash
+                  type: varchar
+                  remarks: Хэш пароль
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: user_id
+            baseTableName: password
+            constraintName: fk_user_password
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 2
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: server
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с серверами
+      changes:
+        - createTable:
+            tableName: server
+            remarks: Сервера
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: server_id_pkey
+              - column:
+                  name: name
+                  type: varchar
+                  remarks: Название сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: uuid
+                  remarks: Идентификатор владельца сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: avatar_url
+                  type: varchar
+                  remarks: Ссылка на аватарку
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: RESTRICT
+            onUpdate: RESTRICT
+            baseColumnNames: owner_id
+            baseTableName: server
+            constraintName: fk_user_server
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 3
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: member
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с участниками серверов
+      changes:
+        - createTable:
+            tableName: member
+            remarks: Участники серверов
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: member_id_pkey
+              - column:
+                  name: server_id
+                  type: uuid
+                  remarks: Идентификатор сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+                  remarks: Идентификатор пользователя
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: server_id
+            baseTableName: member
+            constraintName: fk_server_member
+            referencedColumnNames: id
+            referencedTableName: server
+        - addForeignKeyConstraint:
+            onDelete: SET NULL
+            onUpdate: RESTRICT
+            baseColumnNames: user_id
+            baseTableName: member
+            constraintName: fk_user_member
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: 4
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: role
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с ролями
+      changes:
+        - createTable:
+            tableName: role
+            remarks: Роли сервера
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: role_id_pkey
+              - column:
+                  name: server_id
+                  type: uuid
+                  remarks: Идентификатор сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar
+                  remarks: Название канала
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: server_id
+            baseTableName: role
+            constraintName: fk_server_role
+            referencedColumnNames: id
+            referencedTableName: server
+  - changeSet:
+      id: 5
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: privilege
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с привилегиями ролей.
+      changes:
+        - createTable:
+            tableName: privilege
+            remarks: Привилегии роли
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: role_privileges_id_pkey
+              - column:
+                  name: role_id
+                  type: uuid
+                  remarks: Идентификатор роли
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar
+                  remarks: Тип привилегии
+                  constraints:
+                    nullable: false
+              - column:
+                  name: is_granted
+                  type: boolean
+                  remarks: Флаг того, что привилегия разрешает что-то
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: role_id
+            baseTableName: privilege
+            constraintName: fk_role_privilege
+            referencedColumnNames: id
+            referencedTableName: role
+  - changeSet:
+      id: 6
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: member_role
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с участниками ролей
+      changes:
+        - createTable:
+            tableName: member_role
+            remarks: Участники ролей
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: member_role_id_pkey
+              - column:
+                  name: member_id
+                  type: uuid
+                  remarks: Идентификатор участника сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: uuid
+                  remarks: Идентификатор роли сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: member_id
+            baseTableName: member_role
+            constraintName: fk_member_member_role
+            referencedColumnNames: id
+            referencedTableName: member
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: role_id
+            baseTableName: member_role
+            constraintName: fk_role_member_roles
+            referencedColumnNames: id
+            referencedTableName: role
+  - changeSet:
+      id: 7
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: channel
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с каналами категорий
+      changes:
+        - createTable:
+            tableName: channel
+            remarks: Каналы категорий
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: channel_id_pkey
+              - column:
+                  name: server_id
+                  type: uuid
+                  remarks: Идентификатор сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar
+                  remarks: Название канала
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar
+                  remarks: Тип канала
+                  defaultValue: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE # Такое удаление используется только в цепочке при удалении сервера!!!
+            onUpdate: RESTRICT
+            baseColumnNames: server_id
+            baseTableName: channel
+            constraintName: fk_server_channel
+            referencedColumnNames: id
+            referencedTableName: server
+  - changeSet:
+      id: 8
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: text_message
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с сообщениями текстовых каналов
+      changes:
+        - createTable:
+            tableName: text_message
+            remarks: Сообщения текстовых каналов
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: text_message_id_pkey
+              - column:
+                  name: author_id
+                  type: uuid
+                  remarks: Идентификатор автора сообщения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: channel_id
+                  type: uuid
+                  remarks: Идентификатор текстового канала
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: varchar
+                  remarks: Содержимое сообщения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_url
+                  type: varchar
+                  remarks: Ссылка на прикреплённый файл
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE # Такое удаление используется только в цепочке при удалении сервера!!!
+            onUpdate: RESTRICT
+            baseColumnNames: author_id
+            baseTableName: text_message
+            constraintName: fk_member_text_message
+            referencedColumnNames: id
+            referencedTableName: member
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: channel_id
+            baseTableName: text_message
+            constraintName: fk_channel_text_message
+            referencedColumnNames: id
+            referencedTableName: channel
+  - changeSet:
+      id: 9
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: invite
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с приглашениями на сервер
+      changes:
+        - createTable:
+            tableName: invite
+            remarks: Приглашения на сервера
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: invite_id_pkey
+              - column:
+                  name: author_id
+                  type: uuid
+                  remarks: Идентификатор автора приглашения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: server_id
+                  type: uuid
+                  remarks: Идентификатор сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar
+                  remarks: Название приглашения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: author_id
+            baseTableName: invite
+            constraintName: fk_member_invite
+            referencedColumnNames: id
+            referencedTableName: member
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: server_id
+            baseTableName: invite
+            constraintName: fk_server_invite
+            referencedColumnNames: id
+            referencedTableName: server
+  - changeSet:
+      id: 10
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: conservation
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с личными диалогами
+      changes:
+        - createTable:
+            tableName: conservation
+            remarks: Личные диалоги
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: conservation_id_pkey
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+  - changeSet:
+      id: 11
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: direct_message
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с сообщениями личных диалогов
+      changes:
+        - createTable:
+            tableName: direct_message
+            remarks: Сообщения личных диалогов
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: direct_message_id_pkey
+              - column:
+                  name: author_id
+                  type: uuid
+                  remarks: Идентификатор автора сообщения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: conservation_id
+                  type: uuid
+                  remarks: Идентификатор личного диалога
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: varchar
+                  remarks: Содержимое сообщения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_url
+                  type: varchar
+                  remarks: Ссылка на прикреплённый файл
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+  - changeSet:
+      id: 12
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: member_conservation
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с участниками личных диалогов
+      changes:
+        - createTable:
+            tableName: member_conservation
+            remarks: Участники личных диалогов
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: member_conservation_id_pkey
+              - column:
+                  name: conservation_id
+                  type: uuid
+                  remarks: Идентификатор личного диалога
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+                  remarks: Идентификатор пользователя
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
