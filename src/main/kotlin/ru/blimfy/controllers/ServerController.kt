@@ -16,6 +16,7 @@ import ru.blimfy.persistence.entity.toDto
 import ru.blimfy.persistence.entity.toEntity
 import ru.blimfy.security.TokenService
 import ru.blimfy.services.channel.ChannelService
+import ru.blimfy.services.invite.InviteService
 import ru.blimfy.services.member.MemberService
 import ru.blimfy.services.server.ServerService
 
@@ -36,6 +37,7 @@ class ServerController(
     private val serverService: ServerService,
     private val memberService: MemberService,
     private val channelService: ChannelService,
+    private val inviteService: InviteService,
     private val tokenService: TokenService,
 ) {
     @Operation(summary = "Создать/Обновить сервер")
@@ -66,5 +68,10 @@ class ServerController(
     @Operation(summary = "Получить все каналы сервера")
     @GetMapping("/{serverId}/channels")
     suspend fun findServerChannels(@PathVariable serverId: UUID) =
-        channelService.findChannels(serverId)
+        channelService.findServerChannels(serverId)
+
+    @Operation(summary = "Получить все приглашения сервера")
+    @GetMapping("/{serverId}/invites")
+    suspend fun findServerInvites(@PathVariable serverId: UUID) =
+        inviteService.findServerInvites(serverId)
 }

@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.blimfy.common.dto.ChannelDto
 import ru.blimfy.services.channel.ChannelService
+import ru.blimfy.services.message.TextMessageService
 
 /**
  * REST API контроллер для работы с информацией о каналах.
@@ -23,7 +24,7 @@ import ru.blimfy.services.channel.ChannelService
 @Tag(name = "ChannelController", description = "REST API для работы с каналами серверов")
 @RestController
 @RequestMapping("/v1/channels")
-class ChannelController(private val channelService: ChannelService) {
+class ChannelController(private val channelService: ChannelService, private val messageService: TextMessageService) {
     @Operation(summary = "Создать/Обновить канал сервера")
     @PostMapping
     suspend fun saveChannel(@RequestBody channelDto: ChannelDto) = channelService.saveChannel(channelDto)
@@ -35,4 +36,9 @@ class ChannelController(private val channelService: ChannelService) {
     @Operation(summary = "Удалить канал по его идентификатору")
     @DeleteMapping("/{channelId}")
     suspend fun deleteChannel(@PathVariable channelId: UUID) = channelService.deleteChannel(channelId)
+
+    @Operation(summary = "Получить все сообщения канала")
+    @GetMapping("/{channelId}/messages")
+    suspend fun findChannelMessages(@PathVariable channelId: UUID) =
+        messageService.findChannelMessages(channelId)
 }

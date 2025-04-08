@@ -33,7 +33,7 @@ class ConservationController(
     suspend fun createConservation(@RequestBody createConservationDto: CreateConservationDto) =
         conservationService.createConservation(createConservationDto.firstUserId, createConservationDto.secondUserId)
 
-    @Operation(summary = "Получить личный диалог")
+    @Operation(summary = "Получить сообщения личного диалога")
     @GetMapping("/{conservationId}/messages")
     suspend fun findConservationDirectMessages(@PathVariable conservationId: UUID) =
         directMessageService.findConservationDirectMessages(conservationId)

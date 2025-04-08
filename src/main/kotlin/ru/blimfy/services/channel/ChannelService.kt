@@ -24,7 +24,7 @@ interface ChannelService {
     /**
      * Возвращает каналы сервера с [serverId].
      */
-    fun findChannels(serverId: UUID): Flow<ChannelDto>
+    fun findServerChannels(serverId: UUID): Flow<ChannelDto>
 
     /**
      * Удаляет канал с таким [id].

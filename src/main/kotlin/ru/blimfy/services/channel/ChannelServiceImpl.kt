@@ -27,7 +27,7 @@ class ChannelServiceImpl(private val channelRepo: ChannelRepository) : ChannelSe
             ?.toDto()
             ?: throw NotFoundException(CHANNEL_BY_ID_NOT_FOUND.msg.format(id))
 
-    override fun findChannels(serverId: UUID) =
+    override fun findServerChannels(serverId: UUID) =
         channelRepo.findAllByServerId(serverId).map(Channel::toDto)
 
     override suspend fun deleteChannel(id: UUID) = channelRepo.deleteById(id)

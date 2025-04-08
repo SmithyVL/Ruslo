@@ -1,6 +1,7 @@
 package ru.blimfy.services.invite
 
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
 import ru.blimfy.persistence.entity.Invite
 
 /**
@@ -16,9 +17,9 @@ interface InviteService {
     suspend fun saveInvite(invite: Invite): Invite
 
     /**
-     * Возвращает существующее приглашение с [id].
+     * Возвращает приглашения на сервер с идентификатором [serverId].
      */
-    suspend fun findInvite(id: UUID): Invite
+    suspend fun findServerInvites(serverId: UUID): Flow<Invite>
 
     /**
      * Удаляет приглашение с таким [id].
