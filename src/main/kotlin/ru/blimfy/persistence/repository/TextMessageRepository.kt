@@ -2,6 +2,7 @@ package ru.blimfy.persistence.repository
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
+import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
 import ru.blimfy.persistence.entity.TextMessage
@@ -15,7 +16,8 @@ import ru.blimfy.persistence.entity.TextMessage
 @Repository
 interface TextMessageRepository : CoroutineCrudRepository<TextMessage, UUID> {
     /**
-     * Возвращает все сущности текстовых сообщений для текстового канала с идентификатором [channelId].
+     * Возвращает страницу сущностей текстовых сообщений для текстового канала с
+     * идентификатором [channelId] по конфигурации [pageable].
      */
-    fun findAllByChannelId(channelId: UUID): Flow<TextMessage>
+    fun findAllByChannelId(channelId: UUID, pageable: Pageable): Flow<TextMessage>
 }

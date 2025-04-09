@@ -2,6 +2,7 @@ package ru.blimfy.services.direct
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
+import org.springframework.data.domain.Pageable
 import ru.blimfy.persistence.entity.DirectMessage
 
 /**
@@ -17,9 +18,9 @@ interface DirectMessageService {
     suspend fun saveDirectMessage(directMessage: DirectMessage): DirectMessage
 
     /**
-     * Возвращает сообщения личного диалога с идентификатором [conservationId].
+     * Возвращает страницу с сообщениями личного диалога с идентификатором [conservationId] по конфигурации [pageable].
      */
-    suspend fun findConservationDirectMessages(conservationId: UUID): Flow<DirectMessage>
+    suspend fun findConservationDirectMessages(conservationId: UUID, pageable: Pageable): Flow<DirectMessage>
 
     /**
      * Удаляет личное сообщение с таким [id].
