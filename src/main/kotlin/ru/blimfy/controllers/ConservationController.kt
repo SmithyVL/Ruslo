@@ -3,6 +3,7 @@ package ru.blimfy.controllers
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import java.util.UUID
+import kotlinx.coroutines.flow.map
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.blimfy.common.dto.CreateConservationDto
+import ru.blimfy.persistence.entity.toDto
 import ru.blimfy.services.conservation.ConservationService
 import ru.blimfy.services.direct.DirectMessageService
 
@@ -32,9 +34,10 @@ class ConservationController(
     @PostMapping
     suspend fun createConservation(@RequestBody createConservationDto: CreateConservationDto) =
         conservationService.createConservation(createConservationDto.firstUserId, createConservationDto.secondUserId)
+            .toDto()
 
     @Operation(summary = "Получить сообщения личного диалога")
     @GetMapping("/{conservationId}/messages")
     suspend fun findConservationDirectMessages(@PathVariable conservationId: UUID) =
-        directMessageService.findConservationDirectMessages(conservationId)
+        directMessageService.findConservationDirectMessages(conservationId).map { it.toDto() }
 }

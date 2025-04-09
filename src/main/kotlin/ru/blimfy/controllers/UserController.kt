@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.blimfy.common.dto.ConservationDto
+import ru.blimfy.common.dto.ConservationTitleDto
 import ru.blimfy.persistence.entity.toDto
 import ru.blimfy.persistence.repository.MemberConservationRepository
 import ru.blimfy.security.TokenService
@@ -55,7 +55,7 @@ class UserController(
         memberConservationRepo.findAllByUserId(tokenService.extractUserId(principal))
             .map {
                 val user = userService.findUser(it.userId)
-                ConservationDto(it.conservationId, user.username, user.avatarUrl)
+                ConservationTitleDto(it.conservationId, user.username, user.avatarUrl)
             }
 
     @Operation(summary = "Покинуть сервер пользователем")

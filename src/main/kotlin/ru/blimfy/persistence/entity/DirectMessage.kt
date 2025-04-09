@@ -29,7 +29,9 @@ data class DirectMessage(val authorId: UUID, val conservationId: UUID, val conte
 /**
  * Возвращает DTO представления сущности приглашения на сервер.
  */
-fun DirectMessage.toDto() = DirectMessageDto(id, authorId, conservationId, content, fileUrl, createdDate, updatedDate)
+fun DirectMessage.toDto() = DirectMessageDto(
+    id, authorId, conservationId, content, fileUrl, createdDate, updatedDate,
+)
 
 /**
  * Возвращает сущность приглашения на сервер из DTO.

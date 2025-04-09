@@ -1,4 +1,4 @@
-package ru.blimfy.controllers.dto
+package ru.blimfy.common.dto
 
 /**
  * DTO для регистрации нового пользователя.

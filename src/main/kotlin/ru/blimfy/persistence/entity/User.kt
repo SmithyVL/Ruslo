@@ -3,8 +3,8 @@ package ru.blimfy.persistence.entity
 import java.time.Instant
 import java.util.UUID
 import org.springframework.data.relational.core.mapping.Table
+import ru.blimfy.common.dto.SignUpDto
 import ru.blimfy.common.dto.UserDto
-import ru.blimfy.controllers.dto.SignUpDto
 import ru.blimfy.persistence.entity.base.WithBaseData
 
 /**

@@ -3,6 +3,7 @@ package ru.blimfy.persistence.entity
 import java.time.Instant
 import java.util.UUID
 import org.springframework.data.relational.core.mapping.Table
+import ru.blimfy.common.dto.ConservationDto
 import ru.blimfy.persistence.entity.base.WithBaseData
 
 /**
@@ -18,3 +19,8 @@ class Conservation : WithBaseData {
     override var updatedDate: Instant? = null
     override fun isNew() = !::id.isInitialized
 }
+
+/**
+ * Возвращает DTO представления сущности личного диалога.
+ */
+fun Conservation.toDto() = ConservationDto(id, createdDate, updatedDate)

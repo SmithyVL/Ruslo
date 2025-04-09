@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.blimfy.common.dto.PasswordDto
-import ru.blimfy.controllers.dto.SignInDto
-import ru.blimfy.controllers.dto.SignUpDto
-import ru.blimfy.controllers.dto.TokenDto
+import ru.blimfy.common.dto.SignInDto
+import ru.blimfy.common.dto.SignUpDto
+import ru.blimfy.common.dto.TokenDto
 import ru.blimfy.exception.Errors.INCORRECT_PASSWORD
 import ru.blimfy.exception.IncorrectPasswordException
 import ru.blimfy.persistence.entity.toDto
