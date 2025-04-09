@@ -14,6 +14,7 @@ import ru.blimfy.persistence.repository.ChannelRepository
 import ru.blimfy.persistence.repository.MemberRepository
 import ru.blimfy.persistence.repository.MemberRoleRepository
 import ru.blimfy.persistence.repository.RoleRepository
+import ru.blimfy.persistence.repository.ServerRepository
 import ru.blimfy.services.role.RoleServiceImpl.Companion.ROLE_FOR_ALL_NAME
 
 /**
@@ -25,7 +26,7 @@ import ru.blimfy.services.role.RoleServiceImpl.Companion.ROLE_FOR_ALL_NAME
  */
 @Service
 class ServerServiceImpl(
-    private val serverRepo: ru.blimfy.persistence.repository.ServerRepository,
+    private val serverRepo: ServerRepository,
     private val channelRepo: ChannelRepository,
     private val memberRepo: MemberRepository,
     private val roleRepo: RoleRepository,

@@ -2,7 +2,7 @@ package ru.blimfy.services.channel
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
-import ru.blimfy.common.dto.ChannelDto
+import ru.blimfy.persistence.entity.Channel
 
 /**
  * Интерфейс для работы с каналами серверов.
@@ -14,17 +14,17 @@ interface ChannelService {
     /**
      * Возвращает новый или обновлённый [channel].
      */
-    suspend fun saveChannel(channel: ChannelDto): ChannelDto
+    suspend fun saveChannel(channel: Channel): Channel
 
     /**
      * Возвращает существующий канал с [id].
      */
-    suspend fun findChannel(id: UUID): ChannelDto
+    suspend fun findChannel(id: UUID): Channel
 
     /**
      * Возвращает каналы сервера с [serverId].
      */
-    fun findServerChannels(serverId: UUID): Flow<ChannelDto>
+    fun findServerChannels(serverId: UUID): Flow<Channel>
 
     /**
      * Удаляет канал с таким [id].

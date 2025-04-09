@@ -64,12 +64,12 @@ class ServerController(
     @Operation(summary = "Получить всех участников сервера")
     @GetMapping("/{serverId}/members")
     suspend fun findServerMembers(@PathVariable serverId: UUID) =
-        memberService.findServerMembers(serverId)
+        memberService.findServerMembers(serverId).map { it.toDto() }
 
     @Operation(summary = "Получить все каналы сервера")
     @GetMapping("/{serverId}/channels")
     suspend fun findServerChannels(@PathVariable serverId: UUID) =
-        channelService.findServerChannels(serverId)
+        channelService.findServerChannels(serverId).map { it.toDto() }
 
     @Operation(summary = "Получить все приглашения сервера")
     @GetMapping("/{serverId}/invites")

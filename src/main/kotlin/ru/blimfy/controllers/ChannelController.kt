@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.blimfy.common.dto.ChannelDto
 import ru.blimfy.persistence.entity.toDto
+import ru.blimfy.persistence.entity.toEntity
 import ru.blimfy.services.channel.ChannelService
 import ru.blimfy.services.message.TextMessageService
 
@@ -29,11 +30,12 @@ import ru.blimfy.services.message.TextMessageService
 class ChannelController(private val channelService: ChannelService, private val messageService: TextMessageService) {
     @Operation(summary = "Создать/Обновить канал сервера")
     @PostMapping
-    suspend fun saveChannel(@RequestBody channelDto: ChannelDto) = channelService.saveChannel(channelDto)
+    suspend fun saveChannel(@RequestBody channelDto: ChannelDto) =
+        channelService.saveChannel(channelDto.toEntity()).toDto()
 
     @Operation(summary = "Получить канал по его идентификатору")
     @GetMapping("/{channelId}")
-    suspend fun findChannel(@PathVariable channelId: UUID) = channelService.findChannel(channelId)
+    suspend fun findChannel(@PathVariable channelId: UUID) = channelService.findChannel(channelId).toDto()
 
     @Operation(summary = "Удалить канал по его идентификатору")
     @DeleteMapping("/{channelId}")

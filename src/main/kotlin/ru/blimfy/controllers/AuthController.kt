@@ -11,12 +11,12 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.blimfy.common.dto.PasswordDto
 import ru.blimfy.common.dto.SignInDto
 import ru.blimfy.common.dto.SignUpDto
 import ru.blimfy.common.dto.TokenDto
 import ru.blimfy.exception.Errors.INCORRECT_PASSWORD
 import ru.blimfy.exception.IncorrectPasswordException
+import ru.blimfy.persistence.entity.Password
 import ru.blimfy.persistence.entity.toDto
 import ru.blimfy.persistence.entity.toUserEntity
 import ru.blimfy.security.TokenService
@@ -49,8 +49,7 @@ class AuthController(
     suspend fun registerUser(@RequestBody signUpDto: SignUpDto) =
         userService.saveUser(signUpDto.toUserEntity()).let { user ->
             val userId = user.id
-            val password = PasswordDto(userId, encoder.encode(signUpDto.password))
-            passwordService.savePassword(password)
+            passwordService.savePassword(Password(userId, encoder.encode(signUpDto.password)))
             TokenDto(tokenService.generateToken(user.username, userId))
         }
 
@@ -59,16 +58,13 @@ class AuthController(
     @PostMapping("/sign-in")
     suspend fun login(@RequestBody signInDto: SignInDto) =
         userService.findUser(signInDto.username).let { user ->
-            passwordService.findUserPassword(user.id).let { password ->
-                val username = user.username
-                if (!encoder.matches(signInDto.password, password.hash)) {
-                    throw IncorrectPasswordException(
-                        INCORRECT_PASSWORD.msg.format(signInDto.password, username)
-                    )
-                }
-
-                TokenDto(tokenService.generateToken(username, user.id))
+            val password = passwordService.findUserPassword(user.id)
+            val username = user.username
+            if (!encoder.matches(signInDto.password, password.hash)) {
+                throw IncorrectPasswordException(INCORRECT_PASSWORD.msg.format(signInDto.password, username))
             }
+
+            TokenDto(tokenService.generateToken(username, user.id))
         }
 
     @Operation(summary = "Получить информацию о пользователе из JWT")

@@ -14,7 +14,8 @@ import ru.blimfy.persistence.repository.DirectMessageRepository
  */
 @Service
 class DirectMessageServiceImpl(private val directMessageRepo: DirectMessageRepository) : DirectMessageService {
-    override suspend fun saveDirectMessage(directMessage: DirectMessage) = directMessageRepo.save(directMessage)
+    override suspend fun saveDirectMessage(directMessage: DirectMessage) =
+        directMessageRepo.save(directMessage)
 
     override suspend fun findConservationDirectMessages(conservationId: UUID) =
         directMessageRepo.findAllByConservationId(conservationId)

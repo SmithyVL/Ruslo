@@ -39,11 +39,6 @@ enum class Errors(val msg: String) {
     CHANNEL_BY_ID_NOT_FOUND("Channel with id - ['%s'], not found!"),
 
     /**
-     * Приглашение на сервер не найдено по идентификатору.
-     */
-    INVITE_BY_ID_NOT_FOUND("Invite with id - ['%s'], not found!"),
-
-    /**
      * Участник сервера не найден по идентификатору пользователя и сервера.
      */
     MEMBER_BY_USER_ID_AND_SERVER_ID_NOT_FOUND("Member with user id - ['%s'], and server id - ['%s'], not found!"),

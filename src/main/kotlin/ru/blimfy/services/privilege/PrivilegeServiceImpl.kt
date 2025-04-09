@@ -12,15 +12,15 @@ import ru.blimfy.common.enums.PrivilegeTypes.entries as privileges
 /**
  * Реализация интерфейса для работы с привилегиями ролей.
  *
- * @property repository репозиторий для работы с привилегиями в БД.
+ * @property privilegeRepo репозиторий для работы с привилегиями в БД.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Service
-class PrivilegeServiceImpl(private val repository: PrivilegeRepository) : PrivilegeService {
+class PrivilegeServiceImpl(private val privilegeRepo: PrivilegeRepository) : PrivilegeService {
     override suspend fun initDefaultPrivileges(roleId: UUID) {
         privileges.asFlow()
-            .onEach { repository.save(Privilege(roleId, it, it.defaultGranted)) }
+            .onEach { privilegeRepo.save(Privilege(roleId, it, it.defaultGranted)) }
             .collect()
     }
 }
