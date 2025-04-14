@@ -17,9 +17,14 @@ interface InviteService {
     suspend fun saveInvite(invite: Invite): Invite
 
     /**
+     * Возвращает приглашение с идентификатором [inviteId] на сервер.
+     */
+    suspend fun findInvite(inviteId: UUID): Invite
+
+    /**
      * Возвращает приглашения на сервер с идентификатором [serverId].
      */
-    suspend fun findServerInvites(serverId: UUID): Flow<Invite>
+    fun findServerInvites(serverId: UUID): Flow<Invite>
 
     /**
      * Удаляет приглашение с таким [id].

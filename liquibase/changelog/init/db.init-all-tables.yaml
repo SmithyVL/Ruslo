@@ -257,6 +257,13 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: default
+                  type: boolean
+                  remarks: Флаг того, что роль является дефолтной
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_date
                   type: timestamptz
                   remarks: Дата создания

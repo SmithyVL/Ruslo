@@ -12,4 +12,9 @@ import ru.blimfy.persistence.entity.Role
  * @since 0.0.1.
  */
 @Repository
-interface RoleRepository : CoroutineCrudRepository<Role, UUID>
+interface RoleRepository : CoroutineCrudRepository<Role, UUID> {
+    /**
+     * Возвращает сущность дефолтной роли для сервера с идентификатором [serverId]
+     */
+    suspend fun findAllByServerIdAndDefaultIsTrue(serverId: UUID): Role
+}

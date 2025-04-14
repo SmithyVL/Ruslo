@@ -47,4 +47,9 @@ enum class Errors(val msg: String) {
      * Пароль не найден по идентификатору пользователя.
      */
     PASSWORD_BY_USER_ID_NOT_FOUND("Password with user id - ['%s'], not found!"),
+
+    /**
+     * Приглашение на сервер не найдено по идентификатору.
+     */
+    INVITE_BY_ID_NOT_FOUND("Invite with id - ['%s'], not found!"),
 }

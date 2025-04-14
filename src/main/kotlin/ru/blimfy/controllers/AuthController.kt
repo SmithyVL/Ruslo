@@ -42,10 +42,10 @@ class AuthController(
     private val tokenService: TokenService,
     private val encoder: PasswordEncoder,
 ) {
-    @Transactional
     @SecurityRequirements
     @Operation(summary = "Зарегистрировать нового пользователя")
     @PostMapping("/sign-up")
+    @Transactional
     suspend fun registerUser(@RequestBody signUpDto: SignUpDto) =
         userService.saveUser(signUpDto.toUserEntity()).let { user ->
             val userId = user.id

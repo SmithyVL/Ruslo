@@ -5,7 +5,6 @@ import java.util.UUID
 import org.springframework.data.relational.core.mapping.Table
 import ru.blimfy.common.dto.ChannelDto
 import ru.blimfy.common.enums.ChannelTypes
-import ru.blimfy.common.enums.ChannelTypes.TEXT
 import ru.blimfy.persistence.entity.base.WithBaseData
 
 /**
@@ -18,7 +17,7 @@ import ru.blimfy.persistence.entity.base.WithBaseData
  * @since 0.0.1.
  */
 @Table
-data class Channel(val serverId: UUID, val name: String, val type: ChannelTypes = TEXT) : WithBaseData {
+data class Channel(val serverId: UUID, val name: String, val type: ChannelTypes) : WithBaseData {
     override lateinit var id: UUID
     override lateinit var createdDate: Instant
     override var updatedDate: Instant? = null

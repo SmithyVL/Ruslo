@@ -23,13 +23,17 @@ import ru.blimfy.services.message.TextMessageService
  * REST API контроллер для работы с информацией о каналах.
  *
  * @property channelService сервис для работы с каналами.
+ * @property textMessageService сервис для работы с сообщениями каналов.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Tag(name = "ChannelController", description = "REST API для работы с каналами серверов")
 @RestController
 @RequestMapping("/v1/channels")
-class ChannelController(private val channelService: ChannelService, private val messageService: TextMessageService) {
+class ChannelController(
+    private val channelService: ChannelService,
+    private val textMessageService: TextMessageService,
+) {
     @Operation(summary = "Создать/Обновить канал сервера")
     @PostMapping
     suspend fun saveChannel(@RequestBody channelDto: ChannelDto) =
@@ -50,5 +54,5 @@ class ChannelController(private val channelService: ChannelService, private val 
         @RequestParam pageNumber: Int,
         @RequestParam pageSize: Int,
     ) =
-        messageService.findPageChannelMessages(channelId, of(pageNumber, pageSize)).map { it.toDto() }
+        textMessageService.findPageChannelMessages(channelId, of(pageNumber, pageSize)).map { it.toDto() }
 }

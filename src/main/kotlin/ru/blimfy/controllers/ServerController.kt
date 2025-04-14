@@ -25,8 +25,9 @@ import ru.blimfy.services.server.ServerService
  * REST API контроллер для работы с серверами.
  *
  * @property serverService сервис для работы с серверами.
- * @property memberService сервис для работы с участниками серверов.
  * @property channelService сервис для работы с каналами серверов.
+ * @property memberService сервис для работы с участниками серверов.
+ * @property inviteService сервис для работы с приглашениями серверов.
  * @property tokenService сервис для работы с токенами.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
@@ -36,8 +37,8 @@ import ru.blimfy.services.server.ServerService
 @RequestMapping("/v1/servers")
 class ServerController(
     private val serverService: ServerService,
-    private val memberService: MemberService,
     private val channelService: ChannelService,
+    private val memberService: MemberService,
     private val inviteService: InviteService,
     private val tokenService: TokenService,
 ) {

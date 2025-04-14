@@ -15,7 +15,17 @@ import ru.blimfy.persistence.entity.MemberRole
 @Repository
 interface MemberRoleRepository : CoroutineCrudRepository<MemberRole, UUID> {
     /**
-     * Возвращает все сущности ролей для участника с идентификатором [memberId].
+     * Возвращает все сущности ролей участников для участника с идентификатором [memberId].
      */
     fun findAllByMemberId(memberId: UUID): Flow<MemberRole>
+
+    /**
+     * Возвращает все сущности ролей участников для роли с идентификатором [roleId].
+     */
+    fun findAllByRoleId(roleId: UUID): Flow<MemberRole>
+
+    /**
+     * Удаляет сущность роли с идентификатором [roleId] у участника с идентификатором [memberId].
+     */
+    suspend fun deleteByMemberIdAndRoleId(memberId: UUID, roleId: UUID)
 }

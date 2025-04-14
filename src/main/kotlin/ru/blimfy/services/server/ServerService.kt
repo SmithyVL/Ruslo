@@ -1,6 +1,7 @@
 package ru.blimfy.services.server
 
 import java.util.UUID
+import ru.blimfy.persistence.entity.Role
 import ru.blimfy.persistence.entity.Server
 
 /**
@@ -20,6 +21,11 @@ interface ServerService {
      * Возвращает сервер с таким [id].
      */
     suspend fun findServer(id: UUID): Server
+
+    /**
+     * Возвращает стандартную роль сервера с идентификатором [serverId].
+     */
+    suspend fun findServerDefaultRole(serverId: UUID): Role
 
     /**
      * Удалить сервер с таким [id] его владельцем с идентификатором [ownerId].
