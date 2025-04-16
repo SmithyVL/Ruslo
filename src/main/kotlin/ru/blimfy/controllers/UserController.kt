@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController
 import ru.blimfy.common.dto.ConservationTitleDto
 import ru.blimfy.persistence.entity.toDto
 import ru.blimfy.persistence.repository.MemberConservationRepository
-import ru.blimfy.security.TokenService
+import ru.blimfy.security.service.TokenService
 import ru.blimfy.services.conservation.ConservationService
 import ru.blimfy.services.member.MemberService
 import ru.blimfy.services.server.ServerService

@@ -1,4 +1,4 @@
-package ru.blimfy.security
+package ru.blimfy.security.service
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Jwts.parser
@@ -8,8 +8,10 @@ import java.security.Principal
 import java.util.Date
 import java.util.UUID
 import java.util.UUID.fromString
+import org.springframework.http.HttpHeaders
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
+import ru.blimfy.security.config.JwtProperties
 
 /**
  * Сервис для работы с токенами авторизации (создание, валидация, извлечение данных).
@@ -80,5 +82,11 @@ class TokenService(private val jwtProperties: JwtProperties) {
          * Название одной из "начинок" токена. Об идентификаторе пользователя.
          */
         private const val CLAIM_USER_ID = "userId"
+
+        /**
+         * Возвращает JWT токен из [headers].
+         */
+        fun extractToken(headers: HttpHeaders) = headers.getFirst("Authorization")
+            ?.substringAfter(HEADER_AUTH_TOKEN_PREFIX)
     }
 }

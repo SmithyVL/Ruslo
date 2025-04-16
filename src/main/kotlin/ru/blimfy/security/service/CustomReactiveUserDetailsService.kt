@@ -1,4 +1,4 @@
-package ru.blimfy.security
+package ru.blimfy.security.service
 
 import kotlinx.coroutines.reactor.mono
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService

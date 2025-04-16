@@ -1,4 +1,4 @@
-package ru.blimfy.security
+package ru.blimfy.security.config
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 

@@ -1,4 +1,4 @@
-package ru.blimfy.security
+package ru.blimfy.security.jwt
 
 import kotlinx.coroutines.reactor.awaitSingleOrNull
 import kotlinx.coroutines.reactor.mono
@@ -6,6 +6,8 @@ import org.springframework.security.authentication.ReactiveAuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken.authenticated
 import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Component
+import ru.blimfy.security.service.CustomReactiveUserDetailsService
+import ru.blimfy.security.service.TokenService
 
 /**
  * Менеджер аутентификации для проверки разрешений на выполнение дальнейших запросов.

@@ -1,14 +1,13 @@
-package ru.blimfy.security
+package ru.blimfy.security.jwt
 
 import kotlinx.coroutines.reactor.mono
-import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken.unauthenticated
 import org.springframework.security.core.Authentication
 import org.springframework.security.web.server.authentication.ServerAuthenticationConverter
 import org.springframework.stereotype.Component
 import org.springframework.web.server.ServerWebExchange
 import reactor.core.publisher.Mono
-import ru.blimfy.security.TokenService.Companion.HEADER_AUTH_TOKEN_PREFIX
+import ru.blimfy.security.service.TokenService.Companion.extractToken
 
 /**
  * Конвертер запроса в объект аутентификации.
@@ -19,10 +18,5 @@ import ru.blimfy.security.TokenService.Companion.HEADER_AUTH_TOKEN_PREFIX
 @Component
 class JwtServerAuthenticationConverter : ServerAuthenticationConverter {
     override fun convert(exchange: ServerWebExchange): Mono<Authentication> =
-        mono {
-            val authToken = exchange.request.headers
-                .getFirst(AUTHORIZATION)
-                ?.substringAfter(HEADER_AUTH_TOKEN_PREFIX)
-            unauthenticated(null, authToken)
-        }
+        mono { unauthenticated(null, extractToken(exchange.request.headers)) }
 }

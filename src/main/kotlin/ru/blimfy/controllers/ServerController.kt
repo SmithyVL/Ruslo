@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController
 import ru.blimfy.common.dto.ServerDto
 import ru.blimfy.persistence.entity.toDto
 import ru.blimfy.persistence.entity.toEntity
-import ru.blimfy.security.TokenService
+import ru.blimfy.security.service.TokenService
 import ru.blimfy.services.channel.ChannelService
 import ru.blimfy.services.invite.InviteService
 import ru.blimfy.services.member.MemberService

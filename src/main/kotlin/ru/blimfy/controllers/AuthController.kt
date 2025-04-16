@@ -19,7 +19,7 @@ import ru.blimfy.exception.IncorrectPasswordException
 import ru.blimfy.persistence.entity.Password
 import ru.blimfy.persistence.entity.toDto
 import ru.blimfy.persistence.entity.toUserEntity
-import ru.blimfy.security.TokenService
+import ru.blimfy.security.service.TokenService
 import ru.blimfy.services.password.PasswordService
 import ru.blimfy.services.user.UserService
 

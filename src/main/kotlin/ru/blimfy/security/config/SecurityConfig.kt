@@ -1,4 +1,4 @@
-package ru.blimfy.security
+package ru.blimfy.security.config
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -9,6 +9,8 @@ import org.springframework.security.config.web.server.invoke
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.security.web.server.authentication.AuthenticationWebFilter
 import org.springframework.security.web.server.util.matcher.ServerWebExchangeMatchers.pathMatchers
+import ru.blimfy.security.jwt.JwtReactiveAuthenticationManager
+import ru.blimfy.security.jwt.JwtServerAuthenticationConverter
 
 /**
  * Конфигурация безопасности для бинов, отвечающих за безопасность.

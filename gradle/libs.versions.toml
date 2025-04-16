@@ -1,6 +1,6 @@
 [versions]
-springBoot = "3.4.3"
-kotlin = "2.1.10"
+springBoot = "3.4.4"
+kotlin = "2.1.20"
 dependencyManagement = "1.1.7"
 jwt = "0.12.6"
 # TODO: обновить как только выйдет следующая версия и проверить, что пропадет "WARN": "Appended trailing slash to static

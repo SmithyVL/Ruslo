@@ -15,6 +15,5 @@ enum class ChannelTypes {
     /**
      * Голосовой канал.
      */
-    @Suppress("unused")
     VOICE,
 }

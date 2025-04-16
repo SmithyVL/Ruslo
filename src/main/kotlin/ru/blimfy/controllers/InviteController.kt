@@ -16,7 +16,7 @@ import ru.blimfy.persistence.entity.Member
 import ru.blimfy.persistence.entity.MemberRole
 import ru.blimfy.persistence.entity.toDto
 import ru.blimfy.persistence.entity.toEntity
-import ru.blimfy.security.TokenService
+import ru.blimfy.security.service.TokenService
 import ru.blimfy.services.invite.InviteService
 import ru.blimfy.services.member.MemberService
 import ru.blimfy.services.member.role.MemberRoleService
