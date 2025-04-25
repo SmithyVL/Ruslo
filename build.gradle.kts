@@ -22,10 +22,12 @@ dependencies {
     runtimeOnly(libs.kotlinReflect)
     runtimeOnly(libs.databasePostgresR2dbc)
     runtimeOnly(libs.jwtJackson)
+    runtimeOnly(libs.jacksonJsr310)
 
     implementation(libs.springBootStarterWebflux)
     implementation(libs.springBootStarterDataR2dbc)
     implementation(libs.springBootStarterSecurity)
+    implementation(libs.springBootStarterIntegration)
     implementation(libs.springDocWebflux)
     implementation(libs.kotlinxCoroutinesReactor)
     implementation(libs.jwtImpl)
@@ -35,7 +37,6 @@ dependencies {
     // В более старших версиях Mockito требуется явно указывать "javaagent" для выполнения тестов, в том числе и в
     // зависимостях.
     testImplementation(libs.mockito)
-    @Suppress("UnstableApiUsage")
     mockitoAgent(libs.mockito) { isTransitive = false }
 }
 

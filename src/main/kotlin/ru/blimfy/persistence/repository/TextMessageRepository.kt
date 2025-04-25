@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
-import ru.blimfy.persistence.entity.TextMessage
+import ru.blimfy.persistence.entity.message.TextMessage
 
 /**
  * Репозиторий для работы с сущностью текстового сообщения текстового канала в базе данных.
@@ -20,4 +20,9 @@ interface TextMessageRepository : CoroutineCrudRepository<TextMessage, UUID> {
      * идентификатором [channelId] по конфигурации [pageable].
      */
     fun findAllByChannelId(channelId: UUID, pageable: Pageable): Flow<TextMessage>
+
+    /**
+     * Удаляет сущность текстового сообщения с [id] канала сервера от пользователя с [authorId].
+     */
+    suspend fun deleteByIdAndAuthorId(id: UUID, authorId: UUID)
 }

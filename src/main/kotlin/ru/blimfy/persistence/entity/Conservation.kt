@@ -1,26 +1,19 @@
 package ru.blimfy.persistence.entity
 
-import java.time.Instant
-import java.util.UUID
 import org.springframework.data.relational.core.mapping.Table
-import ru.blimfy.common.dto.ConservationDto
-import ru.blimfy.persistence.entity.base.WithBaseData
+import ru.blimfy.common.dto.direct.conservation.ConservationDto
+import ru.blimfy.persistence.entity.base.BaseEntity
 
 /**
- * Модель с информацией о личном диалоге.
+ * Сущность с информацией о личном диалоге.
  *
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Table
-class Conservation : WithBaseData {
-    override lateinit var id: UUID
-    override lateinit var createdDate: Instant
-    override var updatedDate: Instant? = null
-    override fun isNew() = !::id.isInitialized
-}
+class Conservation : BaseEntity()
 
 /**
  * Возвращает DTO представления сущности личного диалога.
  */
-fun Conservation.toDto() = ConservationDto(id, createdDate, updatedDate)
+fun Conservation.toDto() = ConservationDto(id)

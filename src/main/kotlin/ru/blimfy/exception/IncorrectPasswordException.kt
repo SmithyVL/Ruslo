@@ -8,7 +8,4 @@ package ru.blimfy.exception
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-class IncorrectPasswordException(
-    override val message: String? = null,
-    override val cause: Throwable? = null,
-) : RuntimeException(message, cause)
+class IncorrectPasswordException(message: String? = null, cause: Throwable? = null) : RuntimeException(message, cause)

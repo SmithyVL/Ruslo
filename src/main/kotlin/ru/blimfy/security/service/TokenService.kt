@@ -2,7 +2,6 @@ package ru.blimfy.security.service
 
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Jwts.parser
-import io.jsonwebtoken.lang.Assert.notNull
 import io.jsonwebtoken.security.Keys.hmacShaKeyFor
 import java.security.Principal
 import java.util.Date
@@ -53,14 +52,23 @@ class TokenService(private val jwtProperties: JwtProperties) {
      * Возвращает идентификатор пользователя из информации об авторизации [principal], в которой хранится токен
      * авторизации.
      */
-    fun extractUserId(principal: Principal?): UUID {
-        notNull(principal, "Principal cannot be null")
-        return (principal as UsernamePasswordAuthenticationToken)
+    fun extractUserId(principal: Principal): UUID =
+        (principal as UsernamePasswordAuthenticationToken)
             .credentials
             .toString()
             .let { extractAllClaims(it).get(CLAIM_USER_ID, String::class.java) }
             .let { fromString(it) }
-    }
+
+    /**
+     * Возвращает идентификатор пользователя из HTTP [headers], в которой хранится токен авторизации.
+     */
+    fun extractUserId(headers: HttpHeaders?) =
+        extractToken(headers)
+            ?.let { token ->
+                token
+                    .let { extractAllClaims(it).get(CLAIM_USER_ID, String::class.java) }
+                    .let { fromString(it) }
+            }!!
 
     /**
      * Возвращает содержимое из [token] в удобном виде.
@@ -74,19 +82,15 @@ class TokenService(private val jwtProperties: JwtProperties) {
 
     companion object {
         /**
-         * Префикс заголовка, хранящего в себе токен.
-         */
-        const val HEADER_AUTH_TOKEN_PREFIX = "Bearer "
-
-        /**
          * Название одной из "начинок" токена. Об идентификаторе пользователя.
          */
         private const val CLAIM_USER_ID = "userId"
 
         /**
-         * Возвращает JWT токен из [headers].
+         * Возвращает JWT токен из [headers] или null, если его нет.
          */
-        fun extractToken(headers: HttpHeaders) = headers.getFirst("Authorization")
-            ?.substringAfter(HEADER_AUTH_TOKEN_PREFIX)
+        fun extractToken(headers: HttpHeaders?) = headers
+            ?.getFirst("Authorization")
+            ?.substringAfter("Bearer ")
     }
 }

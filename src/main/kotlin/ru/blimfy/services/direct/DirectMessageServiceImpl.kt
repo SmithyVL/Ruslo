@@ -3,7 +3,9 @@ package ru.blimfy.services.direct
 import java.util.UUID
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import ru.blimfy.persistence.entity.DirectMessage
+import ru.blimfy.exception.Errors.DIRECT_MESSAGE_BY_ID_NOT_FOUND
+import ru.blimfy.exception.NotFoundException
+import ru.blimfy.persistence.entity.message.DirectMessage
 import ru.blimfy.persistence.repository.DirectMessageRepository
 
 /**
@@ -18,8 +20,12 @@ class DirectMessageServiceImpl(private val directMessageRepo: DirectMessageRepos
     override suspend fun saveDirectMessage(directMessage: DirectMessage) =
         directMessageRepo.save(directMessage)
 
+    override suspend fun findDirectMessage(id: UUID) = directMessageRepo.findById(id)
+        ?: throw NotFoundException(DIRECT_MESSAGE_BY_ID_NOT_FOUND.msg.format(id))
+
     override suspend fun findConservationDirectMessages(conservationId: UUID, pageable: Pageable) =
         directMessageRepo.findAllByConservationId(conservationId, pageable)
 
-    override suspend fun deleteDirectMessage(id: UUID) = directMessageRepo.deleteById(id)
+    override suspend fun deleteDirectMessage(id: UUID, authorId: UUID) =
+        directMessageRepo.deleteByIdAndAuthorId(id, authorId)
 }

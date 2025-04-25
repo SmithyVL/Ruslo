@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.Flow
 import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.kotlin.CoroutineCrudRepository
 import org.springframework.stereotype.Repository
-import ru.blimfy.persistence.entity.DirectMessage
+import ru.blimfy.persistence.entity.message.DirectMessage
 
 /**
  * Репозиторий для работы с сущностью сообщения личного диалога в базе данных.
@@ -20,4 +20,9 @@ interface DirectMessageRepository : CoroutineCrudRepository<DirectMessage, UUID>
      * конфигурации [pageable].
      */
     fun findAllByConservationId(conservationId: UUID, pageable: Pageable): Flow<DirectMessage>
+
+    /**
+     * Удаляет сущность личного сообщения с [id] от пользователя с [authorId].
+     */
+    suspend fun deleteByIdAndAuthorId(id: UUID, authorId: UUID)
 }

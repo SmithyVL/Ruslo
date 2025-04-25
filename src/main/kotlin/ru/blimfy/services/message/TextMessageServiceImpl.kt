@@ -3,7 +3,9 @@ package ru.blimfy.services.message
 import java.util.UUID
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
-import ru.blimfy.persistence.entity.TextMessage
+import ru.blimfy.exception.Errors.TEXT_MESSAGE_BY_ID_NOT_FOUND
+import ru.blimfy.exception.NotFoundException
+import ru.blimfy.persistence.entity.message.TextMessage
 import ru.blimfy.persistence.repository.TextMessageRepository
 
 /**
@@ -17,8 +19,11 @@ import ru.blimfy.persistence.repository.TextMessageRepository
 class TextMessageServiceImpl(private val messageRepo: TextMessageRepository) : TextMessageService {
     override suspend fun saveMessage(message: TextMessage) = messageRepo.save(message)
 
+    override suspend fun findMessage(id: UUID) = messageRepo.findById(id)
+        ?: throw NotFoundException(TEXT_MESSAGE_BY_ID_NOT_FOUND.msg.format(id))
+
     override suspend fun findPageChannelMessages(channelId: UUID, pageable: Pageable) =
         messageRepo.findAllByChannelId(channelId, pageable)
 
-    override suspend fun deleteMessage(id: UUID) = messageRepo.deleteById(id)
+    override suspend fun deleteMessage(id: UUID, authorId: UUID) = messageRepo.deleteByIdAndAuthorId(id, authorId)
 }

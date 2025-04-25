@@ -36,6 +36,11 @@ interface MemberRepository : CoroutineCrudRepository<Member, UUID> {
     suspend fun deleteByIdAndServerId(id: UUID, serverId: UUID)
 
     /**
+     * Удаляет сущность участника пользователя с идентификатором [userId] с сервера с идентификатором [serverId].
+     */
+    suspend fun deleteByUserIdAndServerId(userId: UUID, serverId: UUID)
+
+    /**
      * Удаляет все сущности участников для сервера с идентификатором [serverId].
      */
     suspend fun deleteAllByServerId(serverId: UUID)

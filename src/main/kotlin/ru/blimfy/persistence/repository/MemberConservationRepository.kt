@@ -18,4 +18,14 @@ interface MemberConservationRepository : CoroutineCrudRepository<MemberConservat
      * Возвращает информацию пользователя с [userId] об участии в личных диалогах.
      */
     fun findAllByUserId(userId: UUID): Flow<MemberConservation>
+
+    /**
+     * Возвращает информацию личного диалога с [conservationId] об участии в нём пользователей.
+     */
+    fun findAllByConservationId(conservationId: UUID): Flow<MemberConservation>
+
+    /**
+     * Возвращает информацию пользователя с [userId] об участии в личном диалоге с [conservationId].
+     */
+    suspend fun findAllByUserIdAndConservationId(userId: UUID, conservationId: UUID): MemberConservation?
 }

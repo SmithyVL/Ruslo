@@ -23,8 +23,8 @@ class UserServiceImpl(private val userRepo: UserRepository) : UserService {
     override suspend fun saveUser(user: User) =
         try {
             userRepo.save(user)
-        } catch (e: DuplicateKeyException) {
-            throw DuplicateException(USER_ALREADY_EXISTS.msg.format(user.username))
+        } catch (ex: DuplicateKeyException) {
+            throw DuplicateException(USER_ALREADY_EXISTS.msg.format(user.username), ex)
         }
 
     override suspend fun findUser(id: UUID) = userRepo.findById(id)

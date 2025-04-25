@@ -21,11 +21,17 @@ class RoleServiceImpl(
     private val privilegeService: PrivilegeService,
 ) : RoleService {
     @Transactional
-    override suspend fun saveRole(role: Role) =
-        roleRepo.save(role).apply { privilegeService.initDefaultPrivileges(this.id) }
+    override suspend fun createRole(role: Role) =
+        roleRepo.save(role).apply {
+            // Для новой роли создаём набор стандартных привилегий.
+            privilegeService.initDefaultPrivileges(this.id)
+        }
+
+    override suspend fun modifyRole(role: Role) =
+        roleRepo.save(role)
 
     override suspend fun findDefaultServerRole(serverId: UUID) =
-        roleRepo.findAllByServerIdAndDefaultIsTrue(serverId)
+        roleRepo.findAllByServerIdAndIsDefaultIsTrue(serverId)
 
     companion object {
         /**

@@ -1,15 +1,14 @@
 [versions]
-springBoot = "3.4.4"
+springBoot = "3.4.5"
 kotlin = "2.1.20"
 dependencyManagement = "1.1.7"
 jwt = "0.12.6"
-# TODO: обновить как только выйдет следующая версия и проверить, что пропадет "WARN": "Appended trailing slash to static
-#  resource location".
 springDoc = "2.8.6"
 
 [libraries]
 # Spring Boot.
 springBootStarterWebflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
+springBootStarterIntegration = { module = "org.springframework.boot:spring-boot-starter-integration" }
 springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 
@@ -24,6 +23,9 @@ jwtImpl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jwt" }
 # Работа с базой данных.
 springBootStarterDataR2dbc = { module = "org.springframework.boot:spring-boot-starter-data-r2dbc" }
 databasePostgresR2dbc = { module = "org.postgresql:r2dbc-postgresql" }
+
+# Сериализация (например, для дат).
+jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 
 # Котлин.
 kotlinxCoroutinesReactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }

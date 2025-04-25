@@ -3,6 +3,7 @@ package ru.blimfy.common.dto
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.Instant
 import java.util.UUID
+import ru.blimfy.Application.Companion.INSTANT_FORMAT
 
 /**
  * DTO с информацией о пользователе.
@@ -19,12 +20,6 @@ data class UserDto(
     val id: UUID,
     val username: String,
     val email: String,
-
-    @param:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSX", timezone = "UTC")
-    val createdDate: Instant,
-
-    @param:JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSSSSX", timezone = "UTC")
-    val updatedDate: Instant? = null,
-
+    @JsonFormat(pattern = INSTANT_FORMAT, timezone = "UTC") val createdDate: Instant,
     val avatarUrl: String? = null
 )

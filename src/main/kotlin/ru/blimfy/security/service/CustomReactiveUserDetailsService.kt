@@ -25,7 +25,7 @@ class CustomReactiveUserDetailsService(
     override fun findByUsername(username: String) = mono {
         try {
             userService.findUser(username).mapToUserDetails()
-        } catch (e: NotFoundException) {
+        } catch (_: NotFoundException) {
             null
         }
     }

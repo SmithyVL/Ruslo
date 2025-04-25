@@ -25,6 +25,8 @@ spring:
   # Настройки реактивности.
   webflux:
     base-path: /blimfy
+    problemdetails:
+      enabled: true
 
   # Общие настройки Spring.
   main:

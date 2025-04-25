@@ -17,5 +17,5 @@ interface ServerRepository : CoroutineCrudRepository<Server, UUID> {
      * Удаляет сущность сервера с идентификатором [id], владельцем которого является пользователь с идентификатором
      * [ownerId].
      */
-    suspend fun deleteByIdAndOwnerId(ownerId: UUID, id: UUID)
+    suspend fun deleteByIdAndOwnerId(id: UUID, ownerId: UUID)
 }

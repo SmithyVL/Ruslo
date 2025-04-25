@@ -1,7 +1,7 @@
 package ru.blimfy.services.server
 
 import java.util.UUID
-import ru.blimfy.persistence.entity.Role
+import ru.blimfy.persistence.entity.Member
 import ru.blimfy.persistence.entity.Server
 
 /**
@@ -12,10 +12,14 @@ import ru.blimfy.persistence.entity.Server
  */
 interface ServerService {
     /**
-     * Возвращает новый или обновлённый [server]. Для нового сервера создаются стандартные категории с каналами, роли с
-     * привилегиями, участник сервера из владельца и так далее.
+     * Возвращает новый [server].
      */
-    suspend fun saveServer(server: Server): Server
+    suspend fun createServer(server: Server): Server
+
+    /**
+     * Возвращает обновлённый [server].
+     */
+    suspend fun modifyServer(server: Server): Server
 
     /**
      * Возвращает сервер с таким [id].
@@ -23,12 +27,22 @@ interface ServerService {
     suspend fun findServer(id: UUID): Server
 
     /**
-     * Возвращает стандартную роль сервера с идентификатором [serverId].
-     */
-    suspend fun findServerDefaultRole(serverId: UUID): Role
-
-    /**
      * Удалить сервер с таким [id] его владельцем с идентификатором [ownerId].
      */
-    suspend fun deleteServer(ownerId: UUID, id: UUID)
+    suspend fun deleteServer(id: UUID, ownerId: UUID)
+
+    /**
+     * Возвращает нового пользователя с [userId] на сервер с [serverId].
+     */
+    suspend fun addNewMember(serverId: UUID, userId: UUID): Member
+
+    /**
+     * Проверяет разрешение пользователя с [userId] на изменение сервера с [serverId] и его связанных данных.
+     */
+    suspend fun checkServerModifyAccess(serverId: UUID, userId: UUID)
+
+    /**
+     * Проверяет разрешение пользователя с [userId] на просмотр сервера с [serverId] и его связанных данных.
+     */
+    suspend fun checkServerViewAccess(serverId: UUID, userId: UUID)
 }

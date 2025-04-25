@@ -11,9 +11,14 @@ import ru.blimfy.persistence.entity.Role
  */
 interface RoleService {
     /**
-     * Возвращает новую или обновлённую [role]. Для новой роли создаётся стандартный набор привилегий.
+     * Возвращает новую [role].
      */
-    suspend fun saveRole(role: Role): Role
+    suspend fun createRole(role: Role): Role
+
+    /**
+     * Возвращает обновлённую [role].
+     */
+    suspend fun modifyRole(role: Role): Role
 
     /**
      * Возвращает дефолтную роль сервера с идентификатором [serverId].

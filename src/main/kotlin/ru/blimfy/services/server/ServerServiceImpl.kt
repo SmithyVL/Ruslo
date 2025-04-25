@@ -1,11 +1,14 @@
 package ru.blimfy.services.server
 
 import java.util.UUID
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ru.blimfy.common.enums.ChannelTypes.TEXT
 import ru.blimfy.common.enums.ChannelTypes.VOICE
 import ru.blimfy.exception.Errors.SERVER_BY_ID_NOT_FOUND
+import ru.blimfy.exception.Errors.SERVER_MODIFY_ACCESS_DENIED
+import ru.blimfy.exception.Errors.SERVER_VIEW_ACCESS_DENIED
 import ru.blimfy.exception.NotFoundException
 import ru.blimfy.persistence.entity.Channel
 import ru.blimfy.persistence.entity.Member
@@ -39,35 +42,52 @@ class ServerServiceImpl(
     private val memberRoleService: MemberRoleService,
 ) : ServerService {
     @Transactional
-    override suspend fun saveServer(server: Server): Server {
-        val isNew = server.isNew()
-        return serverRepo.save(server).apply {
-            if (isNew) {
-                val serverId = this.id
+    override suspend fun createServer(server: Server) =
+        serverRepo.save(server).apply {
+            val serverId = this.id
 
-                // Создание дефолтных каналов для нового сервера - текстового и голосового.
-                channelService.saveChannel(Channel(serverId, DEFAULT_TEXT_CHANNEL_NAME, TEXT))
-                channelService.saveChannel(Channel(serverId, DEFAULT_VOICE_CHANNEL_NAME, VOICE))
+            // Создание дефолтных каналов для нового сервера - текстового и голосового.
+            channelService.saveChannel(Channel(serverId, DEFAULT_TEXT_CHANNEL_NAME, TEXT))
+            channelService.saveChannel(Channel(serverId, DEFAULT_VOICE_CHANNEL_NAME, VOICE))
 
-                // Создание дефолтной роли для нового сервера, которая будет присваиваться каждому нового участнику
-                // навсегда.
-                val defaultRoleId = roleService.saveRole(Role(serverId, DEFAULT_ROLE_NAME, true)).id
+            // Создание дефолтной роли для нового сервера, которая будет присваиваться каждому нового участнику
+            // навсегда.
+            val defaultRoleId = roleService.createRole(Role(serverId, DEFAULT_ROLE_NAME, true)).id
 
-                // Создание участника для пользователя-создателя сервера с дефолтной ролью.
-                val memberId = memberService.saveMember(Member(serverId = serverId, userId = this.ownerId)).id
-                memberRoleService.saveRoleToMember(MemberRole(memberId = memberId, roleId = defaultRoleId))
-            }
+            // Создание участника для пользователя-создателя сервера с дефолтной ролью.
+            val memberId = memberService.saveMember(Member(serverId = serverId, userId = this.ownerId)).id
+            memberRoleService.saveRoleToMember(MemberRole(memberId = memberId, roleId = defaultRoleId))
         }
-    }
+
+    override suspend fun modifyServer(server: Server) = serverRepo.save(server)
 
     override suspend fun findServer(id: UUID) = serverRepo.findById(id)
         ?: throw NotFoundException(SERVER_BY_ID_NOT_FOUND.msg.format(id))
 
-    override suspend fun findServerDefaultRole(serverId: UUID) =
-        roleService.findDefaultServerRole(serverId)
+    override suspend fun deleteServer(id: UUID, ownerId: UUID) =
+        serverRepo.deleteByIdAndOwnerId(id = id, ownerId = ownerId)
 
-    override suspend fun deleteServer(ownerId: UUID, id: UUID) =
-        serverRepo.deleteByIdAndOwnerId(ownerId, id)
+    override suspend fun addNewMember(serverId: UUID, userId: UUID) =
+        memberService.saveMember(Member(serverId = serverId, userId = userId)).apply {
+            val defaultRoleId = roleService.findDefaultServerRole(serverId).id
+            memberRoleService.saveRoleToMember(MemberRole(memberId = id, roleId = defaultRoleId))
+        }
+
+    override suspend fun checkServerModifyAccess(serverId: UUID, userId: UUID) {
+        val server = findServer(serverId)
+
+        if (userId != server.ownerId) {
+            throw AccessDeniedException(SERVER_MODIFY_ACCESS_DENIED.msg.format(server.id))
+        }
+    }
+
+    override suspend fun checkServerViewAccess(serverId: UUID, userId: UUID) {
+        try {
+            memberService.findServerMember(userId = userId, serverId = serverId)
+        } catch (_: NotFoundException) {
+            throw AccessDeniedException(SERVER_VIEW_ACCESS_DENIED.msg.format(serverId))
+        }
+    }
 
     private companion object {
         /**

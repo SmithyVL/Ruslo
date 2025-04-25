@@ -16,5 +16,5 @@ interface RoleRepository : CoroutineCrudRepository<Role, UUID> {
     /**
      * Возвращает сущность дефолтной роли для сервера с идентификатором [serverId]
      */
-    suspend fun findAllByServerIdAndDefaultIsTrue(serverId: UUID): Role
+    suspend fun findAllByServerIdAndIsDefaultIsTrue(serverId: UUID): Role
 }

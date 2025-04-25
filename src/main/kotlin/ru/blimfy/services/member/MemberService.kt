@@ -37,6 +37,11 @@ interface MemberService {
     suspend fun deleteServerMember(memberId: UUID, serverId: UUID)
 
     /**
+     * Удаляет участника пользователя с идентификатором [userId] с сервера с идентификатором [serverId].
+     */
+    suspend fun deleteUserMember(userId: UUID, serverId: UUID)
+
+    /**
      * Удаляет всех участников сервера с идентификатором [serverId].
      */
     suspend fun deleteServerMembers(serverId: UUID)

@@ -46,10 +46,6 @@ databaseChangeLog:
                   defaultValueDate: now()
                   constraints:
                     nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
   - changeSet:
       id: 1
       preConditions:
@@ -85,17 +81,6 @@ databaseChangeLog:
                   remarks: Хэш пароль
                   constraints:
                     nullable: false
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
         - addForeignKeyConstraint:
             onDelete: CASCADE
             onUpdate: RESTRICT
@@ -149,10 +134,6 @@ databaseChangeLog:
                   defaultValueDate: now()
                   constraints:
                     nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
         - addForeignKeyConstraint:
             onDelete: RESTRICT
             onUpdate: RESTRICT
@@ -202,10 +183,10 @@ databaseChangeLog:
                   defaultValueDate: now()
                   constraints:
                     nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
+        - addUniqueConstraint:
+            columnNames: server_id, user_id
+            constraintName: const_unique_server_user
+            tableName: member
         - addForeignKeyConstraint:
             onDelete: CASCADE
             onUpdate: RESTRICT
@@ -257,23 +238,12 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: default
+                  name: is_default
                   type: boolean
-                  remarks: Флаг того, что роль является дефолтной
+                  remarks: Флаг того, что роль является дефолтной для сервера
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
         - addForeignKeyConstraint:
             onDelete: CASCADE
             onUpdate: RESTRICT
@@ -323,17 +293,6 @@ databaseChangeLog:
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
         - addForeignKeyConstraint:
             onDelete: CASCADE
             onUpdate: RESTRICT
@@ -387,6 +346,10 @@ databaseChangeLog:
                   name: updated_date
                   type: timestamptz
                   remarks: Дата обновления
+        - addUniqueConstraint:
+            columnNames: member_id, role_id
+            constraintName: const_unique_member_role
+            tableName: member_role
         - addForeignKeyConstraint:
             onDelete: CASCADE
             onUpdate: RESTRICT
@@ -444,25 +407,14 @@ databaseChangeLog:
                   defaultValue: TEXT
                   constraints:
                     nullable: false
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
         - addForeignKeyConstraint:
             onDelete: CASCADE # Такое удаление используется только в цепочке при удалении сервера!!!
             onUpdate: RESTRICT
             baseColumnNames: server_id
             baseTableName: channel
-            constraintName: fk_server_channel
             referencedColumnNames: id
             referencedTableName: server
+            constraintName: fk_server_channel
   - changeSet:
       id: 8
       preConditions:
@@ -519,15 +471,15 @@ databaseChangeLog:
                   type: timestamptz
                   remarks: Дата обновления
         - addForeignKeyConstraint:
-            onDelete: CASCADE # Такое удаление используется только в цепочке при удалении сервера!!!
+            onDelete: CASCADE
             onUpdate: RESTRICT
             baseColumnNames: author_id
             baseTableName: text_message
-            constraintName: fk_member_text_message
+            constraintName: fk_user_text_message
             referencedColumnNames: id
-            referencedTableName: member
+            referencedTableName: users
         - addForeignKeyConstraint:
-            onDelete: CASCADE
+            onDelete: CASCADE # Такое удаление используется только в цепочке при удалении сервера!!!
             onUpdate: RESTRICT
             baseColumnNames: channel_id
             baseTableName: text_message
@@ -568,23 +520,6 @@ databaseChangeLog:
                   remarks: Идентификатор сервера
                   constraints:
                     nullable: false
-              - column:
-                  name: name
-                  type: varchar
-                  remarks: Название приглашения
-                  constraints:
-                    nullable: false
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
         - addForeignKeyConstraint:
             onDelete: CASCADE
             onUpdate: RESTRICT
@@ -623,17 +558,6 @@ databaseChangeLog:
                   constraints:
                     primaryKey: true
                     primaryKeyName: conservation_id_pkey
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
   - changeSet:
       id: 11
       preConditions:
@@ -689,6 +613,14 @@ databaseChangeLog:
                   name: updated_date
                   type: timestamptz
                   remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: author_id
+            baseTableName: direct_message
+            constraintName: fk_user_direct_message
+            referencedColumnNames: id
+            referencedTableName: users
   - changeSet:
       id: 12
       preConditions:
@@ -723,14 +655,3 @@ databaseChangeLog:
                   remarks: Идентификатор пользователя
                   constraints:
                     nullable: false
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
