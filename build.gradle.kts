@@ -23,6 +23,8 @@ dependencies {
     runtimeOnly(libs.databasePostgresR2dbc)
     runtimeOnly(libs.jwtJackson)
     runtimeOnly(libs.jacksonJsr310)
+    runtimeOnly(libs.databasePostgres)
+    runtimeOnly(libs.liquibaseCore)
 
     implementation(libs.springBootStarterWebflux)
     implementation(libs.springBootStarterDataR2dbc)

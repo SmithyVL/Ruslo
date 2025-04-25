@@ -31,17 +31,6 @@ services:
     networks:
       - blimfy_network
 
-  liquibase:
-    image: liquibase:latest
-    container_name: liquibase_migration
-    depends_on:
-      - db
-    volumes:
-      - ./liquibase/changelog/:/liquibase/changelog
-    command: --defaults-file=/liquibase/changelog/liquibase.properties update
-    networks:
-      - blimfy_network
-
 volumes:
   db_data:
 

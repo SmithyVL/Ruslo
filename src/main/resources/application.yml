@@ -40,3 +40,10 @@ spring:
     url: r2dbc:postgresql://${BLIMFY_DB_HOST:localhost}:${BLIMFY_DB_PORT:5432}/blimfy
     username: ${BLIMFY_DB_USERNAME:blimfy_admin}
     password: ${BLIMFY_DB_PASSWORD:blimfy_password}
+
+  # Настройки версионирования БД.
+  liquibase:
+    url: jdbc:postgresql://${BLIMFY_DB_HOST:localhost}:${BLIMFY_DB_PORT:5432}/blimfy
+    user: ${BLIMFY_DB_USERNAME:blimfy_admin}
+    password: ${BLIMFY_DB_PASSWORD:blimfy_password}
+    show-summary: off

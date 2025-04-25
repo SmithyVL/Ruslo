@@ -23,6 +23,8 @@ jwtImpl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jwt" }
 # Работа с базой данных.
 springBootStarterDataR2dbc = { module = "org.springframework.boot:spring-boot-starter-data-r2dbc" }
 databasePostgresR2dbc = { module = "org.postgresql:r2dbc-postgresql" }
+databasePostgres = { module = "org.postgresql:postgresql" }
+liquibaseCore = { module = "org.liquibase:liquibase-core" }
 
 # Сериализация (например, для дат).
 jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
