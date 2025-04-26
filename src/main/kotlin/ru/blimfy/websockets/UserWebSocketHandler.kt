@@ -19,12 +19,12 @@ class UserWebSocketHandler(
     private val userWebSocketService: UserWebSocketService,
     private val tokenService: TokenService,
 ) : WebSocketHandler {
-    override fun handle(session: WebSocketSession): Mono<Void> =
-        session.receive()
-            .doOnSubscribe {
-                val userId = tokenService.extractUserId(session.handshakeInfo.headers)
-                userWebSocketService.addUserSession(userId, session)
-            }
-            .doOnTerminate { userWebSocketService.removeUserSession(session) }
+    override fun handle(session: WebSocketSession): Mono<Void> {
+        val userId = tokenService.extractUserId(session.handshakeInfo.headers)
+
+        return session.receive()
+            .doOnSubscribe { userWebSocketService.addUserSession(userId, session) }
+            .doOnTerminate { userWebSocketService.removeUserSession(userId) }
             .then()
+    }
 }

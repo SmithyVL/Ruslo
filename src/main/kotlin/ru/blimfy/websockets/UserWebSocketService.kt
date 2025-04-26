@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.reactor.mono
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.socket.WebSocketSession
+import reactor.core.publisher.Mono
 import ru.blimfy.services.conservation.member.MemberConservationService
 import ru.blimfy.services.member.MemberService
 import ru.blimfy.websockets.dto.WsMessage
@@ -33,20 +33,20 @@ class UserWebSocketService(
     private val memberConservationService: MemberConservationService,
     private val objectMapper: ObjectMapper,
 ) {
-    private val userSessions = ConcurrentHashMap<WebSocketSession, UUID>()
+    private val userSessions = ConcurrentHashMap<UUID, WebSocketSession>()
 
     /**
      * Добавляет новую WebSocket [userSession] для пользователя с [userId].
      */
     fun addUserSession(userId: UUID, userSession: WebSocketSession) {
-        userSessions[userSession] = userId
+        userSessions[userId] = userSession
     }
 
     /**
-     * Удаляет существующую WebSocket [userSession].
+     * Удаляет существующую WebSocket сессию для пользователя с [userId].
      */
-    fun removeUserSession(userSession: WebSocketSession) {
-        userSessions.remove(userSession)
+    fun removeUserSession(userId: UUID) {
+        userSessions.remove(userId)
     }
 
     /**
@@ -76,12 +76,11 @@ class UserWebSocketService(
     /**
      * Отправляет [type] сообщение с [data] пользователю с [userId].
      */
-    private suspend fun sendMessage(userId: UUID, type: WsMessageTypes, data: Any) =
-        userSessions.forEach {
-            if (it.value == userId) {
-                val userSession = it.key
-                val wsMessage = mono { userSession.textMessage(objectMapper.writeValueAsString(WsMessage(type, data))) }
-                userSession.send(wsMessage).subscribe()
-            }
+    private suspend fun sendMessage(userId: UUID, type: WsMessageTypes, data: Any) {
+        userSessions.get(userId)?.let { userSession ->
+            userSession
+                .send(Mono.just(userSession.textMessage(objectMapper.writeValueAsString(WsMessage(type, data)))))
+                .subscribe()
         }
+    }
 }
