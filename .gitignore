@@ -1,6 +1,5 @@
 /.idea/
-/blimfy-app-back.iml
-/.gradle/
-/build/
-/.kotlin/
-/.kotlin/**
+**/.gradle/
+**/build/
+**/.kotlin/
+**/.kotlin/**

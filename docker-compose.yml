@@ -3,7 +3,7 @@ services:
     depends_on:
       - db
     build:
-      context: .
+      context: ./bm-application
     container_name: blimfy
     ports:
       - "8080:8080"
@@ -12,7 +12,7 @@ services:
     command:
       - java
       - -jar
-      - blimfy.jar
+      - bm-application.jar
     environment:
       BLIMFY_FULL_DEBUG: true
       BLIMFY_DB_HOST: db

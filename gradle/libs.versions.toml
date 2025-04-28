@@ -11,6 +11,7 @@ springBootStarterWebflux = { module = "org.springframework.boot:spring-boot-star
 springBootStarterIntegration = { module = "org.springframework.boot:spring-boot-starter-integration" }
 springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
+springBootStarter = { module = "org.springframework.boot:spring-boot-starter" }
 
 # Документация.
 springDocWebflux = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springDoc" }
@@ -35,11 +36,11 @@ kotlinReactorExtension = { module = "io.projectreactor.kotlin:reactor-kotlin-ext
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 
 # Тесты.
-springBooStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
-mockito = { module = "org.mockito:mockito-core" }
+springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
+testcontainersPostgres = { module = "org.testcontainers:postgresql" }
 
 [plugins]
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
-dependencyManagement = { id = "io.spring.dependency-management", version.ref = "dependencyManagement" }
+springDependencyManagement = { id = "io.spring.dependency-management", version.ref = "dependencyManagement" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }
