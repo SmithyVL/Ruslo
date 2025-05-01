@@ -14,8 +14,8 @@ services:
       - -jar
       - bm-application.jar
     environment:
-      BLIMFY_FULL_DEBUG: true
-      BLIMFY_DB_HOST: db
+      BM_FULL_DEBUG: true
+      BM_DB_HOST: db
 
   db:
     image: postgres:latest

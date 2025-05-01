@@ -1,20 +1,20 @@
 # Количество логов. При "true" будет отображено больше логов.
-debug: ${BLIMFY_FULL_DEBUG:false}
+debug: ${BM_FULL_DEBUG:false}
 
 # Логирование запросов к БД.
 logging:
   level:
     ru:
-      blimfy: ${BLIMFY_LOGGING_LEVEL:debug}
+      blimfy: ${BM_LOGGING_LEVEL:debug}
     org:
       springframework:
         # Логирование SQL запросов.
-        r2dbc: ${BLIMFY_LOGGING_LEVEL_R2DBC:debug}
+        r2dbc: ${BM_LOGGING_LEVEL_R2DBC:debug}
     io:
       r2dbc:
         postgresql:
           # Логирование параметров SQL запросов.
-          PARAM: ${BLIMFY_LOGGING_LEVEL_R2DBC:debug}
+          PARAM: ${BM_LOGGING_LEVEL_R2DBC:debug}
 
 spring:
   # Настройки реактивности.
@@ -28,15 +28,6 @@ spring:
     # Уменьшение количества начальных логов.
     log-startup-info: false
 
-  # Настройки реактивной БД.
-  r2dbc:
-    url: r2dbc:postgresql://${BLIMFY_DB_HOST:localhost}:${BLIMFY_DB_PORT:5432}/blimfy
-    username: ${BLIMFY_DB_USERNAME:blimfy_admin}
-    password: ${BLIMFY_DB_PASSWORD:blimfy_password}
-
   # Настройки версионирования БД.
   liquibase:
-    url: jdbc:postgresql://${BLIMFY_DB_HOST:localhost}:${BLIMFY_DB_PORT:5432}/blimfy
-    user: ${BLIMFY_DB_USERNAME:blimfy_admin}
-    password: ${BLIMFY_DB_PASSWORD:blimfy_password}
     show-summary: off

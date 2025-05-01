@@ -4,11 +4,11 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.security.core.userdetails.ReactiveUserDetailsService
-import org.springframework.test.context.ActiveProfiles
 import reactor.core.publisher.Mono.empty
 import ru.blimfy.security.SecurityAutoConfigurationTest.TestConfig
 import ru.blimfy.security.config.properties.SecurityProperties
@@ -20,8 +20,7 @@ import ru.blimfy.security.config.properties.SecurityProperties
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-@SpringBootTest(classes = [SecurityAutoConfiguration::class])
-@ActiveProfiles("test")
+@SpringBootTest(classes = [SecurityAutoConfiguration::class], webEnvironment = NONE)
 @Import(TestConfig::class)
 class SecurityAutoConfigurationTest {
     @Autowired
@@ -31,7 +30,7 @@ class SecurityAutoConfigurationTest {
     fun `should load spring context`() {
         assertEquals(securityProperties.jwt.issuer.isNotBlank(), true)
         assertEquals(securityProperties.jwt.key.isNotBlank(), true)
-        assertEquals(securityProperties.permitAllPaths.isEmpty(), true)
+        assertEquals(securityProperties.permitAllPaths.isNotEmpty(), true)
     }
 
     /**

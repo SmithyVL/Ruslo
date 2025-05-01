@@ -34,9 +34,7 @@ internal class JwtReactiveAuthenticationManager(
                     if (!tokenService.isValid(token, user.username)) {
                         authentication
                     } else {
-                        // Сейчас нет ролей (authorities), но в будущем здесь будет инициализация доступов пользователя
-                        // к различным ресурсам.
-                        authenticated(user, token, user.authorities)
+                        authenticated(user, token, null)
                     }
                 }
                 ?: authentication

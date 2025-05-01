@@ -4,7 +4,6 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.DynamicPropertyRegistry
 import org.springframework.test.context.DynamicPropertySource
 import org.testcontainers.containers.PostgreSQLContainer
@@ -16,7 +15,6 @@ import org.testcontainers.containers.PostgreSQLContainer
  * @since 0.0.1.
  */
 @SpringBootTest
-@ActiveProfiles("test")
 class ApplicationTest {
     @Test
     fun `should load spring context`() {

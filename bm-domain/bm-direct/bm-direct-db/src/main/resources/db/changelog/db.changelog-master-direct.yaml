@@ -1,0 +1,4 @@
+databaseChangeLog:
+  - include:
+      file: init/db.init-direct-tables.yaml
+      relativeToChangelogFile: true

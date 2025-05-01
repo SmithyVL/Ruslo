@@ -1,0 +1,19 @@
+bm-server-db:
+  liquibase:
+    changelog: classpath:db/changelog/db.changelog-master-server.yaml
+
+spring:
+  # Настройки реактивной БД.
+  r2dbc:
+    url: r2dbc:postgresql://${BM_DB_HOST:localhost}:${BM_DB_PORT:5432}/blimfy
+    username: ${BM_DB_USERNAME:blimfy_admin}
+    password: ${BM_DB_PASSWORD:blimfy_password}
+
+  # Настройки версионирования БД.
+  liquibase:
+    # Выключение автоматического запуска, потому что запуск выполняется с помощью кастомных Spring Liquibase.
+    enabled: false
+    url: jdbc:postgresql://${BM_DB_HOST:localhost}:${BM_DB_PORT:5432}/blimfy
+    user: ${BM_DB_USERNAME:blimfy_admin}
+    password: ${BM_DB_PASSWORD:blimfy_password}
+    driver-class-name: org.postgresql.Driver

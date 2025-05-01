@@ -1,7 +1,6 @@
 [versions]
 springBoot = "3.4.5"
 kotlin = "2.1.20"
-dependencyManagement = "1.1.7"
 jwt = "0.12.6"
 springDoc = "2.8.6"
 
@@ -12,6 +11,10 @@ springBootStarterIntegration = { module = "org.springframework.boot:spring-boot-
 springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootStarter = { module = "org.springframework.boot:spring-boot-starter" }
+
+# Spring.
+springCore = { module = "org.springframework:spring-core" }
+springBeans = { module = "org.springframework:spring-beans" }
 
 # Документация.
 springDocWebflux = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springDoc" }
@@ -26,13 +29,13 @@ springBootStarterDataR2dbc = { module = "org.springframework.boot:spring-boot-st
 databasePostgresR2dbc = { module = "org.postgresql:r2dbc-postgresql" }
 databasePostgres = { module = "org.postgresql:postgresql" }
 liquibaseCore = { module = "org.liquibase:liquibase-core" }
+hikari = { module = "com.zaxxer:HikariCP" }
 
 # Сериализация (например, для дат).
 jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 
 # Котлин.
 kotlinxCoroutinesReactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }
-kotlinReactorExtension = { module = "io.projectreactor.kotlin:reactor-kotlin-extensions" }
 kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 
 # Тесты.
@@ -41,6 +44,5 @@ testcontainersPostgres = { module = "org.testcontainers:postgresql" }
 
 [plugins]
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }
-springDependencyManagement = { id = "io.spring.dependency-management", version.ref = "dependencyManagement" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinSpring = { id = "org.jetbrains.kotlin.plugin.spring", version.ref = "kotlin" }

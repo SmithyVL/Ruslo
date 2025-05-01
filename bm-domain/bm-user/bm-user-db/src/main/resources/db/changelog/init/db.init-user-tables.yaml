@@ -1,0 +1,91 @@
+databaseChangeLog:
+  - changeSet:
+      id: init_user_tables_0
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: users # Так как просто "user" использовать нельзя - будет "users".
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с пользователями
+      changes:
+        - createTable:
+            tableName: users
+            remarks: Пользователи
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: users_id_pkey
+              - column:
+                  name: username
+                  type: varchar
+                  remarks: Логин пользователя
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: email
+                  type: varchar
+                  remarks: Электронная почта
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: avatar_url
+                  type: varchar
+                  remarks: Ссылка на аватарку
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: init_user_tables_1
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: password
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с паролями
+      changes:
+        - createTable:
+            tableName: password
+            remarks: Пароли
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: password_id_pkey
+              - column:
+                  name: user_id
+                  type: uuid
+                  remarks: Идентификатор пользователя
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: hash
+                  type: varchar
+                  remarks: Хэш пароля
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: user_id
+            baseTableName: password
+            constraintName: fk_user_password
+            referencedColumnNames: id
+            referencedTableName: users

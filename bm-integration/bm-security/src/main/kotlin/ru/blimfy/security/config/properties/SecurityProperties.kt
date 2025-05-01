@@ -11,4 +11,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties
  * @since 0.0.1.
  */
 @ConfigurationProperties("bm-security")
-data class SecurityProperties(val jwt: JwtProperties, val permitAllPaths: List<String>)
+data class SecurityProperties(val jwt: JwtProperties, val permitAllPaths: List<String> = emptyList())

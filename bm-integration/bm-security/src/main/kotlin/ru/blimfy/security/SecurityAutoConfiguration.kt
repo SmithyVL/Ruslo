@@ -1,11 +1,11 @@
 package ru.blimfy.security
 
 import org.springframework.boot.autoconfigure.AutoConfiguration
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean
-import org.springframework.boot.context.properties.ConfigurationPropertiesScan
+import org.springframework.boot.context.properties.EnableConfigurationProperties
+import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.PropertySource
-import org.springframework.security.core.userdetails.ReactiveUserDetailsService
-import ru.blimfy.security.factory.CustomConfigPropertiesReaderFactory
+import ru.blimfy.common.factory.CustomConfigPropertiesReaderFactory
+import ru.blimfy.security.config.properties.SecurityProperties
 
 /**
  * Авто-конфигурация для подключения бинов для работы с безопасностью в приложении.
@@ -14,7 +14,7 @@ import ru.blimfy.security.factory.CustomConfigPropertiesReaderFactory
  * @since 0.0.1.
  */
 @AutoConfiguration
-@ConfigurationPropertiesScan
+@ComponentScan
+@EnableConfigurationProperties(SecurityProperties::class)
 @PropertySource("classpath:bm-security.yml", factory = CustomConfigPropertiesReaderFactory::class)
-@ConditionalOnBean(ReactiveUserDetailsService::class)
 class SecurityAutoConfiguration

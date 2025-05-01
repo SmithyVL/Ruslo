@@ -2,8 +2,8 @@ package ru.blimfy.websocket
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -14,16 +14,12 @@ import ru.blimfy.websocket.storage.WebSocketStorage
 /**
  * Тестирование поднятия spring контекста для стартера.
  *
- * @property webSocketStorage хранилище WebSocket сессий.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-@SpringBootTest(classes = [WebSocketAutoConfiguration::class])
+@SpringBootTest(classes = [WebSocketAutoConfiguration::class], webEnvironment = NONE)
 @Import(TestConfig::class)
 class WebSocketAutoConfigurationTest {
-    @Autowired
-    private lateinit var webSocketStorage: WebSocketStorage<out Any>
-
     @Test
     fun `should load spring context`() {
         // Логика не требуется.
@@ -39,11 +35,11 @@ class WebSocketAutoConfigurationTest {
     private class TestConfig {
         /**
          * Создаёт бин, который требуется стартеру для работоспособности. Нужен для тестов, потому что этот бин должен
-         * создаваться извне стартера. Использует внутри [objectMapper].
+         * создаваться извне стартера.
          */
         @Bean
-        fun tokenWebSocketStorage(objectMapper: ObjectMapper) =
-            object : WebSocketStorage<Any>(objectMapper) {
+        fun tokenWebSocketStorage() =
+            object : WebSocketStorage<Any>(ObjectMapper()) {
                 override fun addSession(token: String, userSession: WebSocketSession) {
                     // Логика не требуется.
                 }

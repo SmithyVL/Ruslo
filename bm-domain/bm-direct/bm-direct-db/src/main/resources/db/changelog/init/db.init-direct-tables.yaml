@@ -1,0 +1,112 @@
+databaseChangeLog:
+  - changeSet:
+      id: init_direct_tables_0
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: conservation
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с личными диалогами
+      changes:
+        - createTable:
+            tableName: conservation
+            remarks: Личные диалоги
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: conservation_id_pkey
+  - changeSet:
+      id: init_direct_tables_1
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: direct_message
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с сообщениями личных диалогов
+      changes:
+        - createTable:
+            tableName: direct_message
+            remarks: Сообщения личных диалогов
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: direct_message_id_pkey
+              - column:
+                  name: author_id
+                  type: uuid
+                  remarks: Идентификатор автора сообщения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: conservation_id
+                  type: uuid
+                  remarks: Идентификатор личного диалога
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: varchar
+                  remarks: Содержимое сообщения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file_url
+                  type: varchar
+                  remarks: Ссылка на прикреплённый файл
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+  - changeSet:
+      id: init_direct_tables_2
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: member_conservation
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с участниками личных диалогов
+      changes:
+        - createTable:
+            tableName: member_conservation
+            remarks: Участники личных диалогов
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: member_conservation_id_pkey
+              - column:
+                  name: conservation_id
+                  type: uuid
+                  remarks: Идентификатор личного диалога
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+                  remarks: Идентификатор пользователя
+                  constraints:
+                    nullable: false
