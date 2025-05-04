@@ -49,5 +49,5 @@ enum class PrivilegeTypes(val defaultGranted: Boolean = true) {
      * Участники с этим правом имеют все права и обходят особые права и ограничения каналов (например, эти участники
      * получают доступ ко всем приватным каналам).
      */
-    ADVANCED_ADMIN,
+    ADVANCED_ADMIN(false),
 }

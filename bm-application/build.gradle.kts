@@ -6,11 +6,14 @@ plugins {
 }
 
 dependencies {
-    runtimeOnly(libs.springBootStarterActuator)
-    runtimeOnly(libs.springBootStarterDataR2dbc)
-
+    // Подключение основной логики микросервиса, которая в будущем будет разделена на отдельные микросервисы.
     implementation(project(":bm-gateway"))
+
+    // Включение авто-конфигурации с помощью аннотаций "SpringBootApplication" и "EnableWebFlux".
     implementation(libs.springBootStarterWebflux)
+
+    // Включение аудита с помощью аннотации "EnableR2dbcAuditing".
+    implementation(libs.springBootStarterDataR2dbc)
 
     testImplementation(libs.springBootStarterTest)
     testImplementation(libs.testcontainersPostgres)

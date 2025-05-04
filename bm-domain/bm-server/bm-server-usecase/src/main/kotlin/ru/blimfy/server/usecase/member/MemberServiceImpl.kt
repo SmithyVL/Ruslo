@@ -7,6 +7,7 @@ import ru.blimfy.common.exception.DuplicateException
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.server.db.entity.Member
 import ru.blimfy.server.db.repository.MemberRepository
+import ru.blimfy.server.usecase.exception.ServerErrors.MEMBER_BY_ID_NOT_FOUND
 import ru.blimfy.server.usecase.exception.ServerErrors.MEMBER_BY_USER_ID_AND_SERVER_ID_NOT_FOUND
 import ru.blimfy.server.usecase.exception.ServerErrors.SERVER_MEMBER_ALREADY_EXISTS
 
@@ -29,6 +30,11 @@ class MemberServiceImpl(private val memberRepo: MemberRepository) : MemberServic
     override suspend fun findServerMember(userId: UUID, serverId: UUID) =
         memberRepo.findByUserIdAndServerId(userId, serverId)
             ?: throw NotFoundException(MEMBER_BY_USER_ID_AND_SERVER_ID_NOT_FOUND.msg.format(userId, serverId))
+
+    override suspend fun findMember(id: UUID) = memberRepo.findById(id)
+        ?: throw NotFoundException(MEMBER_BY_ID_NOT_FOUND.msg.format(id))
+
+    override suspend fun getCountServerMembers(serverId: UUID) = memberRepo.countByServerId(serverId)
 
     override fun findUserMembers(userId: UUID) = memberRepo.findAllByUserId(userId)
 

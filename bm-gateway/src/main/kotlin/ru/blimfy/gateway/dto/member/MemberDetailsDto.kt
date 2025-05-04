@@ -1,4 +1,4 @@
-package ru.blimfy.gateway.dto
+package ru.blimfy.gateway.dto.member
 
 import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.Instant
@@ -9,34 +9,29 @@ import ru.blimfy.server.db.entity.Member
 /**
  * DTO с информацией об участнике сервера.
  *
+ * @property id идентификатор.
  * @property serverId идентификатор сервера.
  * @property userId идентификатор пользователя.
  * @property username имя пользователя участника сервера.
  * @property serverUserName имя участника сервера для конкретного сервера.
- * @property id идентификатор.
  * @property createdDate дата создания.
+ * @property roles роли.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-data class MemberDto(
+data class MemberDetailsDto(
+    val id: UUID,
     val serverId: UUID,
     val userId: UUID,
     val username: String,
     val serverUserName: String? = null,
-    val id: UUID? = null,
-    @JsonFormat(pattern = INSTANT_FORMAT, timezone = "UTC") val createdDate: Instant? = null,
-)
-
-/**
- * Возвращает DTO представление сущности участника сервера.
- */
-fun Member.toDto() = MemberDto(serverId, userId, username, serverUsername, id, createdDate)
-
-/**
- * Возвращает сущность участника сервера из DTO.
- */
-fun MemberDto.toEntity() = Member(serverId, userId, username).apply {
-    this@toEntity.id?.let { id = it }
-    this@toEntity.createdDate?.let { createdDate = it }
-    serverUsername = this@toEntity.serverUserName
+    @JsonFormat(pattern = INSTANT_FORMAT, timezone = "UTC") val createdDate: Instant,
+) {
+    lateinit var roles: List<String>
 }
+
+/**
+ * Возвращает DTO представление сущности участника сервера с подробной информацией.
+ */
+fun Member.toDetailsDto() =
+    MemberDetailsDto(id, serverId, userId, username, serverUsername, createdDate)

@@ -1,6 +1,8 @@
 package ru.blimfy.server.usecase.privilege
 
 import java.util.UUID
+import kotlinx.coroutines.flow.Flow
+import ru.blimfy.server.db.entity.Privilege
 
 /**
  * Интерфейс для работы с привилегиями ролей.
@@ -10,7 +12,12 @@ import java.util.UUID
  */
 interface PrivilegeService {
     /**
-     * Создаёт стандартные привилегии для роли с идентификатором [roleId].
+     * Возвращает новую [privilege].
      */
-    suspend fun initDefaultPrivileges(roleId: UUID)
+    suspend fun savePrivilege(privilege: Privilege): Privilege
+
+    /**
+     * Возвращает привилегии роли с идентификатором [roleId].
+     */
+    fun findRolePrivileges(roleId: UUID): Flow<Privilege>
 }

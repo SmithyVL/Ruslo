@@ -24,4 +24,9 @@ interface RoleService {
      * Возвращает дефолтную роль сервера с идентификатором [serverId].
      */
     suspend fun findDefaultServerRole(serverId: UUID): Role
+
+    /**
+     * Возвращает роль с идентификатором [id].
+     */
+    suspend fun findRole(id: UUID): Role
 }

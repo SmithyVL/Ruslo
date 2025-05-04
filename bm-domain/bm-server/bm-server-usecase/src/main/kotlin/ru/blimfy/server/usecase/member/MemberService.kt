@@ -22,6 +22,16 @@ interface MemberService {
     suspend fun findServerMember(userId: UUID, serverId: UUID): Member
 
     /**
+     * Возвращает участника с идентификатором [id].
+     */
+    suspend fun findMember(id: UUID): Member
+
+    /**
+     * Возвращает количество участников сервера с идентификатором [serverId].
+     */
+    suspend fun getCountServerMembers(serverId: UUID): Long
+
+    /**
      * Возвращает все участия пользователя с идентификатором [userId] на различных серверах.
      */
     fun findUserMembers(userId: UUID): Flow<Member>

@@ -25,6 +25,11 @@ interface MemberRepository : CoroutineCrudRepository<Member, UUID> {
     fun findAllByServerId(serverId: UUID): Flow<Member>
 
     /**
+     * Возвращает количество сущностей участников сервера с идентификатором [serverId].
+     */
+    suspend fun countByServerId(serverId: UUID): Long
+
+    /**
      * Возвращает все сущности участников для пользователя с идентификатором [userId] и сервера с идентификатором
      * [serverId].
      */

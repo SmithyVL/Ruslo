@@ -2,7 +2,6 @@ package ru.blimfy.direct.usecase.conservation
 
 import java.util.UUID
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import ru.blimfy.common.exception.AccessDeniedException
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.direct.db.entity.Conservation
@@ -25,7 +24,6 @@ class ConservationServiceImpl(
     private val conservationRepo: ConservationRepository,
     private val memberConservationService: MemberConservationService,
 ) : ConservationService {
-    @Transactional
     override suspend fun createConservation(firstUserId: UUID, secondUserId: UUID) =
         conservationRepo.save(Conservation()).apply {
             memberConservationService.saveMember(MemberConservation(this.id, firstUserId))

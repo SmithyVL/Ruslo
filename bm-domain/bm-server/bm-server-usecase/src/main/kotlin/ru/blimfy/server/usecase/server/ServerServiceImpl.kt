@@ -2,7 +2,6 @@ package ru.blimfy.server.usecase.server
 
 import java.util.UUID
 import org.springframework.stereotype.Service
-import org.springframework.transaction.annotation.Transactional
 import ru.blimfy.common.enumeration.ChannelTypes.TEXT
 import ru.blimfy.common.enumeration.ChannelTypes.VOICE
 import ru.blimfy.common.exception.AccessDeniedException
@@ -41,7 +40,6 @@ class ServerServiceImpl(
     private val memberService: MemberService,
     private val memberRoleService: MemberRoleService,
 ) : ServerService {
-    @Transactional
     override suspend fun createServer(server: Server, ownerUsername: String) =
         serverRepo.save(server).apply {
             val serverId = this.id

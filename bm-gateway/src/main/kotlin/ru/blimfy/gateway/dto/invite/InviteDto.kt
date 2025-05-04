@@ -1,4 +1,4 @@
-package ru.blimfy.gateway.dto
+package ru.blimfy.gateway.dto.invite
 
 import java.util.UUID
 import ru.blimfy.server.db.entity.Invite

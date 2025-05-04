@@ -29,6 +29,16 @@ enum class ServerErrors(val msg: String) {
     MEMBER_BY_USER_ID_AND_SERVER_ID_NOT_FOUND("Member with user id - '%s', and server id - '%s', not found!"),
 
     /**
+     * Участник сервера не найден по идентификатору.
+     */
+    MEMBER_BY_ID_NOT_FOUND("Member with id - '%s', not found!"),
+
+    /**
+     * Роль сервера не найдена по идентификатору.
+     */
+    ROLE_BY_ID_NOT_FOUND("Role with id - '%s', not found!"),
+
+    /**
      * Приглашение на сервер не найдено по идентификатору.
      */
     INVITE_BY_ID_NOT_FOUND("Invite with id - '%s', not found!"),
