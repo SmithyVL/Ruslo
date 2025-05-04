@@ -24,5 +24,5 @@ interface TextMessageRepository : CoroutineCrudRepository<TextMessage, UUID> {
     /**
      * Удаляет сущность текстового сообщения с [id] канала сервера от пользователя с [authorId].
      */
-    suspend fun deleteByIdAndAuthorId(id: UUID, authorId: UUID)
+    suspend fun deleteByIdAndAuthorUserId(id: UUID, authorId: UUID)
 }

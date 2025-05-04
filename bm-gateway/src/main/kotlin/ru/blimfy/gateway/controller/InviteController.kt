@@ -66,7 +66,7 @@ class InviteController(
         inviteService.findInvite(inviteId)
             .apply {
                 val userId = tokenService.extractUserId(principal)
-                val newMember = serverService.addNewMember(serverId = serverId, userId = userId)
+                val newMember = serverService.addNewMember(serverId = serverId, userId = userId, principal.name)
                 userWebSocketStorage.sendServerMessages(serverId, NEW_SERVER_MEMBER, newMember, userId)
             }
             .serverId

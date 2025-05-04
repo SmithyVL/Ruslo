@@ -11,6 +11,8 @@ import ru.blimfy.server.db.entity.Member
  *
  * @property serverId идентификатор сервера.
  * @property userId идентификатор пользователя.
+ * @property username имя пользователя участника сервера.
+ * @property serverUserName имя участника сервера для конкретного сервера.
  * @property id идентификатор.
  * @property createdDate дата создания.
  * @author Владислав Кузнецов.
@@ -19,6 +21,8 @@ import ru.blimfy.server.db.entity.Member
 data class MemberDto(
     val serverId: UUID,
     val userId: UUID,
+    val username: String,
+    val serverUserName: String? = null,
     val id: UUID? = null,
     @JsonFormat(pattern = INSTANT_FORMAT, timezone = "UTC") val createdDate: Instant? = null,
 )
@@ -26,12 +30,13 @@ data class MemberDto(
 /**
  * Возвращает DTO представление сущности участника сервера.
  */
-fun Member.toDto() = MemberDto(serverId, userId, id, createdDate)
+fun Member.toDto() = MemberDto(serverId, userId, username, serverUsername, id, createdDate)
 
 /**
  * Возвращает сущность участника сервера из DTO.
  */
-fun MemberDto.toEntity() = Member(serverId, userId).apply {
+fun MemberDto.toEntity() = Member(serverId, userId, username).apply {
     this@toEntity.id?.let { id = it }
     this@toEntity.createdDate?.let { createdDate = it }
+    serverUsername = this@toEntity.serverUserName
 }

@@ -18,6 +18,11 @@ enum class WsMessageTypes {
     NEW_SERVER_MEMBER,
 
     /**
+     * Участник сервера изменён.
+     */
+    EDIT_SERVER_MEMBER,
+
+    /**
      * Участник удалён с сервера.
      */
     REMOVE_SERVER_MEMBER,

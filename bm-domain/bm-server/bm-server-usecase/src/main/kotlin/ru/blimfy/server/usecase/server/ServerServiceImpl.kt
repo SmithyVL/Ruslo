@@ -42,7 +42,7 @@ class ServerServiceImpl(
     private val memberRoleService: MemberRoleService,
 ) : ServerService {
     @Transactional
-    override suspend fun createServer(server: Server) =
+    override suspend fun createServer(server: Server, ownerUsername: String) =
         serverRepo.save(server).apply {
             val serverId = this.id
 
@@ -55,7 +55,8 @@ class ServerServiceImpl(
             val defaultRoleId = roleService.createRole(Role(serverId, DEFAULT_ROLE_NAME, true)).id
 
             // Создание участника для пользователя-создателя сервера с дефолтной ролью.
-            val memberId = memberService.saveMember(Member(serverId = serverId, userId = this.ownerId)).id
+            val ownerMember = Member(serverId = serverId, userId = this.ownerUserId, ownerUsername)
+            val memberId = memberService.saveMember(ownerMember).id
             memberRoleService.saveRoleToMember(MemberRole(memberId = memberId, roleId = defaultRoleId))
         }
 
@@ -65,10 +66,10 @@ class ServerServiceImpl(
         ?: throw NotFoundException(SERVER_BY_ID_NOT_FOUND.msg.format(id))
 
     override suspend fun deleteServer(id: UUID, ownerId: UUID) =
-        serverRepo.deleteByIdAndOwnerId(id = id, ownerId = ownerId)
+        serverRepo.deleteByIdAndOwnerUserId(id = id, ownerId = ownerId)
 
-    override suspend fun addNewMember(serverId: UUID, userId: UUID) =
-        memberService.saveMember(Member(serverId = serverId, userId = userId)).apply {
+    override suspend fun addNewMember(serverId: UUID, userId: UUID, username: String) =
+        memberService.saveMember(Member(serverId = serverId, userId = userId, username)).apply {
             val defaultRoleId = roleService.findDefaultServerRole(serverId).id
             memberRoleService.saveRoleToMember(MemberRole(memberId = id, roleId = defaultRoleId))
         }
@@ -76,7 +77,7 @@ class ServerServiceImpl(
     override suspend fun checkServerModifyAccess(serverId: UUID, userId: UUID) {
         val server = findServer(serverId)
 
-        if (userId != server.ownerId) {
+        if (userId != server.ownerUserId) {
             throw AccessDeniedException(SERVER_MODIFY_ACCESS_DENIED.msg.format(server.id))
         }
     }

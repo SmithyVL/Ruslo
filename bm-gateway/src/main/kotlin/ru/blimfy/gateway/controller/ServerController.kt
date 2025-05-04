@@ -58,7 +58,7 @@ class ServerController(
     @Operation(summary = "Создать сервер")
     @PostMapping
     suspend fun createServer(@RequestBody newServerDto: NewServerDto, principal: Principal) =
-        serverService.createServer(newServerDto.toEntity(tokenService.extractUserId(principal))).toDto()
+        serverService.createServer(newServerDto.toEntity(tokenService.extractUserId(principal)), principal.name).toDto()
 
     @Operation(summary = "Обновить сервер")
     @PutMapping

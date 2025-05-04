@@ -12,9 +12,9 @@ import ru.blimfy.server.db.entity.Server
  */
 interface ServerService {
     /**
-     * Возвращает новый [server].
+     * Возвращает новый [server] пользователя с [ownerUsername].
      */
-    suspend fun createServer(server: Server): Server
+    suspend fun createServer(server: Server, ownerUsername: String): Server
 
     /**
      * Возвращает обновлённый [server].
@@ -32,9 +32,9 @@ interface ServerService {
     suspend fun deleteServer(id: UUID, ownerId: UUID)
 
     /**
-     * Возвращает нового пользователя с [userId] на сервер с [serverId].
+     * Возвращает нового пользователя с [userId] и [username] на сервер с [serverId].
      */
-    suspend fun addNewMember(serverId: UUID, userId: UUID): Member
+    suspend fun addNewMember(serverId: UUID, userId: UUID, username: String): Member
 
     /**
      * Проверяет разрешение пользователя с [userId] на изменение сервера с [serverId] и его связанных данных.

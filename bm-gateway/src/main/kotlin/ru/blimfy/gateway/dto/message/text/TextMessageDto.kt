@@ -10,7 +10,7 @@ import ru.blimfy.server.db.entity.TextMessage
  * DTO с информацией о сообщении канала.
  *
  * @property id идентификатор.
- * @property authorId идентификатор автора сообщения.
+ * @property authorUserId идентификатор пользователя, создавшего сообщение в канале сервера.
  * @property channelId идентификатор канала.
  * @property content содержимое сообщения.
  * @property fileUrl ссылка на файл, прикреплённый к сообщению.
@@ -21,7 +21,7 @@ import ru.blimfy.server.db.entity.TextMessage
  */
 data class TextMessageDto(
     val id: UUID,
-    val authorId: UUID,
+    val authorUserId: UUID,
     val channelId: UUID,
     val content: String,
     val fileUrl: String? = null,
@@ -36,7 +36,7 @@ data class TextMessageDto(
 /**
  * Возвращает сущность текстового сообщения канала сервера из DTO представления текстового сообщения канала сервера.
  */
-fun TextMessageDto.toEntity(authorId: UUID) = TextMessage(content, authorId, channelId).apply {
+fun TextMessageDto.toEntity(authorUserId: UUID) = TextMessage(content, authorUserId, channelId).apply {
     id = this@toEntity.id
     fileUrl = this@toEntity.fileUrl
     createdDate = this@toEntity.createdDate
@@ -47,4 +47,4 @@ fun TextMessageDto.toEntity(authorId: UUID) = TextMessage(content, authorId, cha
  * Возвращает DTO представления сущности текстового сообщения канала сервера.
  */
 fun TextMessage.toDto() =
-    TextMessageDto(id, authorId, channelId, content, fileUrl, createdDate, updatedDate)
+    TextMessageDto(id, authorUserId, channelId, content, fileUrl, createdDate, updatedDate)

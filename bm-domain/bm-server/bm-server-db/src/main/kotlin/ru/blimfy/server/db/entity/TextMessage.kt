@@ -8,10 +8,10 @@ import ru.blimfy.server.db.entity.base.BaseMessage
  * Сущность с информацией о сообщениях текстовых каналов.
  *
  * @param content содержимое сообщения.
- * @property authorId идентификатор автора сообщения.
+ * @property authorUserId идентификатор пользователя, создавшего сообщение в канале сервера.
  * @property channelId идентификатор текстового канала.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Table
-class TextMessage(content: String, val authorId: UUID, val channelId: UUID) : BaseMessage(content)
+class TextMessage(content: String, val authorUserId: UUID, val channelId: UUID) : BaseMessage(content)

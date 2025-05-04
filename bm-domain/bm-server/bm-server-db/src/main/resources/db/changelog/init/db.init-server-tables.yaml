@@ -28,9 +28,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: owner_id
+                  name: owner_user_id
                   type: uuid
-                  remarks: Идентификатор владельца сервера
+                  remarks: Идентификатор пользователя, владеющего сервером
                   constraints:
                     nullable: false
               - column:
@@ -78,6 +78,16 @@ databaseChangeLog:
                   remarks: Идентификатор пользователя
                   constraints:
                     nullable: false
+              - column:
+                  name: username
+                  type: varchar
+                  remarks: Имя пользователя
+                  constraints:
+                    nullable: false
+              - column:
+                  name: server_username
+                  type: varchar
+                  remarks: Имя участника для конкретного сервера
               - column:
                   name: created_date
                   type: timestamptz
@@ -332,9 +342,9 @@ databaseChangeLog:
                     primaryKey: true
                     primaryKeyName: text_message_id_pkey
               - column:
-                  name: author_id
+                  name: author_user_id
                   type: uuid
-                  remarks: Идентификатор автора сообщения
+                  remarks: Идентификатор пользователя, создавшего сообщение в канале сервера
                   constraints:
                     nullable: false
               - column:
@@ -395,9 +405,9 @@ databaseChangeLog:
                     primaryKey: true
                     primaryKeyName: invite_id_pkey
               - column:
-                  name: author_id
+                  name: author_member_id
                   type: uuid
-                  remarks: Идентификатор автора приглашения
+                  remarks: Идентификатор участника сервера, создавшего приглашение
                   constraints:
                     nullable: false
               - column:
@@ -409,7 +419,7 @@ databaseChangeLog:
         - addForeignKeyConstraint:
             onDelete: CASCADE
             onUpdate: RESTRICT
-            baseColumnNames: author_id
+            baseColumnNames: author_member_id
             baseTableName: invite
             constraintName: fk_member_invite
             referencedColumnNames: id
