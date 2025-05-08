@@ -2,13 +2,12 @@
 springBoot = "3.4.5"
 kotlin = "2.1.20"
 jwt = "0.12.6"
-springDoc = "2.8.6"
+springDoc = "2.8.8"
 
 [libraries]
 # Spring Boot.
 springBootStarterWebflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
 springBootStarterIntegration = { module = "org.springframework.boot:spring-boot-starter-integration" }
-springBootStarterActuator = { module = "org.springframework.boot:spring-boot-starter-actuator" }
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootStarter = { module = "org.springframework.boot:spring-boot-starter" }
 

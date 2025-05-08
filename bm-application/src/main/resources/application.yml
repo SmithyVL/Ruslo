@@ -1,5 +1,5 @@
 # Количество логов. При "true" будет отображено больше логов.
-debug: ${BM_FULL_DEBUG:false}
+debug: ${BM_FULL_DEBUG:true}
 
 # Логирование запросов к БД.
 logging:

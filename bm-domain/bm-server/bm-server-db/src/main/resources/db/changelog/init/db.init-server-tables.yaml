@@ -79,17 +79,11 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: username
+                  name: nick
                   type: varchar
-                  remarks: Имя пользователя
-                  constraints:
-                    nullable: false
+                  remarks: Ник участника
               - column:
-                  name: server_username
-                  type: varchar
-                  remarks: Имя участника для конкретного сервера
-              - column:
-                  name: created_date
+                  name: joining_date
                   type: timestamptz
                   remarks: Дата создания
                   defaultValueDate: now()

@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.blimfy.common.exception.IncorrectPasswordException
+import ru.blimfy.common.exception.IncorrectDataException
 import ru.blimfy.gateway.dto.auth.SignInDto
 import ru.blimfy.gateway.dto.auth.SignUpDto
 import ru.blimfy.gateway.dto.auth.TokenDto
@@ -54,7 +54,7 @@ class AuthController(
             .apply {
                 val password = passwordService.findUserPassword(id)
                 if (!encoder.matches(signInDto.password, password.hash)) {
-                    throw IncorrectPasswordException(INCORRECT_PASSWORD.msg.format(signInDto.password, username))
+                    throw IncorrectDataException(INCORRECT_PASSWORD.msg.format(signInDto.password, username))
                 }
             }
             .let { user -> TokenDto(tokenService.generateToken(user.username, user.id)) }

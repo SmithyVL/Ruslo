@@ -2,19 +2,18 @@ package ru.blimfy.gateway.exception
 
 import kotlinx.coroutines.reactive.awaitSingle
 import org.springframework.http.HttpStatus
+import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NOT_FOUND
-import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.ProblemDetail.forStatusAndDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler
 import org.springframework.web.server.ServerWebExchange
-import ru.blimfy.common.exception.AccessDeniedException
 import ru.blimfy.common.exception.DuplicateException
-import ru.blimfy.common.exception.IncorrectPasswordException
+import ru.blimfy.common.exception.IncorrectDataException
 import ru.blimfy.common.exception.NotFoundException
 
 /**
@@ -50,14 +49,12 @@ class ControllerAdvice : ResponseEntityExceptionHandler() {
             ResponseEntity<in Any> = transformException(ex, FORBIDDEN, exchange)
 
     /**
-     * Возвращает преобразованный [exchange] с информацией о перехваченной ошибке [ex], указывающей на то, что
-     * пользователь не авторизован.
+     * Возвращает преобразованный [exchange] с информацией о перехваченной ошибке [ex], указывающей на то, пришли
+     *      * некорректные данные.
      */
     @ExceptionHandler
-    suspend fun handleUnauthorized(
-        ex: IncorrectPasswordException,
-        exchange: ServerWebExchange,
-    ) = transformException(ex, UNAUTHORIZED, exchange)
+    suspend fun handleBadRequest(ex: IncorrectDataException, exchange: ServerWebExchange):
+            ResponseEntity<in Any> = transformException(ex, BAD_REQUEST, exchange)
 
     /**
      * Возвращает преобразованное в ответ со [status] исключение - [ex], для [exchange].

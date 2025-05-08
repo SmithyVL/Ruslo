@@ -6,6 +6,8 @@ import java.security.Principal
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.toList
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -18,18 +20,23 @@ import ru.blimfy.gateway.dto.channel.ChannelDto
 import ru.blimfy.gateway.dto.channel.toDto
 import ru.blimfy.gateway.dto.invite.InviteDto
 import ru.blimfy.gateway.dto.invite.toDto
-import ru.blimfy.gateway.dto.member.MemberDto
-import ru.blimfy.gateway.dto.member.toDto
+import ru.blimfy.gateway.dto.member.MemberDetailsDto
+import ru.blimfy.gateway.dto.member.toDetailsDto
+import ru.blimfy.gateway.dto.role.toDto
 import ru.blimfy.gateway.dto.server.NewServerDto
 import ru.blimfy.gateway.dto.server.ServerDto
 import ru.blimfy.gateway.dto.server.toDto
 import ru.blimfy.gateway.dto.server.toEntity
+import ru.blimfy.gateway.dto.toDto
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.security.service.TokenService
 import ru.blimfy.server.usecase.channel.ChannelService
 import ru.blimfy.server.usecase.invite.InviteService
 import ru.blimfy.server.usecase.member.MemberService
+import ru.blimfy.server.usecase.member.role.MemberRoleService
+import ru.blimfy.server.usecase.role.RoleService
 import ru.blimfy.server.usecase.server.ServerService
+import ru.blimfy.user.usecase.user.UserService
 import ru.blimfy.websocket.dto.WsMessageTypes.EDIT_SERVER
 import ru.blimfy.websocket.dto.WsMessageTypes.REMOVE_SERVER_MEMBER
 
@@ -52,7 +59,10 @@ class ServerController(
     private val serverService: ServerService,
     private val channelService: ChannelService,
     private val memberService: MemberService,
+    private val roleService: RoleService,
+    private val memberRoleService: MemberRoleService,
     private val inviteService: InviteService,
+    private val userService: UserService,
     private val tokenService: TokenService,
     private val userTokenWebSocketStorage: UserWebSocketStorage,
 ) {
@@ -86,7 +96,7 @@ class ServerController(
     @Operation(summary = "Удалить сервер")
     @DeleteMapping("/{serverId}")
     suspend fun deleteServer(@PathVariable serverId: UUID, principal: Principal) =
-        serverService.deleteServer(id = serverId, ownerId = tokenService.extractUserId(principal))
+        serverService.deleteServer(serverId = serverId, ownerId = tokenService.extractUserId(principal))
 
     @Operation(summary = "Кикнуть участника сервера")
     @DeleteMapping("/{serverId}/member/{memberId}")
@@ -106,24 +116,30 @@ class ServerController(
 
     @Operation(summary = "Получить всех участников сервера")
     @GetMapping("/{serverId}/members")
-    suspend fun findServerMembers(@PathVariable serverId: UUID, principal: Principal): Flow<MemberDto> {
+    suspend fun findServerMembers(@PathVariable serverId: UUID, principal: Principal): Flow<MemberDetailsDto> {
         // Получить участников сервера может только его участник.
-        serverService.checkServerViewAccess(
-            serverId = serverId,
-            userId = tokenService.extractUserId(principal),
-        )
+        serverService.checkServerViewAccess(serverId = serverId, userId = tokenService.extractUserId(principal))
 
-        return memberService.findServerMembers(serverId).map { it.toDto() }
+        return memberService.findServerMembers(serverId)
+            .map { it.toDetailsDto() }
+            .onEach { member ->
+                member.apply {
+                    roles = memberRoleService.findMemberRoles(id)
+                        .map { roleService.findRole(it.roleId) }
+                        //.filter { !it.basic }
+                        .map { it.toDto() }
+                        .toList()
+
+                    user = userService.findUser(userId).toDto()
+                }
+            }
     }
 
     @Operation(summary = "Получить все каналы сервера")
     @GetMapping("/{serverId}/channels")
     suspend fun findServerChannels(@PathVariable serverId: UUID, principal: Principal): Flow<ChannelDto> {
         // Получить каналы сервера может только его участник.
-        serverService.checkServerViewAccess(
-            serverId = serverId,
-            userId = tokenService.extractUserId(principal),
-        )
+        serverService.checkServerViewAccess(serverId = serverId, userId = tokenService.extractUserId(principal))
 
         return channelService.findServerChannels(serverId).map { it.toDto() }
     }

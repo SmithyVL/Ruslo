@@ -14,8 +14,8 @@ import ru.blimfy.server.db.entity.Server
 @Repository
 interface ServerRepository : CoroutineCrudRepository<Server, UUID> {
     /**
-     * Удаляет сущность сервера с идентификатором [id], владельцем которого является пользователь с идентификатором
+     * Удаляет сущность сервера с идентификатором [serverId], владельцем которого является пользователь с идентификатором
      * [ownerId].
      */
-    suspend fun deleteByIdAndOwnerUserId(id: UUID, ownerId: UUID)
+    suspend fun deleteByIdAndOwnerUserId(serverId: UUID, ownerId: UUID)
 }

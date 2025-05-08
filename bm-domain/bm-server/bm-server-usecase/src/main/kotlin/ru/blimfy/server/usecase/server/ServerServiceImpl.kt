@@ -53,7 +53,7 @@ class ServerServiceImpl(
             val defaultRoleId = roleService.createRole(Role(serverId, DEFAULT_ROLE_NAME, true)).id
 
             // Создание участника для пользователя-создателя сервера с дефолтной ролью.
-            val ownerMember = Member(serverId = serverId, userId = this.ownerUserId, ownerUsername)
+            val ownerMember = Member(serverId = serverId, userId = this.ownerUserId)
             val memberId = memberService.saveMember(ownerMember).id
             memberRoleService.saveRoleToMember(MemberRole(memberId = memberId, roleId = defaultRoleId))
         }
@@ -63,11 +63,11 @@ class ServerServiceImpl(
     override suspend fun findServer(id: UUID) = serverRepo.findById(id)
         ?: throw NotFoundException(SERVER_BY_ID_NOT_FOUND.msg.format(id))
 
-    override suspend fun deleteServer(id: UUID, ownerId: UUID) =
-        serverRepo.deleteByIdAndOwnerUserId(id = id, ownerId = ownerId)
+    override suspend fun deleteServer(serverId: UUID, ownerId: UUID) =
+        serverRepo.deleteByIdAndOwnerUserId(serverId = serverId, ownerId = ownerId)
 
-    override suspend fun addNewMember(serverId: UUID, userId: UUID, username: String) =
-        memberService.saveMember(Member(serverId = serverId, userId = userId, username)).apply {
+    override suspend fun addNewMember(serverId: UUID, userId: UUID) =
+        memberService.saveMember(Member(serverId = serverId, userId = userId)).apply {
             val defaultRoleId = roleService.findDefaultServerRole(serverId).id
             memberRoleService.saveRoleToMember(MemberRole(memberId = id, roleId = defaultRoleId))
         }

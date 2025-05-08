@@ -27,14 +27,14 @@ interface ServerService {
     suspend fun findServer(id: UUID): Server
 
     /**
-     * Удалить сервер с таким [id] его владельцем с идентификатором [ownerId].
+     * Удалить сервер с таким [serverId] его владельцем с идентификатором [ownerId].
      */
-    suspend fun deleteServer(id: UUID, ownerId: UUID)
+    suspend fun deleteServer(serverId: UUID, ownerId: UUID)
 
     /**
-     * Возвращает нового пользователя с [userId] и [username] на сервер с [serverId].
+     * Возвращает нового пользователя с [userId] на сервер с [serverId].
      */
-    suspend fun addNewMember(serverId: UUID, userId: UUID, username: String): Member
+    suspend fun addNewMember(serverId: UUID, userId: UUID): Member
 
     /**
      * Проверяет разрешение пользователя с [userId] на изменение сервера с [serverId] и его связанных данных.

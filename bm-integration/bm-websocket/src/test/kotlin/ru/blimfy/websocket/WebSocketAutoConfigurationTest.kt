@@ -1,6 +1,7 @@
 package ru.blimfy.websocket
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import java.util.UUID
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE
@@ -40,11 +41,11 @@ class WebSocketAutoConfigurationTest {
         @Bean
         fun tokenWebSocketStorage() =
             object : WebSocketStorage<Any>(ObjectMapper()) {
-                override fun addSession(token: String, userSession: WebSocketSession) {
+                override fun addSession(token: String, session: WebSocketSession) {
                     // Логика не требуется.
                 }
 
-                override fun removeSession(token: String) {
+                override fun removeSession(userId: UUID) {
                     // Логика не требуется.
                 }
             }

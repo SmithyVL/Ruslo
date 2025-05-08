@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import ru.blimfy.gateway.dto.message.text.NewTextMessageDto
 import ru.blimfy.gateway.dto.message.text.TextMessageDto
 import ru.blimfy.gateway.dto.message.text.toDto
 import ru.blimfy.gateway.dto.message.text.toEntity
@@ -36,7 +37,7 @@ import ru.blimfy.websocket.dto.WsMessageTypes.REMOVE_TEXT_MESSAGE
  */
 @Tag(name = "TextMessageController", description = "Контроллер для работы с сообщениями каналов серверов")
 @RestController
-@RequestMapping("/v1/text-messages")
+@RequestMapping("/v1/channel/{channelId}/text-messages")
 class TextMessageController(
     private val textMessageService: TextMessageService,
     private val serverService: ServerService,
@@ -47,16 +48,17 @@ class TextMessageController(
     @Operation(summary = "Создать текстовое сообщение")
     @PostMapping
     suspend fun createTextMessage(
-        @RequestBody textMessageDto: TextMessageDto,
+        @PathVariable channelId: UUID,
+        @RequestBody newTextMessageDto: NewTextMessageDto,
         principal: Principal,
     ): TextMessageDto {
         val userId = tokenService.extractUserId(principal)
-        val serverId = channelService.findChannel(textMessageDto.channelId).serverId
+        val serverId = channelService.findChannel(channelId).serverId
 
         // Отправить текстовое сообщение в канал сервера может только его участник.
         serverService.checkServerViewAccess(serverId = serverId, userId = userId)
 
-        return textMessageService.saveMessage(textMessageDto.toEntity(userId)).toDto()
+        return textMessageService.saveMessage(newTextMessageDto.toEntity(channelId, userId)).toDto()
             .apply { userTokenWebSocketStorage.sendServerMessages(serverId, NEW_TEXT_MESSAGE, this, userId) }
     }
 
@@ -78,15 +80,18 @@ class TextMessageController(
 
     @Operation(summary = "Удалить текстовое сообщение")
     @DeleteMapping("/{textMessageId}")
-    suspend fun deleteTextMessage(@PathVariable textMessageId: UUID, principal: Principal) {
+    suspend fun deleteTextMessage(
+        @PathVariable channelId: UUID,
+        @PathVariable textMessageId: UUID,
+        principal: Principal,
+    ) {
         val userId = tokenService.extractUserId(principal)
-        val channelId = textMessageService.findMessage(textMessageId).channelId
         val serverId = channelService.findChannel(channelId).serverId
 
         // Удалить текстовое сообщение канала сервера может только его участник.
         serverService.checkServerViewAccess(serverId = serverId, userId = userId)
 
-        textMessageService.deleteMessage(id = textMessageId, authorId = userId)
+        textMessageService.deleteMessage(textMessageId = textMessageId, authorId = userId)
             .apply {
                 userTokenWebSocketStorage.sendServerMessages(
                     serverId,

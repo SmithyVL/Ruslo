@@ -16,12 +16,15 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
+import ru.blimfy.common.exception.IncorrectDataException
+import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.gateway.dto.channel.ChannelDto
 import ru.blimfy.gateway.dto.channel.NewChannelDto
 import ru.blimfy.gateway.dto.channel.toDto
 import ru.blimfy.gateway.dto.channel.toEntity
 import ru.blimfy.gateway.dto.message.text.TextMessageDto
 import ru.blimfy.gateway.dto.message.text.toDto
+import ru.blimfy.gateway.exception.GatewayErrors.INVALID_CHANNEL
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.security.service.TokenService
 import ru.blimfy.server.usecase.channel.ChannelService
@@ -44,7 +47,7 @@ import ru.blimfy.websocket.dto.WsMessageTypes.REMOVE_SERVER_CHANNEL
  */
 @Tag(name = "ChannelController", description = "Контроллер для работы с каналами серверов")
 @RestController
-@RequestMapping("/v1/channels")
+@RequestMapping("/v1/servers/{serverId}/channels")
 class ChannelController(
     private val channelService: ChannelService,
     private val textMessageService: TextMessageService,
@@ -54,13 +57,17 @@ class ChannelController(
 ) {
     @Operation(summary = "Создать канал сервера")
     @PostMapping
-    suspend fun createChannel(@RequestBody newChannelDto: NewChannelDto, principal: Principal): ChannelDto {
+    suspend fun createChannel(
+        @PathVariable serverId: UUID,
+        @RequestBody newChannelDto: NewChannelDto,
+        principal: Principal,
+    ): ChannelDto {
         val userId = tokenService.extractUserId(principal)
 
         // Создать канал сервера может только создатель сервера.
-        serverService.checkServerModifyAccess(serverId = newChannelDto.serverId, userId = userId)
+        serverService.checkServerModifyAccess(serverId = serverId, userId = userId)
 
-        return channelService.saveChannel(newChannelDto.toEntity()).toDto()
+        return channelService.saveChannel(newChannelDto.toEntity(serverId)).toDto()
             .apply { userWebSocketStorage.sendServerMessages(serverId, NEW_SERVER_CHANNEL, this, userId) }
     }
 
@@ -78,38 +85,63 @@ class ChannelController(
 
     @Operation(summary = "Удалить канал по его идентификатору")
     @DeleteMapping("/{channelId}")
-    suspend fun deleteChannel(@PathVariable channelId: UUID, principal: Principal) {
+    suspend fun deleteChannel(
+        @PathVariable serverId: UUID,
+        @PathVariable channelId: UUID,
+        principal: Principal,
+    ) {
         val userId = tokenService.extractUserId(principal)
-        val serverId = channelService.findChannel(channelId).serverId
 
         // Удалить канал сервера может только создатель сервера.
         serverService.checkServerModifyAccess(serverId = serverId, userId = userId)
 
-        channelService.deleteChannel(channelId)
+        channelService.deleteChannel(channelId = channelId, serverId = serverId)
             .apply { userWebSocketStorage.sendServerMessages(serverId, REMOVE_SERVER_CHANNEL, channelId, userId) }
     }
 
     @Operation(summary = "Получить канал по его идентификатору")
     @GetMapping("/{channelId}")
-    suspend fun findChannel(@PathVariable channelId: UUID, principal: Principal) =
-        channelService.findChannel(channelId).toDto().apply {
-            // Получить информацию о канале сервера может только его участник.
-            serverService.checkServerViewAccess(serverId = serverId, userId = tokenService.extractUserId(principal))
+    suspend fun findChannel(
+        @PathVariable serverId: UUID,
+        @PathVariable channelId: UUID,
+        principal: Principal,
+    ): ChannelDto {
+        // Получить информацию о канале сервера может только его участник.
+        serverService.checkServerViewAccess(serverId = serverId, userId = tokenService.extractUserId(principal))
+
+        val channel = channelService.findChannel(channelId)
+
+        // Проверяем, чтобы искомый канал находился внутри сервера.
+        if (channel.serverId != serverId) {
+            throw IncorrectDataException(INVALID_CHANNEL.msg.format(channelId, serverId))
         }
+
+        return channel.toDto()
+
+    }
 
     @Operation(summary = "Получить страницу с сообщениями канала")
     @GetMapping("/{channelId}/messages")
     suspend fun findChannelMessages(
+        @PathVariable serverId: UUID,
         @PathVariable channelId: UUID,
         @RequestParam pageNumber: Int,
         @RequestParam pageSize: Int,
         principal: Principal,
     ): Flow<TextMessageDto> {
         // Получить текстовые сообщения канала сервера может только его участник.
-        serverService.checkServerViewAccess(
-            serverId = channelService.findChannel(channelId).serverId,
-            userId = tokenService.extractUserId(principal),
-        )
+        serverService.checkServerViewAccess(serverId = serverId, userId = tokenService.extractUserId(principal))
+
+        // Проверяем, чтобы искомый канал находился внутри сервера.
+        try {
+            val channel = channelService.findChannel(channelId)
+
+            if (channel.serverId != serverId) {
+                throw IncorrectDataException(INVALID_CHANNEL.msg.format(channelId, serverId))
+            }
+        } catch (_: NotFoundException) {
+            throw IncorrectDataException(INVALID_CHANNEL.msg.format(channelId, serverId))
+        }
 
         return textMessageService.findPageChannelMessages(channelId, of(pageNumber, pageSize)).map { it.toDto() }
     }

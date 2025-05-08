@@ -27,7 +27,7 @@ interface InviteService {
     fun findServerInvites(serverId: UUID): Flow<Invite>
 
     /**
-     * Удаляет приглашение с таким [id].
+     * Удаляет приглашение с таким [inviteId] для сервера с [serverId].
      */
-    suspend fun deleteInvite(id: UUID)
+    suspend fun deleteInvite(inviteId: UUID, serverId: UUID)
 }

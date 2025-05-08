@@ -25,5 +25,6 @@ class TextMessageServiceImpl(private val messageRepo: TextMessageRepository) : T
     override suspend fun findPageChannelMessages(channelId: UUID, pageable: Pageable) =
         messageRepo.findAllByChannelId(channelId, pageable)
 
-    override suspend fun deleteMessage(id: UUID, authorId: UUID) = messageRepo.deleteByIdAndAuthorUserId(id, authorId)
+    override suspend fun deleteMessage(textMessageId: UUID, authorId: UUID) =
+        messageRepo.deleteByIdAndAuthorUserId(textMessageId = textMessageId, authorId = authorId)
 }

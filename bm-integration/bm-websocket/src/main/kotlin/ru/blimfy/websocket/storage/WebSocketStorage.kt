@@ -1,6 +1,7 @@
 package ru.blimfy.websocket.storage
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import java.util.UUID
 import java.util.concurrent.ConcurrentHashMap
 import org.springframework.web.reactive.socket.WebSocketSession
 import reactor.core.publisher.Mono.just
@@ -21,7 +22,7 @@ abstract class WebSocketStorage<SESSION_KEY>(private val objectMapper: ObjectMap
 
     abstract override fun addSession(token: String, session: WebSocketSession)
 
-    abstract override fun removeSession(token: String)
+    abstract override fun removeSession(userId: UUID)
 
     /**
      * Отправляет [type] сообщение с [data] в сессию с [key].

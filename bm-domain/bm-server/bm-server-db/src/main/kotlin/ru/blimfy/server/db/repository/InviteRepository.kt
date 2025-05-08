@@ -18,4 +18,9 @@ interface InviteRepository : CoroutineCrudRepository<Invite, UUID> {
      * Возвращает все сущности приглашений на сервер с идентификатором [serverId].
      */
     fun findAllByServerId(serverId: UUID): Flow<Invite>
+
+    /**
+     * Удаляет сущность приглашения с идентификатором [inviteId] для сервера с идентификатором [serverId].
+     */
+    suspend fun deleteByIdAndServerId(inviteId: UUID, serverId: UUID)
 }

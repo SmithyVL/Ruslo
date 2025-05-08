@@ -23,5 +23,6 @@ class InviteServiceImpl(private val inviteRepo: InviteRepository) : InviteServic
 
     override fun findServerInvites(serverId: UUID) = inviteRepo.findAllByServerId(serverId)
 
-    override suspend fun deleteInvite(id: UUID) = inviteRepo.deleteById(id)
+    override suspend fun deleteInvite(inviteId: UUID, serverId: UUID) =
+        inviteRepo.deleteByIdAndServerId(inviteId = inviteId, serverId = serverId)
 }

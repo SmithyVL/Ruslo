@@ -28,7 +28,7 @@ interface TextMessageService {
     suspend fun findPageChannelMessages(channelId: UUID, pageable: Pageable): Flow<TextMessage>
 
     /**
-     * Удаляет сообщение канала с [id] от [authorId].
+     * Удаляет сообщение канала с [textMessageId] от [authorId].
      */
-    suspend fun deleteMessage(id: UUID, authorId: UUID)
+    suspend fun deleteMessage(textMessageId: UUID, authorId: UUID)
 }

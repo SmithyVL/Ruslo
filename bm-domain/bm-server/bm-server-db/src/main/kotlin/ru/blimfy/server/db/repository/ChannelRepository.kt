@@ -18,4 +18,9 @@ interface ChannelRepository : CoroutineCrudRepository<Channel, UUID> {
      * Возвращает все сущности каналов для сервера с идентификатором [serverId].
      */
     fun findAllByServerId(serverId: UUID): Flow<Channel>
+
+    /**
+     * Удаляет сущность канала с идентификатором [channelId] для сервера с идентификатором [serverId].
+     */
+    suspend fun deleteByIdAndServerId(channelId: UUID, serverId: UUID)
 }

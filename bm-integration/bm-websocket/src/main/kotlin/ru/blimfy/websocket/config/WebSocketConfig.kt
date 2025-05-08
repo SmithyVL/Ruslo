@@ -19,5 +19,5 @@ internal class WebSocketConfig(private val webSocketHandler: WebSocketHandler) {
      */
     @Bean
     fun handlerMapping() =
-        SimpleUrlHandlerMapping(mapOf("/{userId}" to webSocketHandler), 1)
+        SimpleUrlHandlerMapping(mapOf("/ws/{userId}" to webSocketHandler), 1)
 }

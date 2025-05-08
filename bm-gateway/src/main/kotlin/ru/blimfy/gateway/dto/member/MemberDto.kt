@@ -9,34 +9,23 @@ import ru.blimfy.server.db.entity.Member
 /**
  * DTO с информацией об участнике сервера.
  *
+ * @property id идентификатор.
  * @property serverId идентификатор сервера.
  * @property userId идентификатор пользователя.
- * @property username имя пользователя участника сервера.
- * @property serverUserName имя участника сервера для конкретного сервера.
- * @property id идентификатор.
- * @property createdDate дата создания.
+ * @property nick имя пользователя участника сервера.
+ * @property joiningDate дата создания.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 data class MemberDto(
+    val id: UUID,
     val serverId: UUID,
     val userId: UUID,
-    val username: String,
-    val serverUserName: String? = null,
-    val id: UUID? = null,
-    @JsonFormat(pattern = INSTANT_FORMAT, timezone = "UTC") val createdDate: Instant? = null,
+    val nick: String? = null,
+    @JsonFormat(pattern = INSTANT_FORMAT, timezone = "UTC") val joiningDate: Instant,
 )
 
 /**
- * Возвращает DTO представление сущности участника сервера.
+ * Возвращает DTO представления с информацией об участнике сервера.
  */
-fun Member.toDto() = MemberDto(serverId, userId, username, serverUsername, id, createdDate)
-
-/**
- * Возвращает сущность участника сервера из DTO.
- */
-fun MemberDto.toEntity() = Member(serverId, userId, username).apply {
-    this@toEntity.id?.let { id = it }
-    this@toEntity.createdDate?.let { createdDate = it }
-    serverUsername = this@toEntity.serverUserName
-}
+fun Member.toDto() = MemberDto(id, serverId, userId, nick, joiningDate)

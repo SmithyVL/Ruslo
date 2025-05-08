@@ -7,3 +7,4 @@ bm-security:
     - "/v3/api-docs/**"
     - "/v1/auth/sign-up"
     - "/v1/auth/sign-in"
+    - "/ws/**"

@@ -1,6 +1,6 @@
 package ru.blimfy.websocket.handler
 
-import org.springframework.http.HttpHeaders
+import java.util.UUID.fromString
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.socket.WebSocketHandler
 import org.springframework.web.reactive.socket.WebSocketSession
@@ -16,20 +16,29 @@ import ru.blimfy.websocket.service.WebSocketService
  */
 @Component
 internal class UserWebSocketHandler(private val webSocketService: WebSocketService) : WebSocketHandler {
-    override fun handle(session: WebSocketSession): Mono<Void> {
-        // Получаем из заголовков WebSocket сессии токен авторизации пользователя, который является обязательным
-        // параметром для установления соединения.
-        val token = extractToken(session.handshakeInfo.headers)
-
-        return session.receive()
-            .doOnSubscribe { webSocketService.addSession(token!!, session) }
-            .doOnTerminate { webSocketService.removeSession(token!!) }
-            .then()
-    }
+    override fun handle(session: WebSocketSession): Mono<Void> = session
+        .receive()
+        .doOnNext {
+            // Получаем первым сообщением токен авторизации для сохранения WebSocket сессии.
+            webSocketService.addSession(it.payloadAsText, session)
+        }
+        .doOnTerminate {
+            // Получаем из URL идентификатор пользователя и удаляем WebSocket сессию.
+            webSocketService.removeSession(findUserIdFromWsUrl(session))
+        }
+        .then()
 
     /**
-     * Возвращает JWT токен из [headers] или null, если его нет.
+     * Возвращает идентификатор пользователя, открывшего [session] через WebSocket из информации о "рукопожатии"
+     * (handshakeInfo).
      */
-    private fun extractToken(headers: HttpHeaders) =
-        headers.getFirst("Authorization")?.substringAfter("Bearer ")
+    private fun findUserIdFromWsUrl(session: WebSocketSession) =
+        fromString(PATTERN_USER_ID.findAll(session.handshakeInfo.uri.toString()).first().value)
+
+    private companion object {
+        /**
+         * REGEX для поиска идентификатора пользователя в URL соединения через WebSocket.
+         */
+        val PATTERN_USER_ID = Regex("[^/]+$")
+    }
 }

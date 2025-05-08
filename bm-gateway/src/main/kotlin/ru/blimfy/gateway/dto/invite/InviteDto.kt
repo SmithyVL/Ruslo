@@ -12,16 +12,9 @@ import ru.blimfy.server.db.entity.Invite
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-data class InviteDto(val id: UUID? = null, val serverId: UUID, val authorMemberId: UUID)
+data class InviteDto(val id: UUID, val serverId: UUID, val authorMemberId: UUID)
 
 /**
- * Возвращает сущность приглашения на сервер из DTO.
- */
-fun InviteDto.toEntity() = Invite(authorMemberId = authorMemberId, serverId = serverId).apply {
-    this@toEntity.id?.let { id = it }
-}
-
-/**
- * Возвращает DTO представления сущности приглашения на сервер.
+ * Возвращает DTO представление сущности приглашения на сервер.
  */
 fun Invite.toDto() = InviteDto(id, serverId, authorMemberId)

@@ -61,7 +61,7 @@ class UserWebSocketStorage(
         sessions[tokenService.extractUserId(token)] = session
     }
 
-    override fun removeSession(token: String) {
-        sessions.remove(tokenService.extractUserId(token))
+    override fun removeSession(userId: UUID) {
+        sessions.remove(userId)
     }
 }

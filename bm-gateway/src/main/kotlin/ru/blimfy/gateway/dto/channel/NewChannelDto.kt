@@ -6,18 +6,17 @@ import ru.blimfy.common.enumeration.ChannelTypes
 import ru.blimfy.server.db.entity.Channel
 
 /**
- * DTO с информацией о новом канале.
+ * DTO с информацией о новом канале сервера.
  *
- * @property serverId идентификатор сервера.
  * @property name название.
  * @property type тип.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Schema(description = "Информация о новом канале сервера")
-data class NewChannelDto(val serverId: UUID, val name: String, val type: ChannelTypes)
+data class NewChannelDto(val name: String, val type: ChannelTypes)
 
 /**
- * Возвращает сущность канала из DTO представления с новым каналом сервера.
+ * Возвращает сущность канала из DTO представления нового канала сервера.
  */
-fun NewChannelDto.toEntity() = Channel(serverId, name, type)
+fun NewChannelDto.toEntity(serverId: UUID) = Channel(serverId, name, type)

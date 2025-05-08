@@ -11,16 +11,15 @@ import ru.blimfy.server.db.entity.base.BaseEntity
  *
  * @property serverId идентификатор сервера.
  * @property userId идентификатор пользователя.
- * @property username имя пользователя участника сервера.
- * @property serverUsername имя участника сервера для конкретного сервера.
- * @property createdDate дата создания. Записывается только один раз при создании новой записи в БД.
+ * @property nick ник участника сервера.
+ * @property joiningDate дата присоединения к серверу.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Table
-data class Member(val serverId: UUID, val userId: UUID, val username: String) : BaseEntity() {
-    var serverUsername: String? = null
+data class Member(val serverId: UUID, val userId: UUID) : BaseEntity() {
+    var nick: String? = null
 
     @CreatedDate
-    lateinit var createdDate: Instant
+    lateinit var joiningDate: Instant
 }

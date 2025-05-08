@@ -17,9 +17,9 @@ interface ChannelService {
     suspend fun saveChannel(channel: Channel): Channel
 
     /**
-     * Возвращает существующий канал с [id].
+     * Возвращает существующий канал с [channelId].
      */
-    suspend fun findChannel(id: UUID): Channel
+    suspend fun findChannel(channelId: UUID): Channel
 
     /**
      * Возвращает каналы сервера с [serverId].
@@ -27,7 +27,7 @@ interface ChannelService {
     fun findServerChannels(serverId: UUID): Flow<Channel>
 
     /**
-     * Удаляет канал с таким [id].
+     * Удаляет канал с таким [channelId] с сервера с [serverId].
      */
-    suspend fun deleteChannel(id: UUID)
+    suspend fun deleteChannel(channelId: UUID, serverId: UUID)
 }

@@ -22,7 +22,7 @@ interface TextMessageRepository : CoroutineCrudRepository<TextMessage, UUID> {
     fun findAllByChannelId(channelId: UUID, pageable: Pageable): Flow<TextMessage>
 
     /**
-     * Удаляет сущность текстового сообщения с [id] канала сервера от пользователя с [authorId].
+     * Удаляет сущность текстового сообщения с [textMessageId] канала сервера от пользователя с [authorId].
      */
-    suspend fun deleteByIdAndAuthorUserId(id: UUID, authorId: UUID)
+    suspend fun deleteByIdAndAuthorUserId(textMessageId: UUID, authorId: UUID)
 }
