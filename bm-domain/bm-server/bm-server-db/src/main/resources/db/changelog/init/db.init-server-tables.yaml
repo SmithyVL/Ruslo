@@ -34,9 +34,17 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: avatar_url
+                  name: icon
                   type: varchar
-                  remarks: Ссылка на аватарку
+                  remarks: Ссылка на иконку
+              - column:
+                  name: banner_color
+                  type: varchar
+                  remarks: Цвет баннера сервера
+              - column:
+                  name: description
+                  type: varchar
+                  remarks: Описание сервера
               - column:
                   name: created_date
                   type: timestamptz
@@ -83,7 +91,7 @@ databaseChangeLog:
                   type: varchar
                   remarks: Ник участника
               - column:
-                  name: joining_date
+                  name: created_date
                   type: timestamptz
                   remarks: Дата создания
                   defaultValueDate: now()
@@ -136,9 +144,33 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: basic
+                  name: permissions
+                  type: varchar
+                  remarks: Битовая маска с разрешениями
+                  constraints:
+                    nullable: false
+              - column:
+                  name: position
+                  type: integer
+                  remarks: Номер в сортировке ролей внутри сервера
+                  defaultValue: "0"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: color
+                  type: varchar
+                  remarks: Цвет роли
+              - column:
+                  name: hoist
                   type: boolean
-                  remarks: Флаг того, что роль является дефолтной для сервера
+                  remarks: Если роль закреплена в списке участников канала сервера
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: mentionable
+                  type: boolean
+                  remarks: Является ли роль упоминаемой
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
@@ -151,56 +183,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: server
   - changeSet:
-      id: init_server_tables_3
-      preConditions:
-        - onFail: MARK_RAN
-        - not:
-            - tableExists:
-                tableName: privilege
-      author: Владислав Кузнецов
-      comment: Инициализация таблицы с привилегиями ролей.
-      changes:
-        - createTable:
-            tableName: privilege
-            remarks: Привилегии роли
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-                  remarks: Идентификатор
-                  defaultValueComputed: gen_random_uuid()
-                  constraints:
-                    primaryKey: true
-                    primaryKeyName: role_privileges_id_pkey
-              - column:
-                  name: role_id
-                  type: uuid
-                  remarks: Идентификатор роли
-                  constraints:
-                    nullable: false
-              - column:
-                  name: type
-                  type: varchar
-                  remarks: Тип привилегии
-                  constraints:
-                    nullable: false
-              - column:
-                  name: is_granted
-                  type: boolean
-                  remarks: Флаг того, что привилегия разрешает что-то
-                  defaultValueBoolean: false
-                  constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            baseColumnNames: role_id
-            baseTableName: privilege
-            constraintName: fk_role_privilege
-            referencedColumnNames: id
-            referencedTableName: role
-  - changeSet:
-      id: init_server_tables_4
+      id: init_server_tables_5
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -265,7 +248,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: role
   - changeSet:
-      id: init_server_tables_5
+      id: init_server_tables_6
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -305,6 +288,20 @@ databaseChangeLog:
                   defaultValue: TEXT
                   constraints:
                     nullable: false
+              - column:
+                  name: position
+                  type: integer
+                  remarks: Номер сортировки каналов внутри сервера
+                  defaultValue: "0"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: nsfw
+                  type: boolean
+                  remarks: Является ли канал NSFW
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
         - addForeignKeyConstraint:
             onDelete: CASCADE # Такое удаление используется только в цепочке при удалении сервера!!!
             onUpdate: RESTRICT
@@ -314,7 +311,7 @@ databaseChangeLog:
             referencedTableName: server
             constraintName: fk_server_channel
   - changeSet:
-      id: init_server_tables_6
+      id: init_server_tables_7
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -358,6 +355,20 @@ databaseChangeLog:
                   type: varchar
                   remarks: Ссылка на прикреплённый файл
               - column:
+                  name: pinned
+                  type: boolean
+                  remarks: Является ли сообщение закреплённым
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar
+                  remarks: Тип сообщения
+                  defaultValue: DEFAULT
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_date
                   type: timestamptz
                   remarks: Дата создания
@@ -377,7 +388,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: channel
   - changeSet:
-      id: init_server_tables_7
+      id: init_server_tables_8
       preConditions:
         - onFail: MARK_RAN
         - not:

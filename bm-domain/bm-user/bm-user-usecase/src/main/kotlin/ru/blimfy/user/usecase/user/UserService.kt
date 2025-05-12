@@ -11,9 +11,14 @@ import ru.blimfy.user.db.entity.User
  */
 interface UserService {
     /**
-     * Возвращает нового или обновлённого [user].
+     * Возвращает нового [user], для которого был так же установлен [passwordHash].
      */
-    suspend fun saveUser(user: User): User
+    suspend fun createUser(user: User, passwordHash: String): User
+
+    /**
+     * Возвращает обновлённого [user].
+     */
+    suspend fun modifyUser(user: User): User
 
     /**
      * Возвращает пользователя с таким [id].
@@ -21,7 +26,7 @@ interface UserService {
     suspend fun findUser(id: UUID): User
 
     /**
-     * Возвращает пользователя с таким [username].
+     * Возвращает пользователя с таким [username], включая его хэш пароля.
      */
     suspend fun findUser(username: String): User
 }

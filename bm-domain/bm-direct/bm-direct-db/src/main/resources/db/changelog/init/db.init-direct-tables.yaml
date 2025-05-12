@@ -66,6 +66,20 @@ databaseChangeLog:
                   type: varchar
                   remarks: Ссылка на прикреплённый файл
               - column:
+                  name: pinned
+                  type: boolean
+                  remarks: Является ли сообщение закреплённым
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar
+                  remarks: Тип сообщения
+                  defaultValue: DEFAULT
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_date
                   type: timestamptz
                   remarks: Дата создания

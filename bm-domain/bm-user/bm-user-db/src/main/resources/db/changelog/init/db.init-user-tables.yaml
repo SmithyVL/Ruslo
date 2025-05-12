@@ -29,6 +29,10 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
+                  name: global_name
+                  type: varchar
+                  remarks: Отображаемое имя пользователя
+              - column:
                   name: email
                   type: varchar
                   remarks: Электронная почта
@@ -36,9 +40,20 @@ databaseChangeLog:
                     nullable: false
                     unique: true
               - column:
-                  name: avatar_url
+                  name: verified
+                  type: boolean
+                  remarks: Был ли подтвержден адрес электронной почты
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: avatar
                   type: varchar
                   remarks: Ссылка на аватарку
+              - column:
+                  name: banner_color
+                  type: varchar
+                  remarks: Цвет баннера пользователя
               - column:
                   name: created_date
                   type: timestamptz

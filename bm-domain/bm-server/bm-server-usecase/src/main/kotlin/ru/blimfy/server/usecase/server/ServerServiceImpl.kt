@@ -40,17 +40,17 @@ class ServerServiceImpl(
     private val memberService: MemberService,
     private val memberRoleService: MemberRoleService,
 ) : ServerService {
-    override suspend fun createServer(server: Server, ownerUsername: String) =
+    override suspend fun createServer(server: Server) =
         serverRepo.save(server).apply {
             val serverId = this.id
 
             // Создание дефолтных каналов для нового сервера - текстового и голосового.
-            channelService.saveChannel(Channel(serverId, DEFAULT_TEXT_CHANNEL_NAME, TEXT))
-            channelService.saveChannel(Channel(serverId, DEFAULT_VOICE_CHANNEL_NAME, VOICE))
+            channelService.saveChannel(Channel(serverId, DEFAULT_TEXT_CHANNEL_NAME, TEXT, 0))
+            channelService.saveChannel(Channel(serverId, DEFAULT_VOICE_CHANNEL_NAME, VOICE, 1))
 
             // Создание дефолтной роли для нового сервера, которая будет присваиваться каждому нового участнику
             // навсегда.
-            val defaultRoleId = roleService.createRole(Role(serverId, DEFAULT_ROLE_NAME, true)).id
+            val defaultRoleId = roleService.createRole(Role(serverId, DEFAULT_ROLE_NAME, getDefaultRolePermission())).id
 
             // Создание участника для пользователя-создателя сервера с дефолтной ролью.
             val ownerMember = Member(serverId = serverId, userId = this.ownerUserId)
@@ -87,6 +87,11 @@ class ServerServiceImpl(
             throw AccessDeniedException(SERVER_VIEW_ACCESS_DENIED.msg.format(serverId))
         }
     }
+
+    /**
+     * Возвращает дефолтное значение битовой маски разрешений.
+     */
+    private fun getDefaultRolePermission() = "0"
 
     private companion object {
         /**

@@ -10,7 +10,4 @@ import io.swagger.v3.oas.annotations.media.Schema
  * @since 0.0.1.
  */
 @Schema(description = "JWT токен авторизации пользователя")
-data class TokenDto(
-    @field:Schema(description = "JWT токен", required = true)
-    val token: String,
-)
+data class TokenDto(val token: String)

@@ -12,9 +12,9 @@ import ru.blimfy.server.db.entity.Server
  */
 interface ServerService {
     /**
-     * Возвращает новый [server] пользователя с [ownerUsername].
+     * Возвращает новый [server] пользователя.
      */
-    suspend fun createServer(server: Server, ownerUsername: String): Server
+    suspend fun createServer(server: Server): Server
 
     /**
      * Возвращает обновлённый [server].

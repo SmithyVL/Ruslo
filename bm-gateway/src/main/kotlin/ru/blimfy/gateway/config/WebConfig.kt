@@ -48,6 +48,11 @@ class WebConfig {
         const val INSTANT_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSSX"
 
         /**
+         * Формат дат для приложения.
+         */
+        const val INSTANT_TIMEZONE = "UTC"
+
+        /**
          * Название типа авторизации через "bearer" токен.
          */
         private const val SECURITY_BEARER_KEY = "JWT авторизация"

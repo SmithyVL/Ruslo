@@ -14,7 +14,7 @@ import ru.blimfy.server.db.entity.Role
 @Repository
 interface RoleRepository : CoroutineCrudRepository<Role, UUID> {
     /**
-     * Возвращает сущность дефолтной роли для сервера с идентификатором [serverId]
+     * Возвращает сущность роли для сервера с идентификатором [serverId] на [position].
      */
-    suspend fun findAllByServerIdAndBasicIsTrue(serverId: UUID): Role
+    suspend fun findAllByServerIdAndPosition(serverId: UUID, position: Int): Role
 }

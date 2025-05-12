@@ -9,12 +9,17 @@ import ru.blimfy.server.db.entity.base.BaseEntity
  *
  * @property serverId идентификатор сервера.
  * @property name название.
- * @property basic флаг того, что роль является дефолтной для сервера.
- * @property color цвет.
+ * @property permissions битовая маска с разрешениями.
+ * @property position номер в сортировке ролей внутри сервера.
+ * @property color цвет роли.
+ * @property hoist если роль закреплена в списке участников канала сервера.
+ * @property mentionable является ли роль упоминаемой.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Table
-data class Role(val serverId: UUID, val name: String, val basic: Boolean) : BaseEntity() {
+data class Role(val serverId: UUID, val name: String, val permissions: String, val position: Int = 0) : BaseEntity() {
     var color: String? = null
+    var hoist: Boolean = false
+    var mentionable: Boolean = false
 }

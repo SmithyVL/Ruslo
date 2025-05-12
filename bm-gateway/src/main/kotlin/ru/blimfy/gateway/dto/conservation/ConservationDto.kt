@@ -1,4 +1,4 @@
-package ru.blimfy.gateway.dto.direct.conservation
+package ru.blimfy.gateway.dto.conservation
 
 import java.util.UUID
 import ru.blimfy.direct.db.entity.Conservation

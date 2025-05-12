@@ -1,0 +1,38 @@
+package ru.blimfy.gateway.dto.user
+
+import com.fasterxml.jackson.annotation.JsonFormat
+import java.time.Instant
+import java.util.UUID
+import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_FORMAT
+import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_TIMEZONE
+import ru.blimfy.user.db.entity.User
+
+/**
+ * DTO с информацией о пользователе.
+ *
+ * @property id идентификатор.
+ * @property username логин.
+ * @property email электронная почта.
+ * @property globalName отображаемое имя пользователя.
+ * @property verified был ли подтвержден адрес электронной почты.
+ * @property avatar ссылка на файл аватарки.
+ * @property bannerColor цвет баннера пользователя.
+ * @property createdDate дата создания. Записывается только один раз при создании новой записи в БД.
+ * @author Владислав Кузнецов.
+ * @since 0.0.1.
+ */
+data class UserDto(
+    val id: UUID,
+    val username: String,
+    val email: String,
+    val verified: Boolean,
+    val globalName: String? = null,
+    val avatar: String? = null,
+    val bannerColor: String? = null,
+    @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE) val createdDate: Instant,
+)
+
+/**
+ * Возвращает DTO представление с информацией из сущности пользователя.
+ */
+fun User.toDto() = UserDto(id, username, email, verified, globalName, avatar, bannerColor, createdDate)

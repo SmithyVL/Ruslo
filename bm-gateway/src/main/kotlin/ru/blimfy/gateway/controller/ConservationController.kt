@@ -2,11 +2,8 @@ package ru.blimfy.gateway.controller
 
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import java.security.Principal
 import java.util.UUID
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
-import org.springframework.data.domain.PageRequest.of
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -14,38 +11,25 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
-import ru.blimfy.direct.usecase.conservation.ConservationService
-import ru.blimfy.direct.usecase.direct.DirectMessageService
-import ru.blimfy.gateway.dto.direct.conservation.NewConservationDto
-import ru.blimfy.gateway.dto.direct.conservation.toDto
-import ru.blimfy.gateway.dto.direct.message.DirectMessageDto
-import ru.blimfy.gateway.dto.direct.message.toDto
-import ru.blimfy.security.service.TokenService
+import ru.blimfy.gateway.dto.conservation.NewConservationDto
+import ru.blimfy.gateway.integration.security.CustomUserDetails
+import ru.blimfy.gateway.service.conservation.ConservationControllerService
 
 /**
  * Контроллер для работы с личными диалогами.
  *
- * @property conservationService сервис для работы с личными диалогами.
- * @property directMessageService сервис для работы с личными сообщениями.
- * @property tokenService сервис для работы с токенами.
+ * @property conservationControllerService сервис для обработки информации о личных диалогах.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Tag(name = "ConservationController", description = "Контроллер для работы с личными диалогами пользователей")
 @RestController
 @RequestMapping("/v1/conservations")
-class ConservationController(
-    private val conservationService: ConservationService,
-    private val directMessageService: DirectMessageService,
-    private val tokenService: TokenService,
-) {
+class ConservationController(private val conservationControllerService: ConservationControllerService) {
     @Operation(summary = "Создать личный диалог")
     @PostMapping
     suspend fun createConservation(@RequestBody newConservationDto: NewConservationDto) =
-        conservationService.createConservation(
-            firstUserId = newConservationDto.firstUserId,
-            secondUserId = newConservationDto.secondUserId,
-        ).toDto()
+        conservationControllerService.createConservation(newConservationDto)
 
     @Operation(summary = "Получить страницу с сообщениями личного диалога")
     @GetMapping("/{conservationId}/messages")
@@ -53,15 +37,7 @@ class ConservationController(
         @PathVariable conservationId: UUID,
         @RequestParam pageNumber: Int,
         @RequestParam pageSize: Int,
-        principal: Principal,
-    ): Flow<DirectMessageDto> {
-        // Получить сообщения личного диалога может только его участник.
-        conservationService.checkConservationAccess(
-            conservationId = conservationId,
-            userId = tokenService.extractUserId(principal),
-        )
-
-        return directMessageService.findConservationDirectMessages(conservationId, of(pageNumber, pageSize))
-            .map { it.toDto() }
-    }
+        @AuthenticationPrincipal user: CustomUserDetails,
+    ) =
+        conservationControllerService.findConservationDirectMessages(conservationId, pageNumber, pageSize, user)
 }

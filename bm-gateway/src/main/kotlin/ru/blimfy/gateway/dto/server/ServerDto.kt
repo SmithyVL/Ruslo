@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.Instant
 import java.util.UUID
 import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_FORMAT
+import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_TIMEZONE
 import ru.blimfy.server.db.entity.Server
 
 /**
@@ -12,8 +13,10 @@ import ru.blimfy.server.db.entity.Server
  * @property id идентификатор.
  * @property ownerUserId идентификатор пользователя, владеющего сервером.
  * @property name название.
+ * @property icon ссылка на файл аватарки.
+ * @property bannerColor цвет баннера.
+ * @property description описание сервера.
  * @property createdDate дата создания.
- * @property avatarUrl ссылка на файл аватарки.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -21,22 +24,23 @@ data class ServerDto(
     val id: UUID,
     val ownerUserId: UUID,
     val name: String,
-    @JsonFormat(pattern = INSTANT_FORMAT, timezone = "UTC") val createdDate: Instant,
-) {
-    var avatarUrl: String? = null
-}
+    val icon: String? = null,
+    val bannerColor: String? = null,
+    val description: String? = null,
+    @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE) val createdDate: Instant,
+)
 
 /**
  * Возвращает сущность сервера из DTO.
  */
 fun ServerDto.toEntity(ownerId: UUID) = Server(ownerId, name).apply {
     id = this@toEntity.id
+    icon = this@toEntity.icon
+    bannerColor = this@toEntity.bannerColor
     createdDate = this@toEntity.createdDate
-    avatarUrl = this@toEntity.avatarUrl
 }
 
 /**
  * Возвращает DTO представление сущности сервера.
  */
-fun Server.toDto() = ServerDto(id, ownerUserId, name, createdDate)
-    .apply { this.avatarUrl = this@toDto.avatarUrl }
+fun Server.toDto() = ServerDto(id, ownerUserId, name, icon, bannerColor, description, createdDate)

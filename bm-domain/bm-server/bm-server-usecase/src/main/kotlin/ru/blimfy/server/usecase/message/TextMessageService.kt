@@ -2,7 +2,6 @@ package ru.blimfy.server.usecase.message
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
-import org.springframework.data.domain.Pageable
 import ru.blimfy.server.db.entity.TextMessage
 
 /**
@@ -23,9 +22,9 @@ interface TextMessageService {
     suspend fun findMessage(id: UUID): TextMessage
 
     /**
-     * Возвращает страницу с сообщениями канала с идентификатором [channelId] по конфигурации [pageable].
+     * Возвращает [pageNumber] страницу с [pageSize] сообщениями канала с [channelId].
      */
-    suspend fun findPageChannelMessages(channelId: UUID, pageable: Pageable): Flow<TextMessage>
+    suspend fun findPageChannelMessages(channelId: UUID, pageNumber: Int, pageSize: Int): Flow<TextMessage>
 
     /**
      * Удаляет сообщение канала с [textMessageId] от [authorId].

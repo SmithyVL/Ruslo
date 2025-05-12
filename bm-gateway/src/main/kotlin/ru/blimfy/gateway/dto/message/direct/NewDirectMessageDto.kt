@@ -1,4 +1,4 @@
-package ru.blimfy.gateway.dto.direct.message
+package ru.blimfy.gateway.dto.message.direct
 
 import java.util.UUID
 import ru.blimfy.direct.db.entity.DirectMessage
@@ -18,4 +18,4 @@ data class NewDirectMessageDto(val conservationId: UUID, val content: String, va
  * Возвращает сущность сообщения личного диалога из DTO представления нового сообщения личного диалога для [authorId].
  */
 fun NewDirectMessageDto.toEntity(authorId: UUID) =
-    DirectMessage(content, authorId, conservationId).apply { fileUrl = this@toEntity.fileUrl }
+    DirectMessage(conservationId, authorId, content).apply { fileUrl = this@toEntity.fileUrl }

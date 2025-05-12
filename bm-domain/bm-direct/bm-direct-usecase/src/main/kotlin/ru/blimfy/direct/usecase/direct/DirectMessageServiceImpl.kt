@@ -1,7 +1,9 @@
 package ru.blimfy.direct.usecase.direct
 
 import java.util.UUID
-import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.PageRequest.of
+import org.springframework.data.domain.Sort.Direction.DESC
+import org.springframework.data.domain.Sort.by
 import org.springframework.stereotype.Service
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.direct.db.entity.DirectMessage
@@ -17,15 +19,29 @@ import ru.blimfy.direct.usecase.exception.DirectErrors.DIRECT_MESSAGE_BY_ID_NOT_
  */
 @Service
 class DirectMessageServiceImpl(private val directMessageRepo: DirectMessageRepository) : DirectMessageService {
-    override suspend fun saveDirectMessage(directMessage: DirectMessage) =
+    override suspend fun saveMessage(directMessage: DirectMessage) =
         directMessageRepo.save(directMessage)
 
-    override suspend fun findDirectMessage(id: UUID) = directMessageRepo.findById(id)
+    override suspend fun findMessage(id: UUID) = directMessageRepo.findById(id)
         ?: throw NotFoundException(DIRECT_MESSAGE_BY_ID_NOT_FOUND.msg.format(id))
 
-    override suspend fun findConservationDirectMessages(conservationId: UUID, pageable: Pageable) =
-        directMessageRepo.findAllByConservationId(conservationId, pageable)
+    override suspend fun findConservationMessages(
+        conservationId: UUID,
+        pageNumber: Int,
+        pageSize: Int,
+    ) =
+        directMessageRepo.findAllByConservationId(
+            conservationId,
+            of(pageNumber, pageSize, by(DESC, DIRECT_MESSAGE_SORT_FIELD)),
+        )
 
-    override suspend fun deleteDirectMessage(id: UUID, authorId: UUID) =
-        directMessageRepo.deleteByIdAndAuthorId(id, authorId)
+    override suspend fun deleteMessage(id: UUID, authorId: UUID) =
+        directMessageRepo.deleteByIdAndAuthorId(directMessageId = id, authorId = authorId)
+
+    companion object {
+        /**
+         * Поле сортировки при поиске страницы личных сообщений.
+         */
+        const val DIRECT_MESSAGE_SORT_FIELD = "created_date"
+    }
 }

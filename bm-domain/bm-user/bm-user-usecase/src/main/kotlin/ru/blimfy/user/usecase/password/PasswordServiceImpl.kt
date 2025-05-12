@@ -5,7 +5,7 @@ import org.springframework.stereotype.Service
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.user.db.entity.Password
 import ru.blimfy.user.db.repository.PasswordRepository
-import ru.blimfy.user.usecase.exception.UserErrors.PASSWORD_BY_USER_ID_NOT_FOUND
+import ru.blimfy.user.usecase.exception.UserErrors.PASSWORD_NOT_FOUND
 
 /**
  * Реализация интерфейса для работы с паролем пользователя.
@@ -19,5 +19,5 @@ class PasswordServiceImpl(private val passwordRepo: PasswordRepository) : Passwo
     override suspend fun savePassword(password: Password) = passwordRepo.save(password)
 
     override suspend fun findUserPassword(userId: UUID) = passwordRepo.findByUserId(userId)
-        ?: throw NotFoundException(PASSWORD_BY_USER_ID_NOT_FOUND.msg.format(userId))
+        ?: throw NotFoundException(PASSWORD_NOT_FOUND.msg.format(userId))
 }

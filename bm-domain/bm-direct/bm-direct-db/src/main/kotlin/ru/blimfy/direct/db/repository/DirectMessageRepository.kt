@@ -22,7 +22,7 @@ interface DirectMessageRepository : CoroutineCrudRepository<DirectMessage, UUID>
     fun findAllByConservationId(conservationId: UUID, pageable: Pageable): Flow<DirectMessage>
 
     /**
-     * Удаляет сущность личного сообщения с [id] от пользователя с [authorId].
+     * Удаляет сущность личного сообщения с [directMessageId] от пользователя с [authorId].
      */
-    suspend fun deleteByIdAndAuthorId(id: UUID, authorId: UUID)
+    suspend fun deleteByIdAndAuthorId(directMessageId: UUID, authorId: UUID)
 }

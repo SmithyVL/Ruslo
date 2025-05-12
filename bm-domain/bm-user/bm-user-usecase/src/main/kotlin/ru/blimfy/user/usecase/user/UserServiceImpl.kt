@@ -5,31 +5,42 @@ import org.springframework.dao.DuplicateKeyException
 import org.springframework.stereotype.Service
 import ru.blimfy.common.exception.DuplicateException
 import ru.blimfy.common.exception.NotFoundException
+import ru.blimfy.user.db.entity.Password
 import ru.blimfy.user.db.entity.User
 import ru.blimfy.user.db.repository.UserRepository
 import ru.blimfy.user.usecase.exception.UserErrors.USER_ALREADY_EXISTS
-import ru.blimfy.user.usecase.exception.UserErrors.USER_BY_ID_NOT_FOUND
-import ru.blimfy.user.usecase.exception.UserErrors.USER_BY_USERNAME_NOT_FOUND
+import ru.blimfy.user.usecase.exception.UserErrors.USER_NOT_FOUND
+import ru.blimfy.user.usecase.password.PasswordService
 
 /**
  * Реализация интерфейса для работы с пользователем.
  *
  * @property userRepo репозиторий для работы с пользователями в БД.
+ * @property passwordService сервис для работы с паролями пользователей.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Service
-class UserServiceImpl(private val userRepo: UserRepository) : UserService {
-    override suspend fun saveUser(user: User) =
+class UserServiceImpl(
+    private val userRepo: UserRepository,
+    private val passwordService: PasswordService,
+) : UserService {
+    override suspend fun createUser(user: User, passwordHash: String) =
         try {
-            userRepo.save(user)
+            userRepo.save(user).apply { passwordService.savePassword(Password(id, passwordHash)) }
         } catch (ex: DuplicateKeyException) {
             throw DuplicateException(USER_ALREADY_EXISTS.msg.format(user.username), ex)
         }
 
-    override suspend fun findUser(id: UUID) = userRepo.findById(id)
-        ?: throw NotFoundException(USER_BY_ID_NOT_FOUND.msg.format(id))
+    override suspend fun modifyUser(user: User) = userRepo.save(user)
 
-    override suspend fun findUser(username: String) = userRepo.findByUsername(username)
-        ?: throw NotFoundException(USER_BY_USERNAME_NOT_FOUND.msg.format(username))
+    override suspend fun findUser(id: UUID) = userRepo.findById(id)
+        ?: throw NotFoundException(USER_NOT_FOUND.msg.format(id))
+
+    override suspend fun findUser(username: String): User {
+        val user = userRepo.findByUsername(username)
+            ?: throw NotFoundException(USER_NOT_FOUND.msg.format(username))
+
+        return user.apply { passwordHash = passwordService.findUserPassword(id).hash }
+    }
 }

@@ -11,15 +11,18 @@ import ru.blimfy.server.db.entity.base.BaseEntity
  *
  * @property ownerUserId идентификатор пользователя, владеющего сервером.
  * @property name название.
- * @property avatarUrl ссылка на файл аватарки.
+ * @property icon ссылка на файл аватарки.
+ * @property bannerColor цвет баннера сервера.
+ * @property description описание сервера.
  * @property createdDate дата создания. Записывается только один раз при создании новой записи в БД.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Table
 data class Server(val ownerUserId: UUID, val name: String) : BaseEntity() {
-    var avatarUrl: String? = null
-
+    var icon: String? = null
+    var bannerColor: String? = null
+    var description: String? = null
     @CreatedDate
     lateinit var createdDate: Instant
 }

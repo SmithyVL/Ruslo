@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat
 import java.time.Instant
 import java.util.UUID
 import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_FORMAT
+import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_TIMEZONE
 import ru.blimfy.server.db.entity.Member
 
 /**
@@ -22,10 +23,10 @@ data class MemberDto(
     val serverId: UUID,
     val userId: UUID,
     val nick: String? = null,
-    @JsonFormat(pattern = INSTANT_FORMAT, timezone = "UTC") val joiningDate: Instant,
+    @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE) val joiningDate: Instant,
 )
 
 /**
  * Возвращает DTO представления с информацией об участнике сервера.
  */
-fun Member.toDto() = MemberDto(id, serverId, userId, nick, joiningDate)
+fun Member.toDto() = MemberDto(id, serverId, userId, nick, createdDate)

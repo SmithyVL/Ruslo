@@ -11,8 +11,12 @@ import ru.blimfy.server.db.entity.base.BaseEntity
  * @property serverId идентификатор сервера.
  * @property name название канала.
  * @property type тип канала, например, текстовый.
+ * @property position номер сортировки каналов внутри сервера.
+ * @property nsfw является ли канал NSFW.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Table
-data class Channel(val serverId: UUID, val name: String, val type: ChannelTypes) : BaseEntity()
+data class Channel(val serverId: UUID, val name: String, val type: ChannelTypes, val position: Int) : BaseEntity() {
+    var nsfw: Boolean = false
+}

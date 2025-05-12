@@ -14,17 +14,12 @@ enum class UserErrors(val msg: String) {
     USER_ALREADY_EXISTS("User with username - '%s', is exists!"),
 
     /**
-     * Пользователь не найден по идентификатору.
+     * Пользователь не найден.
      */
-    USER_BY_ID_NOT_FOUND("User with id - '%s', not found!"),
+    USER_NOT_FOUND("User (%s), not found!"),
 
     /**
-     * Пользователь не найден по имени пользователя.
+     * Пароль пользователя не найден.
      */
-    USER_BY_USERNAME_NOT_FOUND("User with username - '%s', not found!"),
-
-    /**
-     * Пароль не найден по идентификатору пользователя.
-     */
-    PASSWORD_BY_USER_ID_NOT_FOUND("Password with user id - '%s', not found!"),
+    PASSWORD_NOT_FOUND("Password for user (%s), not found!"),
 }

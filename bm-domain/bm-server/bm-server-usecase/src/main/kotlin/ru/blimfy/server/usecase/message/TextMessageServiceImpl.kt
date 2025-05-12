@@ -1,7 +1,9 @@
 package ru.blimfy.server.usecase.message
 
 import java.util.UUID
-import org.springframework.data.domain.Pageable
+import org.springframework.data.domain.PageRequest.of
+import org.springframework.data.domain.Sort.Direction.DESC
+import org.springframework.data.domain.Sort.by
 import org.springframework.stereotype.Service
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.server.db.entity.TextMessage
@@ -22,9 +24,16 @@ class TextMessageServiceImpl(private val messageRepo: TextMessageRepository) : T
     override suspend fun findMessage(id: UUID) = messageRepo.findById(id)
         ?: throw NotFoundException(TEXT_MESSAGE_BY_ID_NOT_FOUND.msg.format(id))
 
-    override suspend fun findPageChannelMessages(channelId: UUID, pageable: Pageable) =
-        messageRepo.findAllByChannelId(channelId, pageable)
+    override suspend fun findPageChannelMessages(channelId: UUID, pageNumber: Int, pageSize: Int) =
+        messageRepo.findAllByChannelId(channelId, of(pageNumber, pageSize, by(DESC, TEXT_MESSAGE_SORT_FIELD)))
 
     override suspend fun deleteMessage(textMessageId: UUID, authorId: UUID) =
         messageRepo.deleteByIdAndAuthorUserId(textMessageId = textMessageId, authorId = authorId)
+
+    companion object {
+        /**
+         * Поле сортировки при поиске страницы текстовых сообщений.
+         */
+        const val TEXT_MESSAGE_SORT_FIELD = "created_date"
+    }
 }

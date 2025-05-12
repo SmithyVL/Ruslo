@@ -12,7 +12,7 @@ import ru.blimfy.server.db.entity.base.BaseEntity
  * @property serverId идентификатор сервера.
  * @property userId идентификатор пользователя.
  * @property nick ник участника сервера.
- * @property joiningDate дата присоединения к серверу.
+ * @property createdDate дата присоединения к серверу.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -21,5 +21,5 @@ data class Member(val serverId: UUID, val userId: UUID) : BaseEntity() {
     var nick: String? = null
 
     @CreatedDate
-    lateinit var joiningDate: Instant
+    lateinit var createdDate: Instant
 }
