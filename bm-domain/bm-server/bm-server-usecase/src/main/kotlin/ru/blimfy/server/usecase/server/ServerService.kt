@@ -17,9 +17,20 @@ interface ServerService {
     suspend fun createServer(server: Server): Server
 
     /**
-     * Возвращает обновлённый [server].
+     * Возвращает обновлённый сервер с [id], [newName], [newIcon], [newBannerColor] и [newDescription].
      */
-    suspend fun modifyServer(server: Server): Server
+    suspend fun modifyServer(
+        id: UUID,
+        newName: String,
+        newIcon: String? = null,
+        newBannerColor: String? = null,
+        newDescription: String? = null,
+    ): Server
+
+    /**
+     * Возвращает обновлённый сервер с [id] и [newOwnerId].
+     */
+    suspend fun setOwner(id: UUID, newOwnerId: UUID): Server
 
     /**
      * Возвращает сервер с таким [id].

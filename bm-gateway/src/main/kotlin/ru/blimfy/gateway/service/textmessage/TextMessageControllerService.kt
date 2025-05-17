@@ -1,9 +1,10 @@
 package ru.blimfy.gateway.service.textmessage
 
 import java.util.UUID
-import ru.blimfy.gateway.dto.message.text.NewTextMessageDto
-import ru.blimfy.gateway.dto.message.text.TextMessageDto
-import ru.blimfy.gateway.integration.security.CustomUserDetails
+import ru.blimfy.gateway.dto.server.message.NewTextMessageDto
+import ru.blimfy.gateway.dto.server.message.TextMessageContentDto
+import ru.blimfy.gateway.dto.server.message.TextMessageDto
+import ru.blimfy.user.db.entity.User
 
 /**
  * Интерфейс для работы с обработкой запросов о сообщениях каналов.
@@ -13,17 +14,22 @@ import ru.blimfy.gateway.integration.security.CustomUserDetails
  */
 interface TextMessageControllerService {
     /**
-     * Возвращает новое текстовое [message], создаваемое [user].
+     * Возвращает новое текстовое [message], создаваемое [currentUser].
      */
-    suspend fun createMessage(message: NewTextMessageDto, user: CustomUserDetails): TextMessageDto
+    suspend fun createMessage(message: NewTextMessageDto, currentUser: User): TextMessageDto
 
     /**
-     * Возвращает обновлённое текстовое [message], обновляемое [user].
+     * Возвращает обновлённое сообщение с [messageId] и новым [messageContent], обновляемое [currentUser].
      */
-    suspend fun modifyMessage(message: TextMessageDto, user: CustomUserDetails): TextMessageDto
+    suspend fun changeContent(messageId: UUID, messageContent: TextMessageContentDto, currentUser: User): TextMessageDto
 
     /**
-     * Удаляет текстовое сообщение с [messageId], удаляемое [user].
+     * Удаляет текстовое сообщение с [messageId], удаляемое [currentUser].
      */
-    suspend fun deleteMessage(messageId: UUID, user: CustomUserDetails)
+    suspend fun deleteMessage(messageId: UUID, currentUser: User)
+
+    /**
+     * Возвращает сообщение с [messageId] и [newPinned], обновляемое [currentUser].
+     */
+    suspend fun setMessagePinned(messageId: UUID, newPinned: Boolean, currentUser: User): TextMessageDto
 }

@@ -12,9 +12,14 @@ import ru.blimfy.server.db.entity.Channel
  */
 interface ChannelService {
     /**
-     * Возвращает новый или обновлённый [channel].
+     * Возвращает новый [channel].
      */
-    suspend fun saveChannel(channel: Channel): Channel
+    suspend fun createChannel(channel: Channel): Channel
+
+    /**
+     * Обновляет [newName] и [newNsfw] для канала с [id].
+     */
+    suspend fun modifyChannel(id: UUID, newName: String, newNsfw: Boolean): Channel
 
     /**
      * Возвращает существующий канал с [channelId].
@@ -29,5 +34,5 @@ interface ChannelService {
     /**
      * Удаляет канал с таким [channelId] с сервера с [serverId].
      */
-    suspend fun deleteChannel(channelId: UUID, serverId: UUID)
+    suspend fun deleteChannel(channelId: UUID, serverId: UUID): Channel
 }

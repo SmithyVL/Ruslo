@@ -17,6 +17,6 @@ import ru.blimfy.server.db.entity.base.BaseEntity
  * @since 0.0.1.
  */
 @Table
-data class Channel(val serverId: UUID, val name: String, val type: ChannelTypes, val position: Int) : BaseEntity() {
+data class Channel(val serverId: UUID, var name: String, val type: ChannelTypes, val position: Int) : BaseEntity() {
     var nsfw: Boolean = false
 }

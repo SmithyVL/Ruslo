@@ -1,48 +1,73 @@
 databaseChangeLog:
   - changeSet:
-      id: init_direct_tables_0
+      id: init_dm_tables_0
       preConditions:
         - onFail: MARK_RAN
         - not:
             - tableExists:
-                tableName: conservation
+                tableName: dm_channel
       author: Владислав Кузнецов
       comment: Инициализация таблицы с личными диалогами
       changes:
         - createTable:
-            tableName: conservation
+            tableName: dm_channel
             remarks: Личные диалоги
             columns:
               - column:
                   name: id
                   type: uuid
-                  remarks: Идентификатор
+                  remarks: Идентификатор личного диалога или группы
                   defaultValueComputed: gen_random_uuid()
                   constraints:
                     primaryKey: true
-                    primaryKeyName: conservation_id_pkey
+                    primaryKeyName: dm_channel_id_pkey
+              - column:
+                  name: recipients
+                  type: uuid[10]
+                  remarks: Идентификаторы участников личного диалога или группы
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar
+                  remarks: Тип личного диалога
+                  defaultValue: DM
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: uuid
+                  remarks: Идентификатор создателя группы
+              - column:
+                  name: name
+                  type: varchar
+                  remarks: Название группы
+              - column:
+                  name: icon
+                  type: varchar
+                  remarks: Иконка группы
   - changeSet:
-      id: init_direct_tables_1
+      id: init_dm_tables_1
       preConditions:
         - onFail: MARK_RAN
         - not:
             - tableExists:
-                tableName: direct_message
+                tableName: dm_message
       author: Владислав Кузнецов
-      comment: Инициализация таблицы с сообщениями личных диалогов
+      comment: Инициализация таблицы с сообщениями личных диалогов или групп
       changes:
         - createTable:
-            tableName: direct_message
-            remarks: Сообщения личных диалогов
+            tableName: dm_message
+            remarks: Сообщения личных диалогов или групп
             columns:
               - column:
                   name: id
                   type: uuid
-                  remarks: Идентификатор
+                  remarks: Идентификатор сообщения в личном диалоге или группы
                   defaultValueComputed: gen_random_uuid()
                   constraints:
                     primaryKey: true
-                    primaryKeyName: direct_message_id_pkey
+                    primaryKeyName: dm_message_id_pkey
               - column:
                   name: author_id
                   type: uuid
@@ -50,33 +75,20 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: conservation_id
+                  name: dm_channel_id
                   type: uuid
-                  remarks: Идентификатор личного диалога
+                  remarks: Идентификатор личного диалога или группы
                   constraints:
                     nullable: false
               - column:
                   name: content
                   type: varchar
                   remarks: Содержимое сообщения
-                  constraints:
-                    nullable: false
-              - column:
-                  name: file_url
-                  type: varchar
-                  remarks: Ссылка на прикреплённый файл
               - column:
                   name: pinned
                   type: boolean
                   remarks: Является ли сообщение закреплённым
                   defaultValueBoolean: false
-                  constraints:
-                    nullable: false
-              - column:
-                  name: type
-                  type: varchar
-                  remarks: Тип сообщения
-                  defaultValue: DEFAULT
                   constraints:
                     nullable: false
               - column:
@@ -90,37 +102,11 @@ databaseChangeLog:
                   name: updated_date
                   type: timestamptz
                   remarks: Дата обновления
-  - changeSet:
-      id: init_direct_tables_2
-      preConditions:
-        - onFail: MARK_RAN
-        - not:
-            - tableExists:
-                tableName: member_conservation
-      author: Владислав Кузнецов
-      comment: Инициализация таблицы с участниками личных диалогов
-      changes:
-        - createTable:
-            tableName: member_conservation
-            remarks: Участники личных диалогов
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-                  remarks: Идентификатор
-                  defaultValueComputed: gen_random_uuid()
-                  constraints:
-                    primaryKey: true
-                    primaryKeyName: member_conservation_id_pkey
-              - column:
-                  name: conservation_id
-                  type: uuid
-                  remarks: Идентификатор личного диалога
-                  constraints:
-                    nullable: false
-              - column:
-                  name: user_id
-                  type: uuid
-                  remarks: Идентификатор пользователя
-                  constraints:
-                    nullable: false
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: dm_channel_id
+            baseTableName: dm_message
+            constraintName: fk_dm_channel_dm_message
+            referencedColumnNames: id
+            referencedTableName: dm_channel

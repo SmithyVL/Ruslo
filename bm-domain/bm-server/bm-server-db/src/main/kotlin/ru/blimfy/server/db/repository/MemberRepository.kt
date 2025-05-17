@@ -30,10 +30,9 @@ interface MemberRepository : CoroutineCrudRepository<Member, UUID> {
     suspend fun countByServerId(serverId: UUID): Long
 
     /**
-     * Возвращает все сущности участников для пользователя с идентификатором [userId] и сервера с идентификатором
-     * [serverId].
+     * Возвращает сущность участника для [serverId] и [userId].
      */
-    suspend fun findByUserIdAndServerId(userId: UUID, serverId: UUID): Member?
+    suspend fun findByServerIdAndUserId(serverId: UUID, userId: UUID): Member?
 
     /**
      * Удаляет сущность участника с идентификатором [id] с сервера с идентификатором [serverId].

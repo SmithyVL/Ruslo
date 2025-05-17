@@ -1,8 +1,9 @@
 package ru.blimfy.gateway.service.member
 
-import ru.blimfy.gateway.dto.member.MemberDto
-import ru.blimfy.gateway.dto.member.ModifyMemberDto
-import ru.blimfy.gateway.integration.security.CustomUserDetails
+import ru.blimfy.gateway.dto.server.member.CurrentMemberNickDto
+import ru.blimfy.gateway.dto.server.member.MemberDto
+import ru.blimfy.gateway.dto.server.member.MemberNickDto
+import ru.blimfy.user.db.entity.User
 
 /**
  * Интерфейс для работы с обработкой запросов об участниках серверов.
@@ -12,7 +13,12 @@ import ru.blimfy.gateway.integration.security.CustomUserDetails
  */
 interface MemberControllerService {
     /**
-     * Возвращает обновлённого [modifyMemberDto], которого обновляет [user].
+     * Возвращает участника сервера с новым [memberNick], которого обновляет [currentUser].
      */
-    suspend fun modifyMember(modifyMemberDto: ModifyMemberDto, user: CustomUserDetails): MemberDto
+    suspend fun changeMemberNick(memberNick: MemberNickDto, currentUser: User): MemberDto
+
+    /**
+     * Возвращает участника сервера с новым [memberNick], который для себя меняет [currentUser].
+     */
+    suspend fun changeCurrentMemberNick(memberNick: CurrentMemberNickDto, currentUser: User): MemberDto
 }

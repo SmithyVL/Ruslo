@@ -27,8 +27,13 @@ class MemberServiceImpl(private val memberRepo: MemberRepository) : MemberServic
             throw DuplicateException(SERVER_MEMBER_ALREADY_EXISTS.msg.format(member.serverId, member.userId), ex)
         }
 
-    override suspend fun findServerMember(userId: UUID, serverId: UUID) =
-        memberRepo.findByUserIdAndServerId(userId, serverId)
+    override suspend fun setNick(serverId: UUID, userId: UUID, newNick: String?) =
+        findServerMember(serverId = serverId, userId = userId)
+            .apply { nick = newNick }
+            .let { memberRepo.save(it) }
+
+    override suspend fun findServerMember(serverId: UUID, userId: UUID) =
+        memberRepo.findByServerIdAndUserId(serverId = serverId, userId = userId)
             ?: throw NotFoundException(MEMBER_BY_USER_ID_AND_SERVER_ID_NOT_FOUND.msg.format(userId, serverId))
 
     override suspend fun findMember(id: UUID) = memberRepo.findById(id)

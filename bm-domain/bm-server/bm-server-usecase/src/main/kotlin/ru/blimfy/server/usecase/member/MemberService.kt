@@ -17,9 +17,14 @@ interface MemberService {
     suspend fun saveMember(member: Member): Member
 
     /**
+     * Изменяет [newNick] участника с [userId] с сервера с [serverId].
+     */
+    suspend fun setNick(serverId: UUID, userId: UUID, newNick: String? = null): Member
+
+    /**
      * Возвращает участника сервера с идентификатором [serverId] для пользователя с идентификатором [userId].
      */
-    suspend fun findServerMember(userId: UUID, serverId: UUID): Member
+    suspend fun findServerMember(serverId: UUID, userId: UUID): Member
 
     /**
      * Возвращает участника с идентификатором [id].

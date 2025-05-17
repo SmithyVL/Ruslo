@@ -2,10 +2,11 @@ package ru.blimfy.gateway.service.channel
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
-import ru.blimfy.gateway.dto.channel.ChannelDto
-import ru.blimfy.gateway.dto.channel.NewChannelDto
-import ru.blimfy.gateway.dto.message.text.TextMessageDto
-import ru.blimfy.gateway.integration.security.CustomUserDetails
+import ru.blimfy.gateway.dto.server.channel.ChannelDto
+import ru.blimfy.gateway.dto.server.channel.ModifyChannelDto
+import ru.blimfy.gateway.dto.server.channel.NewChannelDto
+import ru.blimfy.gateway.dto.server.message.TextMessageDto
+import ru.blimfy.user.db.entity.User
 
 /**
  * Интерфейс для работы с обработкой запросов о каналах серверов.
@@ -15,32 +16,33 @@ import ru.blimfy.gateway.integration.security.CustomUserDetails
  */
 interface ChannelControllerService {
     /**
-     * Возвращает новый [newChannelDto], который создаёт [user].
+     * Возвращает новый [newChannelDto], который создаёт [currentUser].
      */
-    suspend fun createChannel(newChannelDto: NewChannelDto, user: CustomUserDetails): ChannelDto
+    suspend fun createChannel(newChannelDto: NewChannelDto, currentUser: User): ChannelDto
 
     /**
-     * Возвращает обновлённый [channelDto], который обновляет [user].
+     * Возвращает обновлённый [modifyChannel], который обновляет [currentUser].
      */
-    suspend fun modifyChannel(channelDto: ChannelDto, user: CustomUserDetails): ChannelDto
+    suspend fun modifyChannel(modifyChannel: ModifyChannelDto, currentUser: User): ChannelDto
 
     /**
-     * Удаляет канал с [channelId], который удаляет [user].
+     * Удаляет канал с [channelId], который удаляет [currentUser].
      */
-    suspend fun deleteChannel(channelId: UUID, user: CustomUserDetails)
+    suspend fun deleteChannel(channelId: UUID, currentUser: User)
 
     /**
-     * Возвращает канал с [channelId], который хочет получить [user].
+     * Возвращает канал с [channelId], который хочет получить [currentUser].
      */
-    suspend fun findChannel(channelId: UUID, user: CustomUserDetails): ChannelDto
+    suspend fun findChannel(channelId: UUID, currentUser: User): ChannelDto
 
     /**
-     * Возвращает [pageNumber] страницу с [pageSize] сообщениями канала с [channelId], которые хочет получить [user].
+     * Возвращает [pageNumber] страницу с [pageSize] сообщениями канала с [channelId], которые хочет получить
+     * [currentUser].
      */
     suspend fun findChannelMessages(
         channelId: UUID,
         pageNumber: Int,
         pageSize: Int,
-        user: CustomUserDetails,
+        currentUser: User,
     ): Flow<TextMessageDto>
 }

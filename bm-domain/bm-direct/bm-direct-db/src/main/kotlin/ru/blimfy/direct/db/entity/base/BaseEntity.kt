@@ -4,7 +4,7 @@ import java.util.UUID
 import org.springframework.data.annotation.Id
 
 /**
- * Абстрактный класс с базовой информацией о сущности.
+ * Абстрактный класс с базовой информацией о сущности в базе данных.
  *
  * @property id идентификатор сущности.
  * @author Владислав Кузнецов.

@@ -14,7 +14,7 @@ import ru.blimfy.user.db.entity.User
 @Repository
 interface UserRepository : CoroutineCrudRepository<User, UUID> {
     /**
-     * Возвращает сущность пользователя с таким [username].
+     * Возвращает сущность пользователя с [username].
      */
     suspend fun findByUsername(username: String): User?
 }

@@ -19,7 +19,12 @@ enum class UserErrors(val msg: String) {
     USER_NOT_FOUND("User (%s), not found!"),
 
     /**
-     * Пароль пользователя не найден.
+     * Запрос в друзья не найден.
      */
-    PASSWORD_NOT_FOUND("Password for user (%s), not found!"),
+    FRIEND_REQUEST_NOT_FOUND("Friend request not found!"),
+
+    /**
+     * Друг не найден.
+     */
+    FRIEND_NOT_FOUND("Friend not found!"),
 }

@@ -1,17 +1,23 @@
 package ru.blimfy.gateway.exception
 
 import kotlinx.coroutines.reactive.awaitSingle
+import kotlinx.coroutines.runBlocking
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.BAD_REQUEST
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.FORBIDDEN
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatusCode
 import org.springframework.http.ProblemDetail.forStatusAndDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
+import org.springframework.web.bind.support.WebExchangeBindException
 import org.springframework.web.reactive.result.method.annotation.ResponseEntityExceptionHandler
 import org.springframework.web.server.ServerWebExchange
+import reactor.core.publisher.Mono
+import reactor.core.publisher.Mono.fromCallable
 import ru.blimfy.common.exception.DuplicateException
 import ru.blimfy.common.exception.IncorrectDataException
 import ru.blimfy.common.exception.NotFoundException
@@ -49,7 +55,7 @@ class ControllerAdvice : ResponseEntityExceptionHandler() {
             ResponseEntity<in Any> = transformException(ex, FORBIDDEN, exchange)
 
     /**
-     * Возвращает преобразованный [exchange] с информацией о перехваченной ошибке [ex], указывающей на то, пришли
+     * Возвращает преобразованный [exchange] с информацией о перехваченной ошибке [ex], указывающей на то, что пришли
      *      * некорректные данные.
      */
     @ExceptionHandler
@@ -67,4 +73,14 @@ class ControllerAdvice : ResponseEntityExceptionHandler() {
         super.handleExceptionInternal(ex, forStatusAndDetail(status, ex.message), null, status, exchange)
             .apply { logger.error(ex.message, ex) }
             .awaitSingle()
+
+    override fun handleWebExchangeBindException(
+        ex: WebExchangeBindException,
+        headers: HttpHeaders,
+        status: HttpStatusCode,
+        exchange: ServerWebExchange,
+    ): Mono<ResponseEntity<in Any>> {
+        val transformedEx = runBlocking { transformException(ex, BAD_REQUEST, exchange) }
+        return fromCallable { transformedEx }
+    }
 }

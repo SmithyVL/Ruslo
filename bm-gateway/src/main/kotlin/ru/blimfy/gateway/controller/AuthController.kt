@@ -3,6 +3,7 @@ package ru.blimfy.gateway.controller
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.security.SecurityRequirements
 import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.Valid
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -25,10 +26,12 @@ class AuthController(private val authControllerService: AuthControllerService) {
     @SecurityRequirements
     @Operation(summary = "Зарегистрировать нового пользователя")
     @PostMapping("sign-up")
-    suspend fun signUp(@RequestBody signUpDto: SignUpDto) = authControllerService.signUp(signUpDto)
+    suspend fun signUp(@Valid @RequestBody signUpDto: SignUpDto) =
+        authControllerService.signUp(signUpDto)
 
     @SecurityRequirements
     @Operation(summary = "Авторизовать существующего пользователя")
     @PostMapping("sign-in")
-    suspend fun signIn(@RequestBody signInDto: SignInDto) = authControllerService.signIn(signInDto)
+    suspend fun signIn(@Valid @RequestBody signInDto: SignInDto) =
+        authControllerService.signIn(signInDto)
 }

@@ -1,6 +1,6 @@
 [versions]
 springBoot = "3.4.5"
-kotlin = "2.1.20"
+kotlin = "2.1.21"
 jwt = "0.12.6"
 springDoc = "2.8.8"
 
@@ -14,6 +14,9 @@ springBootStarter = { module = "org.springframework.boot:spring-boot-starter" }
 # Spring.
 springCore = { module = "org.springframework:spring-core" }
 springBeans = { module = "org.springframework:spring-beans" }
+
+# Spring Data.
+springDataCommons = { module = "org.springframework.data:spring-data-commons" }
 
 # Документация.
 springDocWebflux = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springDoc" }

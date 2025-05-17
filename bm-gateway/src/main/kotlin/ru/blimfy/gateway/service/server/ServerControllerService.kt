@@ -2,12 +2,14 @@ package ru.blimfy.gateway.service.server
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
-import ru.blimfy.gateway.dto.channel.ChannelDto
-import ru.blimfy.gateway.dto.invite.InviteDto
-import ru.blimfy.gateway.dto.member.MemberDetailsDto
+import ru.blimfy.gateway.dto.server.ModifyServerDto
 import ru.blimfy.gateway.dto.server.NewServerDto
 import ru.blimfy.gateway.dto.server.ServerDto
-import ru.blimfy.gateway.integration.security.CustomUserDetails
+import ru.blimfy.gateway.dto.server.ServerOwnerDto
+import ru.blimfy.gateway.dto.server.channel.ChannelDto
+import ru.blimfy.gateway.dto.server.invite.InviteDto
+import ru.blimfy.gateway.dto.server.member.MemberDto
+import ru.blimfy.user.db.entity.User
 
 /**
  * Интерфейс для работы с обработкой запросов о серверах.
@@ -17,42 +19,47 @@ import ru.blimfy.gateway.integration.security.CustomUserDetails
  */
 interface ServerControllerService {
     /**
-     * Возвращает новый [newServerDto], который создаёт [user].
+     * Возвращает новый [newServer], который создаёт [currentUser].
      */
-    suspend fun createServer(newServerDto: NewServerDto, user: CustomUserDetails): ServerDto
+    suspend fun createServer(newServer: NewServerDto, currentUser: User): ServerDto
 
     /**
-     * Возвращает обновлённый [serverDto], который обновляет [user].
+     * Возвращает обновлённый [modifyServer] с [serverId], который обновляет [currentUser].
      */
-    suspend fun modifyServer(serverDto: ServerDto, user: CustomUserDetails): ServerDto
+    suspend fun modifyServer(serverId: UUID, modifyServer: ModifyServerDto, currentUser: User): ServerDto
 
     /**
-     * Возвращает сервер с [serverId], который хочет получить [user].
+     * Возвращает обновлённый сервер с [serverId] и новым [serverOwner], который обновляет [currentUser].
      */
-    suspend fun findServer(serverId: UUID, user: CustomUserDetails): ServerDto
+    suspend fun changeOwner(serverId: UUID, serverOwner: ServerOwnerDto, currentUser: User): ServerDto
 
     /**
-     * Удаляет сервер с [serverId], который удаляет [user].
+     * Возвращает сервер с [serverId], который хочет получить [currentUser].
      */
-    suspend fun deleteServer(serverId: UUID, user: CustomUserDetails)
+    suspend fun findServer(serverId: UUID, currentUser: User): ServerDto
 
     /**
-     * Кикает участника с [memberId] с сервера с [serverId], которого кикает [user].
+     * Удаляет сервер с [serverId], который удаляет [currentUser].
      */
-    suspend fun deleteServerMember(serverId: UUID, memberId: UUID, user: CustomUserDetails)
+    suspend fun deleteServer(serverId: UUID, currentUser: User)
 
     /**
-     * Возвращает участников сервера с [serverId], которых хочет получить [user].
+     * Кикает участника с [memberId] с сервера с [serverId], которого кикает [currentUser].
      */
-    suspend fun findServerMembers(serverId: UUID, user: CustomUserDetails): Flow<MemberDetailsDto>
+    suspend fun deleteServerMember(serverId: UUID, memberId: UUID, currentUser: User)
 
     /**
-     * Возвращает каналы сервера с [serverId], которых хочет получить [user].
+     * Возвращает участников сервера с [serverId], которых хочет получить [currentUser].
      */
-    suspend fun findServerChannels(serverId: UUID, user: CustomUserDetails): Flow<ChannelDto>
+    suspend fun findServerMembers(serverId: UUID, currentUser: User): Flow<MemberDto>
 
     /**
-     * Возвращает приглашения сервера с [serverId], которых хочет получить [user].
+     * Возвращает каналы сервера с [serverId], которых хочет получить [currentUser].
      */
-    suspend fun findServerInvites(serverId: UUID, user: CustomUserDetails): Flow<InviteDto>
+    suspend fun findServerChannels(serverId: UUID, currentUser: User): Flow<ChannelDto>
+
+    /**
+     * Возвращает приглашения сервера с [serverId], которых хочет получить [currentUser].
+     */
+    suspend fun findServerInvites(serverId: UUID, currentUser: User): Flow<InviteDto>
 }

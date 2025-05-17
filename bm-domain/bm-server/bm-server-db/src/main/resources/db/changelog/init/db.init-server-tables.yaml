@@ -28,9 +28,9 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: owner_user_id
+                  name: owner_id
                   type: uuid
-                  remarks: Идентификатор пользователя, владеющего сервером
+                  remarks: Идентификатор владельца сервера
                   constraints:
                     nullable: false
               - column:
@@ -348,8 +348,6 @@ databaseChangeLog:
                   name: content
                   type: varchar
                   remarks: Содержимое сообщения
-                  constraints:
-                    nullable: false
               - column:
                   name: file_url
                   type: varchar

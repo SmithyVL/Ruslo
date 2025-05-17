@@ -55,6 +55,12 @@ databaseChangeLog:
                   type: varchar
                   remarks: Цвет баннера пользователя
               - column:
+                  name: password
+                  type: varchar
+                  remarks: Хэш пароля
+                  constraints:
+                    nullable: false
+              - column:
                   name: created_date
                   type: timestamptz
                   remarks: Дата создания
@@ -67,13 +73,13 @@ databaseChangeLog:
         - onFail: MARK_RAN
         - not:
             - tableExists:
-                tableName: password
+                tableName: friend
       author: Владислав Кузнецов
-      comment: Инициализация таблицы с паролями
+      comment: Инициализация таблицы с информацией о друзьях
       changes:
         - createTable:
-            tableName: password
-            remarks: Пароли
+            tableName: friend
+            remarks: Друзья
             columns:
               - column:
                   name: id
@@ -82,25 +88,101 @@ databaseChangeLog:
                   defaultValueComputed: gen_random_uuid()
                   constraints:
                     primaryKey: true
-                    primaryKeyName: password_id_pkey
+                    primaryKeyName: friend_id_pkey
               - column:
-                  name: user_id
+                  name: from_id
                   type: uuid
                   remarks: Идентификатор пользователя
                   constraints:
                     nullable: false
-                    unique: true
               - column:
-                  name: hash
-                  type: varchar
-                  remarks: Хэш пароля
+                  name: to_id
+                  type: uuid
+                  remarks: Идентификатор друга
                   constraints:
                     nullable: false
+              - column:
+                  name: nick
+                  type: varchar
+                  remarks: Никнейм для друга
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата появления друга
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: from_id, to_id
+            constraintName: const_unique_friend_from_to
+            tableName: friend
         - addForeignKeyConstraint:
             onDelete: CASCADE
             onUpdate: RESTRICT
-            baseColumnNames: user_id
-            baseTableName: password
-            constraintName: fk_user_password
+            baseColumnNames: from_id
+            baseTableName: friend
+            constraintName: fk_user_friend_from
+            referencedColumnNames: id
+            referencedTableName: users
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: to_id
+            baseTableName: friend
+            constraintName: fk_user_friend_to
+            referencedColumnNames: id
+            referencedTableName: users
+  - changeSet:
+      id: init_user_tables_2
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: friend_request
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с информацией о заявках в друзья
+      changes:
+        - createTable:
+            tableName: friend_request
+            remarks: Заявки в друзья
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор заявки в друзья
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: friend_request_id_pkey
+              - column:
+                  name: from_id
+                  type: uuid
+                  remarks: Идентификатор пользователя, приглашающего в друзья
+                  constraints:
+                    nullable: false
+              - column:
+                  name: to_id
+                  type: uuid
+                  remarks: Идентификатор пользователя, приглашённого в друзья
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: from_id, to_id
+            constraintName: const_unique_friend_request_from_to
+            tableName: friend_request
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: from_id
+            baseTableName: friend_request
+            constraintName: fk_user_friend_request_from
+            referencedColumnNames: id
+            referencedTableName: users
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: to_id
+            baseTableName: friend_request
+            constraintName: fk_user_friend_request_to
             referencedColumnNames: id
             referencedTableName: users

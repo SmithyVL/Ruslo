@@ -8,4 +8,5 @@ dependencies {
     api(project(":bm-domain:bm-user:bm-user-db"))
 
     implementation(project(":bm-common"))
+    implementation(libs.kotlinxCoroutinesReactor)
 }

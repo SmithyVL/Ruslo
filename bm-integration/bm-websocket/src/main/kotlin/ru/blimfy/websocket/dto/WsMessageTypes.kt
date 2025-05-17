@@ -20,7 +20,7 @@ enum class WsMessageTypes {
     /**
      * Участник сервера изменён.
      */
-    EDIT_SERVER_MEMBER,
+    GUILD_MEMBER_UPDATE,
 
     /**
      * Участник удалён с сервера.
@@ -30,17 +30,17 @@ enum class WsMessageTypes {
     /**
      * Создан новый канал на сервере.
      */
-    NEW_SERVER_CHANNEL,
+    CHANNEL_CREATE,
 
     /**
      * Удалён канал на сервере.
      */
-    REMOVE_SERVER_CHANNEL,
+    CHANNEL_DELETE,
 
     /**
      * Изменён канал на сервере.
      */
-    EDIT_SERVER_CHANNEL,
+    CHANNEL_UPDATE,
 
     /**
      * Создано новое сообщение в канале сервера.
@@ -64,23 +64,22 @@ enum class WsMessageTypes {
     PINNED_TEXT_MESSAGE,
 
     /**
-     * Создано новое сообщение в личном диалоге.
+     * Создано новое сообщение в личном канале.
      */
-    NEW_DIRECT_MESSAGE,
+    NEW_DM_MESSAGE,
 
     /**
-     * Удалено сообщение в личном диалоге.
+     * Удалено сообщение в личном канале.
      */
-    REMOVE_DIRECT_MESSAGE,
+    DELETE_DM_MESSAGE,
 
     /**
-     * Изменено сообщение в личном диалоге.
+     * Изменено сообщение в личном канале.
      */
-    EDIT_DIRECT_MESSAGE,
+    EDIT_DM_MESSAGE,
 
     /**
-     * Закреплено сообщение в личном диалоге.
+     * Закреплено сообщение в личном канале.
      */
-    @Suppress("unused")
-    PINNED_DIRECT_MESSAGE,
+    PINNED_DM_MESSAGE,
 }

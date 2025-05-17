@@ -6,4 +6,5 @@ plugins {
 dependencies {
     implementation(libs.springCore)
     implementation(libs.springBeans)
+    implementation(libs.springDataCommons)
 }

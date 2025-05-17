@@ -11,7 +11,7 @@ import ru.blimfy.server.db.entity.Server
  * DTO с информацией о сервере.
  *
  * @property id идентификатор.
- * @property ownerUserId идентификатор пользователя, владеющего сервером.
+ * @property ownerId идентификатор владельца сервера.
  * @property name название.
  * @property icon ссылка на файл аватарки.
  * @property bannerColor цвет баннера.
@@ -22,7 +22,7 @@ import ru.blimfy.server.db.entity.Server
  */
 data class ServerDto(
     val id: UUID,
-    val ownerUserId: UUID,
+    val ownerId: UUID,
     val name: String,
     val icon: String? = null,
     val bannerColor: String? = null,
@@ -43,4 +43,4 @@ fun ServerDto.toEntity(ownerId: UUID) = Server(ownerId, name).apply {
 /**
  * Возвращает DTO представление сущности сервера.
  */
-fun Server.toDto() = ServerDto(id, ownerUserId, name, icon, bannerColor, description, createdDate)
+fun Server.toDto() = ServerDto(id, ownerId, name, icon, bannerColor, description, createdDate)

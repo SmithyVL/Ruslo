@@ -18,6 +18,7 @@ import ru.blimfy.user.db.entity.User
  * @property avatar ссылка на файл аватарки.
  * @property bannerColor цвет баннера пользователя.
  * @property createdDate дата создания. Записывается только один раз при создании новой записи в БД.
+ * @property token токен авторизации.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -30,7 +31,9 @@ data class UserDto(
     val avatar: String? = null,
     val bannerColor: String? = null,
     @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE) val createdDate: Instant,
-)
+) {
+    var token: String? = null
+}
 
 /**
  * Возвращает DTO представление с информацией из сущности пользователя.

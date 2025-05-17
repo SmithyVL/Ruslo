@@ -12,9 +12,19 @@ import ru.blimfy.server.db.entity.TextMessage
  */
 interface TextMessageService {
     /**
-     * Возвращает новый или обновлённый [message].
+     * Возвращает новое [message].
      */
-    suspend fun saveMessage(message: TextMessage): TextMessage
+    suspend fun createMessage(message: TextMessage): TextMessage
+
+    /**
+     * Возвращает обновлённое сообщение с [id] и [newContent].
+     */
+    suspend fun setContent(id: UUID, newContent: String): TextMessage
+
+    /**
+     * Возвращает обновлённое сообщение с [id] и [newPinned].
+     */
+    suspend fun setPinned(id: UUID, newPinned: Boolean): TextMessage
 
     /**
      * Возвращает существующее текстовое сообщение с [id].

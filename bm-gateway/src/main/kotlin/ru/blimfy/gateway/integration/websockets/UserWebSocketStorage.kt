@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.socket.WebSocketSession
-import ru.blimfy.direct.usecase.conservation.member.MemberConservationService
+import ru.blimfy.direct.usecase.channel.DmChannelService
 import ru.blimfy.security.service.TokenService
 import ru.blimfy.server.usecase.member.MemberService
 import ru.blimfy.websocket.dto.WsMessageTypes
@@ -21,7 +21,7 @@ import ru.blimfy.websocket.storage.WebSocketStorage
  *
  * @param objectMapper маппер для сериализации/десериализации объектов.
  * @property memberService сервис для работы с участниками серверов.
- * @property memberConservationService сервис для работы с участиями пользователей в личных диалогах.
+ * @property dmChannelService сервис для работы с личными каналами.
  * @property tokenService сервис для работы с JWT токенами.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
@@ -30,7 +30,7 @@ import ru.blimfy.websocket.storage.WebSocketStorage
 class UserWebSocketStorage(
     objectMapper: ObjectMapper,
     private val memberService: MemberService,
-    private val memberConservationService: MemberConservationService,
+    private val dmChannelService: DmChannelService,
     private val tokenService: TokenService,
 ) : WebSocketStorage<UUID>(objectMapper) {
     /**
@@ -46,15 +46,14 @@ class UserWebSocketStorage(
         }
 
     /**
-     * Отправляет уведомление об изменении [type] для личного диалога с [conservationId] через Websocket'ы кроме
+     * Отправляет уведомление об изменении [type] для личного диалога или группы с [dmChannel] через Websocket'ы кроме
      * [skipUserId].
      */
-    fun sendConservationMessages(conservationId: UUID, type: WsMessageTypes, data: Any, skipUserId: UUID) =
+    fun sendDmChannelMessage(dmChannel: UUID, type: WsMessageTypes, data: Any, skipUserId: UUID) =
         CoroutineScope(IO).launch {
-            memberConservationService.findConservationMembers(conservationId)
-                .filter { it.userId != skipUserId }
-                .onEach { sendMessage(it.userId, type, data) }
-                .collect()
+            dmChannelService.findDmChannel(dmChannel).recipients
+                .filter { it != skipUserId }
+                .forEach { sendMessage(it, type, data) }
         }
 
     override fun addSession(token: String, session: WebSocketSession) {

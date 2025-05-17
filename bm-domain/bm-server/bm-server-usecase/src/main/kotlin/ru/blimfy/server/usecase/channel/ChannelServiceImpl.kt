@@ -16,7 +16,15 @@ import ru.blimfy.server.usecase.exception.ServerErrors.CHANNEL_BY_ID_NOT_FOUND
  */
 @Service
 class ChannelServiceImpl(private val channelRepo: ChannelRepository) : ChannelService {
-    override suspend fun saveChannel(channel: Channel) = channelRepo.save(channel)
+    override suspend fun createChannel(channel: Channel) = channelRepo.save(channel)
+
+    override suspend fun modifyChannel(id: UUID, newName: String, newNsfw: Boolean) =
+        findChannel(id)
+            .apply {
+                name = newName
+                nsfw = newNsfw
+            }
+            .let { channelRepo.save(it) }
 
     override suspend fun findChannel(channelId: UUID) =
         channelRepo.findById(channelId) ?: throw NotFoundException(CHANNEL_BY_ID_NOT_FOUND.msg.format(channelId))
@@ -25,5 +33,5 @@ class ChannelServiceImpl(private val channelRepo: ChannelRepository) : ChannelSe
         channelRepo.findAllByServerId(serverId)
 
     override suspend fun deleteChannel(channelId: UUID, serverId: UUID) =
-        channelRepo.deleteByIdAndServerId(channelId = channelId, serverId = serverId)
+        findChannel(channelId).apply { channelRepo.deleteByIdAndServerId(channelId = channelId, serverId = serverId) }
 }
