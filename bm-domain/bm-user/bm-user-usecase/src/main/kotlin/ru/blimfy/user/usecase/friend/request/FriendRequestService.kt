@@ -42,12 +42,7 @@ interface FriendRequestService {
     suspend fun deleteAllIncomingFriendRequests(userId: UUID)
 
     /**
-     * Удаляет исходящую заявку в друзья с [id] от [fromId].
+     * Удаляет заявку в друзья от пользователя с [fromId] с пользователем с [toId].
      */
-    suspend fun deleteOutgoingFriendRequest(id: UUID, fromId: UUID)
-
-    /**
-     * Удаляет входящую заявку в друзья с [id] к [toId].
-     */
-    suspend fun deleteIncomingFriendRequest(id: UUID, toId: UUID)
+    suspend fun deleteFriendRequest(fromId: UUID, toId: UUID)
 }

@@ -15,23 +15,21 @@ import ru.blimfy.gateway.service.auth.AuthControllerService
 /**
  * Контроллер для обработки запросов авторизации/аутентификации пользователей.
  *
- * @property authControllerService сервис для обработки информации авторизации пользователей.
+ * @property service сервис для обработки информации авторизации пользователей.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Tag(name = "AuthController", description = "Контроллер для работы с авторизацией пользователей")
 @RestController
-@RequestMapping("/v1/auth/")
-class AuthController(private val authControllerService: AuthControllerService) {
+@RequestMapping("/v1/auth")
+class AuthController(private val service: AuthControllerService) {
     @SecurityRequirements
     @Operation(summary = "Зарегистрировать нового пользователя")
-    @PostMapping("sign-up")
-    suspend fun signUp(@Valid @RequestBody signUpDto: SignUpDto) =
-        authControllerService.signUp(signUpDto)
+    @PostMapping("/sign-up")
+    suspend fun signUp(@Valid @RequestBody signUpDto: SignUpDto) = service.signUp(signUpDto)
 
     @SecurityRequirements
     @Operation(summary = "Авторизовать существующего пользователя")
-    @PostMapping("sign-in")
-    suspend fun signIn(@Valid @RequestBody signInDto: SignInDto) =
-        authControllerService.signIn(signInDto)
+    @PostMapping("/sign-in")
+    suspend fun signIn(@Valid @RequestBody signInDto: SignInDto) = service.signIn(signInDto)
 }

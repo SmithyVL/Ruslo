@@ -2,13 +2,13 @@ package ru.blimfy.gateway.service.user
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
-import ru.blimfy.gateway.dto.dm.channel.DmChannelDto
-import ru.blimfy.gateway.dto.server.ServerShortDto
+import ru.blimfy.gateway.dto.channel.ChannelDto
+import ru.blimfy.gateway.dto.server.ServerPartialDto
 import ru.blimfy.gateway.dto.server.member.MemberDto
 import ru.blimfy.gateway.dto.user.ModifyUserDto
 import ru.blimfy.gateway.dto.user.UserDto
 import ru.blimfy.gateway.dto.user.UsernameDto
-import ru.blimfy.gateway.dto.user.friend.FriendDto
+import ru.blimfy.gateway.dto.user.channel.NewDmChannelDto
 import ru.blimfy.user.db.entity.User
 
 /**
@@ -19,37 +19,37 @@ import ru.blimfy.user.db.entity.User
  */
 interface UserControllerService {
     /**
-     * Возвращает [modifyUser], обновляемого [currentUser].
+     * Возвращает [modifyUser], обновляемого [user].
      */
-    suspend fun modifyUser(modifyUser: ModifyUserDto, currentUser: User): UserDto
+    suspend fun modifyUser(modifyUser: ModifyUserDto, user: User): UserDto
 
     /**
-     * Возвращает пользователя с обновлённым именем из [usernameInfo], обновляемого [currentUser].
+     * Возвращает пользователя с обновлённым именем из [usernameInfo], обновляемого [user].
      */
-    suspend fun changeUsername(usernameInfo: UsernameDto, currentUser: User): UserDto
+    suspend fun changeUsername(usernameInfo: UsernameDto, user: User): UserDto
 
     /**
-     * Возвращает сервера [currentUser].
+     * Возвращает сервера [user].
      */
-    fun findUserServers(currentUser: User): Flow<ServerShortDto>
+    fun findUserServers(user: User): Flow<ServerPartialDto>
 
     /**
-     * Возвращает информацию об участии [currentUser] на сервере с [serverId].
+     * Возвращает информацию участника сервера с [serverId] для [user].
      */
-    suspend fun findServerMember(serverId: UUID, currentUser: User): MemberDto
+    suspend fun findMember(serverId: UUID, user: User): MemberDto
 
     /**
-     * Удаляет участие [currentUser] с сервера с [serverId].
+     * Удаляет участие [user] с сервера с [serverId].
      */
-    suspend fun leaveServer(serverId: UUID, currentUser: User)
+    suspend fun leaveServer(serverId: UUID, user: User)
 
     /**
-     * Возвращает личные диалоги [currentUser].
+     * Возвращает личный [channel] для [user].
      */
-    fun findUserDmChannels(currentUser: User): Flow<DmChannelDto>
+    suspend fun createDmChannel(channel: NewDmChannelDto, user: User): ChannelDto
 
     /**
-     * Возвращает друзей [currentUser].
+     * Возвращает личные диалоги [user].
      */
-    fun findUserFriends(currentUser: User): Flow<FriendDto>
+    fun findUserDmChannels(user: User): Flow<ChannelDto>
 }

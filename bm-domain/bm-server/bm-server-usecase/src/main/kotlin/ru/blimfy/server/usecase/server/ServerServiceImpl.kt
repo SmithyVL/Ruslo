@@ -2,17 +2,14 @@ package ru.blimfy.server.usecase.server
 
 import java.util.UUID
 import org.springframework.stereotype.Service
-import ru.blimfy.common.enumeration.ChannelTypes.TEXT
-import ru.blimfy.common.enumeration.ChannelTypes.VOICE
+import org.springframework.transaction.annotation.Transactional
 import ru.blimfy.common.exception.AccessDeniedException
 import ru.blimfy.common.exception.NotFoundException
-import ru.blimfy.server.db.entity.Channel
 import ru.blimfy.server.db.entity.Member
 import ru.blimfy.server.db.entity.MemberRole
 import ru.blimfy.server.db.entity.Role
 import ru.blimfy.server.db.entity.Server
 import ru.blimfy.server.db.repository.ServerRepository
-import ru.blimfy.server.usecase.channel.ChannelService
 import ru.blimfy.server.usecase.exception.ServerErrors.SERVER_BY_ID_NOT_FOUND
 import ru.blimfy.server.usecase.exception.ServerErrors.SERVER_MODIFY_ACCESS_DENIED
 import ru.blimfy.server.usecase.exception.ServerErrors.SERVER_VIEW_ACCESS_DENIED
@@ -25,7 +22,6 @@ import ru.blimfy.server.usecase.role.RoleServiceImpl.Companion.DEFAULT_ROLE_NAME
  * Реализация интерфейса для работы с серверами пользователей.
  *
  * @property serverRepo репозиторий для работы с сущностями серверов в БД.
- * @property channelService сервис для работы с каналами серверов.
  * @property roleService сервис для работы с ролями серверов.
  * @property memberService сервис для работы с участниками серверов.
  * @property memberRoleService сервис для работы с ролями участников серверов.
@@ -35,18 +31,14 @@ import ru.blimfy.server.usecase.role.RoleServiceImpl.Companion.DEFAULT_ROLE_NAME
 @Service
 class ServerServiceImpl(
     private val serverRepo: ServerRepository,
-    private val channelService: ChannelService,
     private val roleService: RoleService,
     private val memberService: MemberService,
     private val memberRoleService: MemberRoleService,
 ) : ServerService {
+    @Transactional
     override suspend fun createServer(server: Server) =
         serverRepo.save(server).apply {
             val serverId = this.id
-
-            // Создание дефолтных каналов для нового сервера - текстового и голосового.
-            channelService.createChannel(Channel(serverId, DEFAULT_TEXT_CHANNEL_NAME, TEXT, 0))
-            channelService.createChannel(Channel(serverId, DEFAULT_VOICE_CHANNEL_NAME, VOICE, 1))
 
             // Создание дефолтной роли для нового сервера, которая будет присваиваться каждому нового участнику
             // навсегда.
@@ -74,14 +66,14 @@ class ServerServiceImpl(
             }
             .let { serverRepo.save(it) }
 
-    override suspend fun setOwner(id: UUID, newOwnerId: UUID) =
-        findServer(id).apply { ownerId = newOwnerId }.let { serverRepo.save(it) }
+    override suspend fun setOwner(id: UUID, ownerId: UUID) =
+        findServer(id).apply { this.ownerId = ownerId }.let { serverRepo.save(it) }
 
     override suspend fun findServer(id: UUID) = serverRepo.findById(id)
         ?: throw NotFoundException(SERVER_BY_ID_NOT_FOUND.msg.format(id))
 
     override suspend fun deleteServer(serverId: UUID, ownerId: UUID) =
-        serverRepo.deleteByIdAndOwnerId(serverId = serverId, ownerId = ownerId)
+        serverRepo.deleteByIdAndOwnerId(id = serverId, ownerId = ownerId)
 
     override suspend fun addNewMember(serverId: UUID, userId: UUID) =
         memberService.saveMember(Member(serverId = serverId, userId = userId)).apply {
@@ -109,16 +101,4 @@ class ServerServiceImpl(
      * Возвращает дефолтное значение битовой маски разрешений.
      */
     private fun getDefaultRolePermission() = "0"
-
-    private companion object {
-        /**
-         * Стандартное название текстового канала.
-         */
-        const val DEFAULT_TEXT_CHANNEL_NAME = "Текстовый канал"
-
-        /**
-         * Стандартное название голосового канала.
-         */
-        const val DEFAULT_VOICE_CHANNEL_NAME = "Голосовой канал"
-    }
 }

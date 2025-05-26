@@ -5,35 +5,44 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import java.util.UUID
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.blimfy.gateway.dto.user.friend.FriendNickDto
+import ru.blimfy.gateway.dto.common.NewNickDto
 import ru.blimfy.gateway.integration.security.CustomUserDetails
 import ru.blimfy.gateway.service.friend.FriendControllerService
 
 /**
  * Контроллер для работы с друзьями.
  *
- * @property friendControllerService сервис для обработки информации о друзьях.
+ * @property service сервис для обработки информации о друзьях.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Tag(name = "FriendController", description = "Контроллер для работы с информацией о друзьях")
 @RestController
-@RequestMapping("/v1/friends")
-class FriendController(private val friendControllerService: FriendControllerService) {
-    @Operation(summary = "Обновить друга")
-    @PutMapping("/{friendId}")
-    suspend fun modifyFriend(
-        @PathVariable friendId: UUID,
-        @RequestBody newFriendRequest: FriendNickDto,
-        @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendControllerService.changeFriendNick(friendId, newFriendRequest, userDetails.info)
+@RequestMapping("/v1/users/@me/friends")
+class FriendController(private val service: FriendControllerService) {
+    @Operation(summary = "Получить друзей пользователя")
+    @GetMapping
+    suspend fun findUserFriends(@AuthenticationPrincipal userDetails: CustomUserDetails) =
+        service.findUserFriends(userDetails.info)
 
-    @Operation(summary = "Удалить друга")
-    @DeleteMapping("/{friendId}")
-    suspend fun deleteFriend(@PathVariable friendId: UUID) = friendControllerService.deleteFriend(friendId)
+    @Operation(summary = "Удалить дружбу с пользователем")
+    @DeleteMapping("/{userId}")
+    suspend fun deleteFriend(
+        @PathVariable userId: UUID,
+        @AuthenticationPrincipal userDetails: CustomUserDetails
+    ) = service.deleteFriend(userId, userDetails.info)
+
+    @Operation(summary = "Обновить ник для друга")
+    @PutMapping("/{userId}/nick")
+    suspend fun changeFriendNick(
+        @PathVariable userId: UUID,
+        @RequestBody nickInfo: NewNickDto,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ) = service.changeFriendNick(userId, nickInfo.nick, userDetails.info)
 }

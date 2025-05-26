@@ -3,7 +3,6 @@ package ru.blimfy.gateway.service.friend
 import java.util.UUID
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
-import ru.blimfy.gateway.dto.user.friend.FriendNickDto
 import ru.blimfy.gateway.dto.user.friend.toDto
 import ru.blimfy.gateway.dto.user.toDto
 import ru.blimfy.user.db.entity.Friend
@@ -12,7 +11,7 @@ import ru.blimfy.user.usecase.friend.FriendService
 import ru.blimfy.user.usecase.user.UserService
 
 /**
- * Реализация интерфейса для работы с обработкой запросов о друзьях.
+ * Реализация интерфейса для работы с обработкой друзей.
  *
  * @property friendService сервис для работы с друзьями.
  * @property userService сервис для работы с пользователями.
@@ -24,19 +23,18 @@ class FriendControllerServiceImpl(
     private val friendService: FriendService,
     private val userService: UserService,
 ) : FriendControllerService {
-    override suspend fun changeFriendNick(friendId: UUID, nickInfo: FriendNickDto, currentUser: User) =
-        friendService.changeFriendNick(friendId, nickInfo.nick, currentUser.id)
-            .toDtoWithUserInfo()
+    override fun findUserFriends(user: User) =
+        friendService.findFriends(user.id).map { it.toDtoWithData() }
 
-    override fun findFriends(currentUser: User) =
-        friendService.findFriends(currentUser.id)
-            .map { it.toDtoWithUserInfo() }
+    override suspend fun deleteFriend(userId: UUID, user: User) =
+        friendService.deleteFriend(user.id, userId)
 
-    override suspend fun deleteFriend(id: UUID) = friendService.deleteFriend(id)
+    override suspend fun changeFriendNick(userId: UUID, nick: String?, user: User) =
+        friendService.changeFriendNick(userId, user.id, nick).toDtoWithData()
 
     /**
-     * Возвращает DTO представление друга с информацией о пользователе, являющимся другом.
+     * Возвращает DTO представление друга.
      */
-    private suspend fun Friend.toDtoWithUserInfo() =
+    private suspend fun Friend.toDtoWithData() =
         this.toDto().apply { to = userService.findUser(toId).toDto() }
 }

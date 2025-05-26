@@ -34,9 +34,6 @@ class FriendRequestServiceImpl(private val friendRequestRepo: FriendRequestRepos
     override suspend fun deleteAllIncomingFriendRequests(userId: UUID) =
         friendRequestRepo.deleteAllByToId(userId)
 
-    override suspend fun deleteOutgoingFriendRequest(id: UUID, fromId: UUID) =
-        friendRequestRepo.deleteByIdAndFromId(id = id, fromId = fromId)
-
-    override suspend fun deleteIncomingFriendRequest(id: UUID, toId: UUID) =
-        friendRequestRepo.deleteByIdAndToId(id = id, toId = toId)
+    override suspend fun deleteFriendRequest(fromId: UUID, toId: UUID) =
+        friendRequestRepo.deleteByFromIdAndToId(fromId = fromId, toId = toId)
 }

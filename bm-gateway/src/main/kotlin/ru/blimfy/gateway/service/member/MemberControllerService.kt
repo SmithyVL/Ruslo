@@ -1,8 +1,8 @@
 package ru.blimfy.gateway.service.member
 
-import ru.blimfy.gateway.dto.server.member.CurrentMemberNickDto
+import java.util.UUID
+import kotlinx.coroutines.flow.Flow
 import ru.blimfy.gateway.dto.server.member.MemberDto
-import ru.blimfy.gateway.dto.server.member.MemberNickDto
 import ru.blimfy.user.db.entity.User
 
 /**
@@ -13,12 +13,23 @@ import ru.blimfy.user.db.entity.User
  */
 interface MemberControllerService {
     /**
-     * Возвращает участника сервера с новым [memberNick], которого обновляет [currentUser].
+     * Возвращает участников сервера с [serverId], которых хочет получить [user].
      */
-    suspend fun changeMemberNick(memberNick: MemberNickDto, currentUser: User): MemberDto
+    suspend fun findMembers(serverId: UUID, user: User): Flow<MemberDto>
 
     /**
-     * Возвращает участника сервера с новым [memberNick], который для себя меняет [currentUser].
+     * [user] удаляет пользователя с [userId] с сервера с [serverId].
      */
-    suspend fun changeCurrentMemberNick(memberNick: CurrentMemberNickDto, currentUser: User): MemberDto
+    suspend fun removeMember(serverId: UUID, userId: UUID, user: User)
+
+    /**
+     * Возвращает обновлённого участника сервера с [serverId] с новым [nick] для пользователя с [userId], которого
+     * обновляет [user].
+     */
+    suspend fun changeMemberNick(serverId: UUID, userId: UUID, nick: String? = null, user: User): MemberDto
+
+    /**
+     * Возвращает обновлённого участника сервера с [serverId] с новым [nick], который для себя меняет [user].
+     */
+    suspend fun changeCurrentMemberNick(serverId: UUID, nick: String? = null, user: User): MemberDto
 }

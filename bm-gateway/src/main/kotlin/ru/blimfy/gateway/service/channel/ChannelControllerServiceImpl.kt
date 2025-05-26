@@ -1,103 +1,151 @@
 package ru.blimfy.gateway.service.channel
 
+import java.time.Instant.now
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import org.springframework.stereotype.Service
-import ru.blimfy.gateway.dto.server.channel.ChannelDto
-import ru.blimfy.gateway.dto.server.channel.ModifyChannelDto
-import ru.blimfy.gateway.dto.server.channel.NewChannelDto
-import ru.blimfy.gateway.dto.server.channel.toDto
-import ru.blimfy.gateway.dto.server.channel.toEntity
-import ru.blimfy.gateway.dto.server.message.TextMessageDto
-import ru.blimfy.gateway.dto.server.message.toDto
+import ru.blimfy.channel.db.entity.Channel
+import ru.blimfy.channel.db.entity.Invite
+import ru.blimfy.channel.usecase.channel.ChannelService
+import ru.blimfy.channel.usecase.invite.InviteService
+import ru.blimfy.common.enumeration.ChannelGroups.SERVER
+import ru.blimfy.common.enumeration.ChannelGroups.USER
+import ru.blimfy.common.enumeration.InviteTypes.GROUP_DM
+import ru.blimfy.gateway.dto.channel.ChannelDto
+import ru.blimfy.gateway.dto.channel.ModifyChannelDto
+import ru.blimfy.gateway.dto.channel.invite.InviteDto
+import ru.blimfy.gateway.dto.channel.invite.toDto
+import ru.blimfy.gateway.dto.channel.toDto
+import ru.blimfy.gateway.dto.channel.toEntity
+import ru.blimfy.gateway.dto.channel.toPartialDto
+import ru.blimfy.gateway.dto.server.toPartialDto
 import ru.blimfy.gateway.dto.user.toDto
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
-import ru.blimfy.server.usecase.channel.ChannelService
-import ru.blimfy.server.usecase.message.TextMessageService
+import ru.blimfy.gateway.integration.websockets.base.PartialMemberDto
+import ru.blimfy.gateway.integration.websockets.dto.TypingStartDto
+import ru.blimfy.gateway.integration.websockets.extra.MemberInfoDto
+import ru.blimfy.server.usecase.member.MemberService
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
 import ru.blimfy.user.usecase.user.UserService
-import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_CREATE
 import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_DELETE
 import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_UPDATE
+import ru.blimfy.websocket.dto.WsMessageTypes.INVITE_CREATE
+import ru.blimfy.websocket.dto.WsMessageTypes.TYPING_START
 
 /**
- * Реализация интерфейса для работы с обработкой запросов о каналах серверов.
+ * Реализация интерфейса для работы с обработкой запросов о личных каналах.
  *
  * @property channelService сервис для работы с каналами.
- * @property textMessageService сервис для работы с сообщениями каналов.
+ * @property inviteService сервис для работы с приглашениями.
  * @property serverService сервис для работы с серверами.
+ * @property memberService сервис для работы с участниками серверов.
  * @property userService сервис для работы с пользователями.
- * @property userWebSocketStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
+ * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Service
 class ChannelControllerServiceImpl(
     private val channelService: ChannelService,
-    private val textMessageService: TextMessageService,
+    private val inviteService: InviteService,
     private val serverService: ServerService,
+    private val memberService: MemberService,
     private val userService: UserService,
-    private val userWebSocketStorage: UserWebSocketStorage,
+    private val userWsStorage: UserWebSocketStorage,
 ) : ChannelControllerService {
-    override suspend fun createChannel(newChannelDto: NewChannelDto, currentUser: User): ChannelDto {
-        val userId = currentUser.id
+    override suspend fun findChannel(id: UUID, user: User): ChannelDto {
+        checkChannelViewAccess(id = id, userId = user.id)
 
-        // Создать канал сервера может только создатель сервера.
-        serverService.checkServerModifyAccess(serverId = newChannelDto.serverId, userId = userId)
-
-        return channelService.createChannel(newChannelDto.toEntity()).toDto()
-            .apply { userWebSocketStorage.sendServerMessages(serverId, CHANNEL_CREATE, this, userId) }
+        return channelService.findChannel(id).toDtoWithData()
     }
 
-    override suspend fun modifyChannel(modifyChannel: ModifyChannelDto, currentUser: User): ChannelDto {
-        val userId = currentUser.id
-        val serverId = channelService.findChannel(modifyChannel.id).serverId
+    override suspend fun modifyChannel(id: UUID, modifyChannel: ModifyChannelDto, user: User): ChannelDto {
+        checkChannelWriteAccess(id = id, userId = user.id)
 
-        // Обновить канал сервера может только создатель сервера.
-        serverService.checkServerModifyAccess(serverId = serverId, userId = userId)
-
-        channelService.modifyChannel(modifyChannel.id, modifyChannel.name, modifyChannel.nsfw)
-        return channelService.findChannel(modifyChannel.id).toDto()
-            .apply { userWebSocketStorage.sendServerMessages(serverId, CHANNEL_UPDATE, this, userId) }
+        val channel = modifyChannel.toEntity(channelService.findChannel(id))
+        return channelService.save(channel).toDtoWithData()
+            .apply { userWsStorage.sendMessage(CHANNEL_UPDATE, this) }
     }
 
-    override suspend fun deleteChannel(channelId: UUID, currentUser: User) {
-        val userId = currentUser.id
+    override suspend fun deleteChannel(id: UUID, user: User): ChannelDto {
+        checkChannelWriteAccess(id = id, userId = user.id)
 
-        // Удалить канал сервера может только создатель сервера.
-        val serverId = channelService.findChannel(channelId).serverId
-        serverService.checkServerModifyAccess(serverId = serverId, userId = userId)
-
-        channelService.deleteChannel(channelId = channelId, serverId = serverId)
-            .apply { userWebSocketStorage.sendServerMessages(serverId, CHANNEL_DELETE, channelId, userId) }
+        return channelService.deleteChannel(id).toDtoWithData()
+            .apply { userWsStorage.sendMessage(CHANNEL_DELETE, id) }
     }
 
-    override suspend fun findChannel(channelId: UUID, currentUser: User): ChannelDto {
-        val channel = channelService.findChannel(channelId)
+    override suspend fun triggerTypingIndicator(id: UUID, user: User) {
+        val memberInfo = channelService.findChannel(id).serverId?.let { serverId ->
+            val memberNick = memberService.findServerMember(serverId = serverId, userId = user.id).nick
+            MemberInfoDto(serverId, PartialMemberDto(memberNick))
+        }
 
-        // Получить информацию о канале сервера может только его участник.
-        serverService.checkServerViewAccess(serverId = channel.serverId, userId = currentUser.id)
-
-        return channel.toDto()
+        val data = TypingStartDto(id, user.id, now(), memberInfo)
+        userWsStorage.sendMessage(TYPING_START, data)
     }
 
-    override suspend fun findChannelMessages(
-        channelId: UUID,
-        pageNumber: Int,
-        pageSize: Int,
-        currentUser: User,
-    ): Flow<TextMessageDto> {
-        val userId = currentUser.id
+    override suspend fun findInvites(id: UUID, user: User): Flow<InviteDto> {
+        checkChannelViewAccess(id = id, userId = user.id)
 
-        // Получить текстовые сообщения канала сервера может только его участник.
-        val serverId = channelService.findChannel(channelId).serverId
-        serverService.checkServerViewAccess(serverId = serverId, userId = userId)
+        return inviteService.findInvites(id).map { it.toDtoWithLinkData() }
+    }
 
-        return textMessageService.findPageChannelMessages(channelId, pageNumber, pageSize)
-            .map { it.toDto() }
-            .onEach { it.author = userService.findUser(userId).toDto() }
+    override suspend fun createGroupInvite(id: UUID, user: User) =
+        checkChannelViewAccess(id = id, userId = user.id)
+            .let { inviteService.saveInvite(Invite(authorId = user.id, channelId = id, type = GROUP_DM)) }
+            .toDtoWithLinkData()
+            .apply { userWsStorage.sendMessage(INVITE_CREATE, this) }
+
+    /**
+     * Проверяет возможность просмотра канала с [id] для пользователя с [userId] и возвращает идентификатор сервера,
+     * если он есть.
+     */
+    private suspend fun checkChannelViewAccess(id: UUID, userId: UUID) =
+        channelService.findChannel(id).let { channel ->
+            channel.serverId.apply {
+                when (channel.type.group) {
+                    USER -> channelService.checkChannelViewAccess(id = channel.id, userId = userId)
+                    SERVER -> serverService.checkServerViewAccess(serverId = this!!, userId = userId)
+                }
+            }
+        }
+
+    /**
+     * Проверяет возможность изменения канала с [id] для пользователя с [userId] и возвращает идентификатор сервера,
+     * если он есть.
+     */
+    private suspend fun checkChannelWriteAccess(id: UUID, userId: UUID) =
+        channelService.findChannel(id).let { channel ->
+            channel.serverId.apply {
+                when (channel.type.group) {
+                    USER -> channelService.checkGroupDmWriteAccess(id = channel.id, userId = userId)
+                    SERVER -> serverService.checkServerModifyAccess(serverId = this!!, userId = userId)
+                }
+            }
+        }
+
+    /**
+     * Возвращает DTO представление группы.
+     */
+    private suspend fun Channel.toDtoWithData() =
+        this.toDto().apply {
+            recipients = this@toDtoWithData.recipients
+                ?.map { recipientId -> userService.findUser(recipientId) }
+                ?.map(User::toDto)
+        }
+
+    /**
+     * Возвращает DTO представление приглашения.
+     */
+    private suspend fun Invite.toDtoWithLinkData() = this.toDto().apply {
+        channel = channelService.findChannel(channelId).toPartialDto()
+        inviter = userService.findUser(authorId).toDto()
+
+        serverId?.let { serverId ->
+            server = serverService.findServer(serverId).toPartialDto(false)
+            approximateMemberCount = memberService.getCountServerMembers(serverId)
+        }
     }
 }

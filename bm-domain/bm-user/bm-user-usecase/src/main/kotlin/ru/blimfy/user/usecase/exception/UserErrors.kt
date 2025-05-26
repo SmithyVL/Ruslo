@@ -3,7 +3,7 @@ package ru.blimfy.user.usecase.exception
 /**
  * Сообщения ошибок работы с пользователями и их паролями.
  *
- * @param msg текст ошибка.
+ * @param msg текст ошибки.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */

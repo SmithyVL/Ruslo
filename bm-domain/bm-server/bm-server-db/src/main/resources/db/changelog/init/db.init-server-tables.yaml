@@ -99,7 +99,7 @@ databaseChangeLog:
                     nullable: false
         - addUniqueConstraint:
             columnNames: server_id, user_id
-            constraintName: const_unique_server_user
+            constraintName: const_unique_server
             tableName: member
         - addForeignKeyConstraint:
             onDelete: CASCADE
@@ -140,7 +140,7 @@ databaseChangeLog:
               - column:
                   name: name
                   type: varchar
-                  remarks: Название канала
+                  remarks: Название
                   constraints:
                     nullable: false
               - column:
@@ -152,7 +152,7 @@ databaseChangeLog:
               - column:
                   name: position
                   type: integer
-                  remarks: Номер в сортировке ролей внутри сервера
+                  remarks: Номер в сортировке внутри сервера
                   defaultValue: "0"
                   constraints:
                     nullable: false
@@ -163,7 +163,7 @@ databaseChangeLog:
               - column:
                   name: hoist
                   type: boolean
-                  remarks: Если роль закреплена в списке участников канала сервера
+                  remarks: Является ли роль закрепляемой в списке участников
                   defaultValueBoolean: false
                   constraints:
                     nullable: false
@@ -183,7 +183,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: server
   - changeSet:
-      id: init_server_tables_5
+      id: init_server_tables_3
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -216,17 +216,6 @@ databaseChangeLog:
                   remarks: Идентификатор роли сервера
                   constraints:
                     nullable: false
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
         - addUniqueConstraint:
             columnNames: member_id, role_id
             constraintName: const_unique_member_role
@@ -244,194 +233,6 @@ databaseChangeLog:
             onUpdate: RESTRICT
             baseColumnNames: role_id
             baseTableName: member_role
-            constraintName: fk_role_member_roles
+            constraintName: fk_role_member_role
             referencedColumnNames: id
             referencedTableName: role
-  - changeSet:
-      id: init_server_tables_6
-      preConditions:
-        - onFail: MARK_RAN
-        - not:
-            - tableExists:
-                tableName: channel
-      author: Владислав Кузнецов
-      comment: Инициализация таблицы с каналами категорий
-      changes:
-        - createTable:
-            tableName: channel
-            remarks: Каналы категорий
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-                  remarks: Идентификатор
-                  defaultValueComputed: gen_random_uuid()
-                  constraints:
-                    primaryKey: true
-                    primaryKeyName: channel_id_pkey
-              - column:
-                  name: server_id
-                  type: uuid
-                  remarks: Идентификатор сервера
-                  constraints:
-                    nullable: false
-              - column:
-                  name: name
-                  type: varchar
-                  remarks: Название канала
-                  constraints:
-                    nullable: false
-              - column:
-                  name: type
-                  type: varchar
-                  remarks: Тип канала
-                  defaultValue: TEXT
-                  constraints:
-                    nullable: false
-              - column:
-                  name: position
-                  type: integer
-                  remarks: Номер сортировки каналов внутри сервера
-                  defaultValue: "0"
-                  constraints:
-                    nullable: false
-              - column:
-                  name: nsfw
-                  type: boolean
-                  remarks: Является ли канал NSFW
-                  defaultValueBoolean: false
-                  constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            onDelete: CASCADE # Такое удаление используется только в цепочке при удалении сервера!!!
-            onUpdate: RESTRICT
-            baseColumnNames: server_id
-            baseTableName: channel
-            referencedColumnNames: id
-            referencedTableName: server
-            constraintName: fk_server_channel
-  - changeSet:
-      id: init_server_tables_7
-      preConditions:
-        - onFail: MARK_RAN
-        - not:
-            - tableExists:
-                tableName: text_message
-      author: Владислав Кузнецов
-      comment: Инициализация таблицы с сообщениями текстовых каналов
-      changes:
-        - createTable:
-            tableName: text_message
-            remarks: Сообщения текстовых каналов
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-                  remarks: Идентификатор
-                  defaultValueComputed: gen_random_uuid()
-                  constraints:
-                    primaryKey: true
-                    primaryKeyName: text_message_id_pkey
-              - column:
-                  name: author_user_id
-                  type: uuid
-                  remarks: Идентификатор пользователя, создавшего сообщение в канале сервера
-                  constraints:
-                    nullable: false
-              - column:
-                  name: channel_id
-                  type: uuid
-                  remarks: Идентификатор текстового канала
-                  constraints:
-                    nullable: false
-              - column:
-                  name: content
-                  type: varchar
-                  remarks: Содержимое сообщения
-              - column:
-                  name: file_url
-                  type: varchar
-                  remarks: Ссылка на прикреплённый файл
-              - column:
-                  name: pinned
-                  type: boolean
-                  remarks: Является ли сообщение закреплённым
-                  defaultValueBoolean: false
-                  constraints:
-                    nullable: false
-              - column:
-                  name: type
-                  type: varchar
-                  remarks: Тип сообщения
-                  defaultValue: DEFAULT
-                  constraints:
-                    nullable: false
-              - column:
-                  name: created_date
-                  type: timestamptz
-                  remarks: Дата создания
-                  defaultValueDate: now()
-                  constraints:
-                    nullable: false
-              - column:
-                  name: updated_date
-                  type: timestamptz
-                  remarks: Дата обновления
-        - addForeignKeyConstraint:
-            onDelete: CASCADE # Такое удаление используется только в цепочке при удалении сервера!!!
-            onUpdate: RESTRICT
-            baseColumnNames: channel_id
-            baseTableName: text_message
-            constraintName: fk_channel_text_message
-            referencedColumnNames: id
-            referencedTableName: channel
-  - changeSet:
-      id: init_server_tables_8
-      preConditions:
-        - onFail: MARK_RAN
-        - not:
-            - tableExists:
-                tableName: invite
-      author: Владислав Кузнецов
-      comment: Инициализация таблицы с приглашениями на сервер
-      changes:
-        - createTable:
-            tableName: invite
-            remarks: Приглашения на сервера
-            columns:
-              - column:
-                  name: id
-                  type: uuid
-                  remarks: Идентификатор
-                  defaultValueComputed: gen_random_uuid()
-                  constraints:
-                    primaryKey: true
-                    primaryKeyName: invite_id_pkey
-              - column:
-                  name: author_member_id
-                  type: uuid
-                  remarks: Идентификатор участника сервера, создавшего приглашение
-                  constraints:
-                    nullable: false
-              - column:
-                  name: server_id
-                  type: uuid
-                  remarks: Идентификатор сервера
-                  constraints:
-                    nullable: false
-        - addForeignKeyConstraint:
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            baseColumnNames: author_member_id
-            baseTableName: invite
-            constraintName: fk_member_invite
-            referencedColumnNames: id
-            referencedTableName: member
-        - addForeignKeyConstraint:
-            onDelete: CASCADE
-            onUpdate: RESTRICT
-            baseColumnNames: server_id
-            baseTableName: invite
-            constraintName: fk_server_invite
-            referencedColumnNames: id
-            referencedTableName: server

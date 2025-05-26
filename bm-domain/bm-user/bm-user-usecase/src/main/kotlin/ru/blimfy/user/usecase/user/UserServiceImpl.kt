@@ -40,14 +40,18 @@ class UserServiceImpl(private val userRepo: UserRepository) : UserService {
             }
             .let { userRepo.save(it) }
 
-    override suspend fun setUsername(id: UUID, newUsername: String) =
-        findUser(id).apply { username = newUsername }.let { userRepo.save(it) }
+    override suspend fun setUsername(id: UUID, username: String) =
+        findUser(id)
+            .apply { this.username = username }
+            .let {
+                userRepo.save(it)
+            }
 
-    override suspend fun setPassword(id: UUID, newPassword: String) =
-        findUser(id).apply { password = newPassword }.let { userRepo.save(it) }
+    override suspend fun setPassword(id: UUID, password: String) =
+        findUser(id).apply { this.password = password }.let { userRepo.save(it) }
 
-    override suspend fun setEmail(id: UUID, newEmail: String) =
-        findUser(id).apply { email = newEmail }.let { userRepo.save(it) }
+    override suspend fun setEmail(id: UUID, email: String) =
+        findUser(id).apply { this.email = email }.let { userRepo.save(it) }
 
     override suspend fun setVerified(id: UUID) =
         findUser(id).apply { verified = true }.let { userRepo.save(it) }

@@ -15,84 +15,94 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.blimfy.gateway.dto.server.ModifyServerDto
 import ru.blimfy.gateway.dto.server.NewServerDto
-import ru.blimfy.gateway.dto.server.ServerOwnerDto
+import ru.blimfy.gateway.dto.server.channel.ChannelPositionDto
+import ru.blimfy.gateway.dto.server.channel.ServerChannelDto
 import ru.blimfy.gateway.integration.security.CustomUserDetails
 import ru.blimfy.gateway.service.server.ServerControllerService
 
 /**
  * Контроллер для работы с серверами.
  *
- * @property serverControllerService сервис для обработки информации о серверах.
+ * @property service сервис для обработки информации о серверах.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Tag(name = "ServerController", description = "Контроллер для работы с серверами пользователей")
 @RestController
 @RequestMapping("/v1/servers")
-class ServerController(private val serverControllerService: ServerControllerService) {
+class ServerController(private val service: ServerControllerService) {
     @Operation(summary = "Создать сервер")
     @PostMapping
     suspend fun createServer(
         @RequestBody newServer: NewServerDto,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.createServer(newServer, userDetails.info)
-
-    @Operation(summary = "Обновить сервер")
-    @PutMapping("/{serverId}")
-    suspend fun modifyServer(
-        @PathVariable serverId: UUID,
-        @RequestBody modifyServer: ModifyServerDto,
-        @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.modifyServer(serverId, modifyServer, userDetails.info)
-
-    @Operation(summary = "Передать владение сервером")
-    @PatchMapping("/{serverId}")
-    suspend fun changeOwner(
-        @PathVariable serverId: UUID,
-        @RequestBody serverOwner: ServerOwnerDto,
-        @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.changeOwner(serverId, serverOwner, userDetails.info)
+    ) = service.createServer(newServer, userDetails.info)
 
     @Operation(summary = "Получить сервер")
-    @GetMapping("/{serverId}")
+    @GetMapping("/{id}")
     suspend fun findServer(
-        @PathVariable serverId: UUID,
+        @PathVariable id: UUID,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.findServer(serverId, userDetails.info)
+    ) = service.findServer(id, userDetails.info)
+
+    @Operation(summary = "Обновить сервер")
+    @PutMapping("/{id}")
+    suspend fun modifyServer(
+        @PathVariable id: UUID,
+        @RequestBody modifyServer: ModifyServerDto,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ) = service.modifyServer(id, modifyServer, userDetails.info)
+
+    @Operation(summary = "Изменить владельца сервером")
+    @PutMapping("/{id}/owner/{userId}")
+    suspend fun changeOwner(
+        @PathVariable id: UUID,
+        @PathVariable userId: UUID,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ) = service.changeOwner(id, userId, userDetails.info)
 
     @Operation(summary = "Удалить сервер")
-    @DeleteMapping("/{serverId}")
+    @DeleteMapping("/{id}")
     suspend fun deleteServer(
-        @PathVariable serverId: UUID,
+        @PathVariable id: UUID,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.deleteServer(serverId, userDetails.info)
+    ) = service.deleteServer(id, userDetails.info)
 
-    @Operation(summary = "Кикнуть участника сервера")
-    @DeleteMapping("/{serverId}/member/{memberId}")
-    suspend fun deleteServerMember(
-        @PathVariable serverId: UUID,
-        @PathVariable memberId: UUID,
+    @Operation(summary = "Получить каналы сервера")
+    @GetMapping("/{id}/channels")
+    suspend fun findChannels(
+        @PathVariable id: UUID,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.deleteServerMember(serverId, memberId, userDetails.info)
+    ) = service.findServerChannels(id, userDetails.info)
 
-    @Operation(summary = "Получить всех участников сервера")
-    @GetMapping("/{serverId}/members")
-    suspend fun findServerMembers(
-        @PathVariable serverId: UUID,
+    @Operation(summary = "Создать канал сервера")
+    @PostMapping("/{id}/channels")
+    suspend fun createChannel(
+        @PathVariable id: UUID,
+        @RequestBody channel: ServerChannelDto,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.findServerMembers(serverId, userDetails.info)
+    ) = service.createChannel(id, channel, userDetails.info)
 
-    @Operation(summary = "Получить все каналы сервера")
-    @GetMapping("/{serverId}/channels")
-    suspend fun findServerChannels(
-        @PathVariable serverId: UUID,
+    @Operation(summary = "Изменить позиции каналов сервера")
+    @PatchMapping("/{id}/channels")
+    suspend fun modifyServerChannelPositions(
+        @PathVariable id: UUID,
+        @RequestBody positions: List<ChannelPositionDto>,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.findServerChannels(serverId, userDetails.info)
+    ) = service.modifyServerChannelPositions(id, positions, userDetails.info)
 
-    @Operation(summary = "Получить все приглашения сервера")
-    @GetMapping("/{serverId}/invites")
-    suspend fun findServerInvites(
-        @PathVariable serverId: UUID,
+    @Operation(summary = "Получить приглашения сервера")
+    @GetMapping("/{id}/invites")
+    suspend fun findInvites(
+        @PathVariable id: UUID,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = serverControllerService.findServerInvites(serverId, userDetails.info)
+    ) = service.findServerInvites(id, userDetails.info)
+
+    @Operation(summary = "Создать приглашение на канал сервера")
+    @PostMapping("/{id}/channels/{channelId}/invites")
+    suspend fun createInvite(
+        @PathVariable id: UUID,
+        @PathVariable channelId: UUID,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ) = service.createInvite(id, channelId, userDetails.info)
 }

@@ -2,13 +2,13 @@ package ru.blimfy.gateway.service.server
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
+import ru.blimfy.gateway.dto.channel.ChannelDto
+import ru.blimfy.gateway.dto.channel.invite.InviteDto
 import ru.blimfy.gateway.dto.server.ModifyServerDto
 import ru.blimfy.gateway.dto.server.NewServerDto
 import ru.blimfy.gateway.dto.server.ServerDto
-import ru.blimfy.gateway.dto.server.ServerOwnerDto
-import ru.blimfy.gateway.dto.server.channel.ChannelDto
-import ru.blimfy.gateway.dto.server.invite.InviteDto
-import ru.blimfy.gateway.dto.server.member.MemberDto
+import ru.blimfy.gateway.dto.server.channel.ChannelPositionDto
+import ru.blimfy.gateway.dto.server.channel.ServerChannelDto
 import ru.blimfy.user.db.entity.User
 
 /**
@@ -19,47 +19,52 @@ import ru.blimfy.user.db.entity.User
  */
 interface ServerControllerService {
     /**
-     * Возвращает новый [newServer], который создаёт [currentUser].
+     * Возвращает новый [newServer], который создаёт [user].
      */
-    suspend fun createServer(newServer: NewServerDto, currentUser: User): ServerDto
+    suspend fun createServer(newServer: NewServerDto, user: User): ServerDto
 
     /**
-     * Возвращает обновлённый [modifyServer] с [serverId], который обновляет [currentUser].
+     * Возвращает сервер с [id], который хочет получить [user].
      */
-    suspend fun modifyServer(serverId: UUID, modifyServer: ModifyServerDto, currentUser: User): ServerDto
+    suspend fun findServer(id: UUID, user: User): ServerDto
 
     /**
-     * Возвращает обновлённый сервер с [serverId] и новым [serverOwner], который обновляет [currentUser].
+     * Возвращает обновлённый [modifyServer] с [id], который обновляет [user].
      */
-    suspend fun changeOwner(serverId: UUID, serverOwner: ServerOwnerDto, currentUser: User): ServerDto
+    suspend fun modifyServer(id: UUID, modifyServer: ModifyServerDto, user: User): ServerDto
 
     /**
-     * Возвращает сервер с [serverId], который хочет получить [currentUser].
+     * Возвращает обновлённый сервер с [id] и новым владельцем с [userId], который обновляет [user].
      */
-    suspend fun findServer(serverId: UUID, currentUser: User): ServerDto
+    suspend fun changeOwner(id: UUID, userId: UUID, user: User): ServerDto
 
     /**
-     * Удаляет сервер с [serverId], который удаляет [currentUser].
+     * Удаляет сервер с [id], который удаляет [user].
      */
-    suspend fun deleteServer(serverId: UUID, currentUser: User)
+    suspend fun deleteServer(id: UUID, user: User)
 
     /**
-     * Кикает участника с [memberId] с сервера с [serverId], которого кикает [currentUser].
+     * Возвращает каналы сервера с [id], которых хочет получить [user].
      */
-    suspend fun deleteServerMember(serverId: UUID, memberId: UUID, currentUser: User)
+    suspend fun findServerChannels(id: UUID, user: User): Flow<ChannelDto>
 
     /**
-     * Возвращает участников сервера с [serverId], которых хочет получить [currentUser].
+     * Возвращает новый [channel] на сервере с [id], который создаёт [user].
      */
-    suspend fun findServerMembers(serverId: UUID, currentUser: User): Flow<MemberDto>
+    suspend fun createChannel(id: UUID, channel: ServerChannelDto, user: User): ChannelDto
 
     /**
-     * Возвращает каналы сервера с [serverId], которых хочет получить [currentUser].
+     * [user] изменяет [positions] каналов на сервере с [id].
      */
-    suspend fun findServerChannels(serverId: UUID, currentUser: User): Flow<ChannelDto>
+    suspend fun modifyServerChannelPositions(id: UUID, positions: List<ChannelPositionDto>, user: User)
 
     /**
-     * Возвращает приглашения сервера с [serverId], которых хочет получить [currentUser].
+     * Возвращает приглашения сервера с [id], которых хочет получить [user].
      */
-    suspend fun findServerInvites(serverId: UUID, currentUser: User): Flow<InviteDto>
+    suspend fun findServerInvites(id: UUID, user: User): Flow<InviteDto>
+
+    /**
+     * Возвращает новое приглашение для сервера с [id] для канала с [channelId], созданного [user].
+     */
+    suspend fun createInvite(id: UUID, channelId: UUID, user: User): InviteDto
 }

@@ -17,15 +17,9 @@ interface FriendService {
     suspend fun createFriend(friend: Friend): Friend
 
     /**
-     * Изменяет ник друга с [id] на [newNick] и возвращает информацию о нём для пользователя с идентификатором [userId].
+     * Возвращает обновлённую информацию о пользователе с [toId] в друзьях с пользователем с [fromId] с новым [nick].
      */
-    suspend fun changeFriendNick(id: UUID, newNick: String, userId: UUID): Friend
-
-    /**
-     * Возвращает информацию о друге между пользователем с идентификатором [fromId] и пользователем с идентификатором
-     * [toId].
-     */
-    suspend fun findFriend(fromId: UUID, toId: UUID): Friend?
+    suspend fun changeFriendNick(toId: UUID, fromId: UUID, nick: String? = null): Friend
 
     /**
      * Возвращает друзей для пользователя с идентификатором [fromId].
@@ -33,7 +27,7 @@ interface FriendService {
     fun findFriends(fromId: UUID): Flow<Friend>
 
     /**
-     * Удаляет информацию о друге на основе связи друга с [id].
+     * Удаляет из друзей пользователя с [fromId] пользователя с [toId].
      */
-    suspend fun deleteFriend(id: UUID)
+    suspend fun deleteFriend(fromId: UUID, toId: UUID)
 }

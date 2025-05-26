@@ -28,9 +28,9 @@ interface ServerService {
     ): Server
 
     /**
-     * Возвращает обновлённый сервер с [id] и [newOwnerId].
+     * Возвращает обновлённый сервер с [id] и новым [ownerId].
      */
-    suspend fun setOwner(id: UUID, newOwnerId: UUID): Server
+    suspend fun setOwner(id: UUID, ownerId: UUID): Server
 
     /**
      * Возвращает сервер с таким [id].

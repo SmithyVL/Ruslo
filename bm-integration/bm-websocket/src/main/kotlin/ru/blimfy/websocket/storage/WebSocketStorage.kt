@@ -25,13 +25,11 @@ abstract class WebSocketStorage<SESSION_KEY>(private val objectMapper: ObjectMap
     abstract override fun removeSession(userId: UUID)
 
     /**
-     * Отправляет [type] сообщение с [data] в сессию с [key].
+     * Отправляет [type] сообщение с [data] во все активные сессии.
      */
-    protected fun sendMessage(key: SESSION_KEY, type: WsMessageTypes, data: Any) {
-        sessions[key]?.let { session ->
-            session
-                .send(just(session.textMessage(objectMapper.writeValueAsString(WsMessage(type, data)))))
-                .subscribe()
+    fun sendMessage(type: WsMessageTypes, data: Any, extra: Any? = null) {
+        sessions.values.forEach {
+            it.send(just(it.textMessage(objectMapper.writeValueAsString(WsMessage(type, data, extra))))).subscribe()
         }
     }
 }

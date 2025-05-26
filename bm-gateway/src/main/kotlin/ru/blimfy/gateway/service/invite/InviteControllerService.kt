@@ -1,35 +1,28 @@
 package ru.blimfy.gateway.service.invite
 
 import java.util.UUID
-import ru.blimfy.gateway.dto.server.invite.InviteDetailsDto
-import ru.blimfy.gateway.dto.server.invite.InviteDto
-import ru.blimfy.gateway.dto.server.invite.NewInviteDto
+import ru.blimfy.gateway.dto.channel.invite.InviteDto
 import ru.blimfy.user.db.entity.User
 
 /**
- * Интерфейс для работы с обработкой запросов о приглашениях серверов.
+ * Интерфейс для работы с обработкой запросов о приглашениях.
  *
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 interface InviteControllerService {
     /**
-     * Возвращает новый [newInviteDto], который создаёт [currentUser].
+     * Возвращает приглашение с [id].
      */
-    suspend fun createInvite(newInviteDto: NewInviteDto, currentUser: User): InviteDto
+    suspend fun findInvite(id: UUID): InviteDto
 
     /**
-     * Возвращает приглашение с [inviteId] на сервер.
+     * Возвращает удалённое [user] приглашение с [id].
      */
-    suspend fun findInvite(inviteId: UUID): InviteDetailsDto
+    suspend fun deleteInvite(id: UUID, user: User): InviteDto
 
     /**
-     * Удаляет приглашение с [inviteId] на сервер пользователем [currentUser].
+     * Использует приглашение с [id] для [user].
      */
-    suspend fun deleteInvite(inviteId: UUID, currentUser: User)
-
-    /**
-     * Применяет приглашение с [inviteId] для пользователя [currentUser].
-     */
-    suspend fun useInvite(inviteId: UUID, currentUser: User)
+    suspend fun useInvite(id: UUID, user: User)
 }

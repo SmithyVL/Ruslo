@@ -1,5 +1,7 @@
 package ru.blimfy.gateway.dto.server.role
 
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.util.UUID
 import ru.blimfy.server.db.entity.Role
 
@@ -16,6 +18,7 @@ import ru.blimfy.server.db.entity.Role
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
+@JsonInclude(NON_NULL)
 data class RoleDto(
     val id: UUID,
     val name: String,

@@ -1,6 +1,8 @@
 package ru.blimfy.gateway.dto.user
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.time.Instant
 import java.util.UUID
 import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_FORMAT
@@ -22,6 +24,7 @@ import ru.blimfy.user.db.entity.User
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
+@JsonInclude(NON_NULL)
 data class UserDto(
     val id: UUID,
     val username: String,
@@ -30,7 +33,8 @@ data class UserDto(
     val globalName: String? = null,
     val avatar: String? = null,
     val bannerColor: String? = null,
-    @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE) val createdDate: Instant,
+    @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE)
+    val createdDate: Instant,
 ) {
     var token: String? = null
 }

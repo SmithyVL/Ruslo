@@ -1,73 +1,125 @@
 package ru.blimfy.gateway.service.invite
 
 import java.util.UUID
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
-import ru.blimfy.gateway.dto.server.invite.InviteDetailsDto
-import ru.blimfy.gateway.dto.server.invite.InviteDto
-import ru.blimfy.gateway.dto.server.invite.NewInviteDto
-import ru.blimfy.gateway.dto.server.invite.toDto
-import ru.blimfy.gateway.dto.server.invite.toEntity
+import ru.blimfy.channel.db.entity.Channel
+import ru.blimfy.channel.db.entity.Invite
+import ru.blimfy.channel.usecase.channel.ChannelService
+import ru.blimfy.channel.usecase.invite.InviteService
+import ru.blimfy.common.enumeration.InviteTypes.GROUP_DM
+import ru.blimfy.common.enumeration.InviteTypes.SERVER
+import ru.blimfy.gateway.dto.channel.invite.InviteDto
+import ru.blimfy.gateway.dto.channel.invite.toDto
+import ru.blimfy.gateway.dto.channel.toDto
+import ru.blimfy.gateway.dto.channel.toPartialDto
+import ru.blimfy.gateway.dto.server.member.toDto
+import ru.blimfy.gateway.dto.server.role.toDto
+import ru.blimfy.gateway.dto.server.toPartialDto
+import ru.blimfy.gateway.dto.user.toDto
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
-import ru.blimfy.server.usecase.invite.InviteService
+import ru.blimfy.gateway.integration.websockets.base.EntityDeleteDto
+import ru.blimfy.server.db.entity.Member
 import ru.blimfy.server.usecase.member.MemberService
+import ru.blimfy.server.usecase.member.role.MemberRoleService
+import ru.blimfy.server.usecase.role.RoleService
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
 import ru.blimfy.user.usecase.user.UserService
-import ru.blimfy.websocket.dto.WsMessageTypes.NEW_SERVER_MEMBER
+import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_UPDATE
+import ru.blimfy.websocket.dto.WsMessageTypes.INVITE_DELETE
+import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_MEMBER_ADD
 
 /**
- * Реализация интерфейса для работы с обработкой запросов о приглашениях серверов.
+ * Реализация интерфейса для работы с обработкой запросов о приглашениях.
  *
- * @property inviteService сервис для работы с приглашениями на сервера.
+ * @property inviteService сервис для работы с приглашениями.
+ * @property channelService сервис для работы с каналами.
  * @property serverService сервис для работы с серверами.
  * @property memberService сервис для работы с участниками серверов.
+ * @property roleService сервис для работы с ролями серверов.
+ * @property memberRoleService сервис для работы с ролями участников серверов.
  * @property userService сервис для работы с пользователями.
- * @property userWebSocketStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
+ * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Service
 class InviteControllerServiceImpl(
     private val inviteService: InviteService,
+    private val channelService: ChannelService,
     private val serverService: ServerService,
     private val memberService: MemberService,
+    private val roleService: RoleService,
+    private val memberRoleService: MemberRoleService,
     private val userService: UserService,
-    private val userWebSocketStorage: UserWebSocketStorage,
+    private val userWsStorage: UserWebSocketStorage,
 ) : InviteControllerService {
-    override suspend fun createInvite(newInviteDto: NewInviteDto, currentUser: User): InviteDto {
-        // Создать приглашение на сервер может только создатель сервера.
-        serverService.checkServerModifyAccess(serverId = newInviteDto.serverId, userId = currentUser.id)
+    override suspend fun findInvite(id: UUID) =
+        inviteService.findInvite(id).toDtoWithLinkData()
 
-        return inviteService.saveInvite(newInviteDto.toEntity()).toDto()
-    }
-
-    override suspend fun findInvite(inviteId: UUID) = coroutineScope {
-        val invite = inviteService.findInvite(inviteId)
+    override suspend fun deleteInvite(id: UUID, user: User): InviteDto {
+        val invite = inviteService.findInvite(id)
         val serverId = invite.serverId
 
-        val server = serverService.findServer(serverId)
-        val countMembers = async { memberService.getCountServerMembers(serverId) }
-        val username = async { userService.findUser(memberService.findMember(invite.authorMemberId).userId).username }
+        // Удалить приглашение на сервер может только его создатель.
+        serverService.checkServerModifyAccess(serverId = serverId!!, userId = user.id)
 
-        InviteDetailsDto(inviteId, server.name, server.icon, countMembers.await(), username.await())
+        return inviteService.deleteInvite(id = id).toDtoWithLinkData()
+            .apply {
+                val data = EntityDeleteDto(id = id, channelId = invite.channelId, serverId = serverId)
+                userWsStorage.sendMessage(INVITE_DELETE, data) 
+            }
     }
 
-    override suspend fun deleteInvite(inviteId: UUID, currentUser: User) {
-        val userId = currentUser.id
-        val serverId = inviteService.findInvite(inviteId).serverId
+    override suspend fun useInvite(id: UUID, user: User) {
+        inviteService.findInvite(id).let { invite ->
+            when (invite.type) {
+                SERVER -> serverService.addNewMember(serverId = invite.serverId!!, userId = user.id)
+                    .toDtoWithLinkData(user)
+                    .apply { userWsStorage.sendMessage(SERVER_MEMBER_ADD, this) }
 
-        // Удалить приглашение на сервер может только создатель сервера.
-        serverService.checkServerModifyAccess(serverId = serverId, userId = userId)
-
-        inviteService.deleteInvite(inviteId = inviteId, serverId = serverId)
+                GROUP_DM -> channelService.addRecipients(invite.channelId, setOf(user.id))
+                    .toDtoWithLinkData()
+                    .apply { userWsStorage.sendMessage(CHANNEL_UPDATE, this) }
+            }
+        }
     }
 
-    override suspend fun useInvite(inviteId: UUID, currentUser: User) {
-        val userId = currentUser.id
-        val serverId = inviteService.findInvite(inviteId).serverId
-        val newMember = serverService.addNewMember(serverId = serverId, userId = userId)
-        userWebSocketStorage.sendServerMessages(serverId, NEW_SERVER_MEMBER, newMember, userId)
+    /**
+     * Возвращает DTO представление приглашения.
+     */
+    private suspend fun Invite.toDtoWithLinkData() = this.toDto().apply {
+        channel = channelService.findChannel(channelId).toPartialDto()
+        inviter = userService.findUser(authorId).toDto()
+
+        serverId?.let { serverId ->
+            server = serverService.findServer(serverId).toPartialDto(false)
+            approximateMemberCount = memberService.getCountServerMembers(serverId)
+        }
     }
+
+    /**
+     * Возвращает DTO представление группы.
+     */
+    private suspend fun Channel.toDtoWithLinkData() =
+        this.toDto().apply {
+            recipients = this@toDtoWithLinkData.recipients
+                ?.map { recipientId -> userService.findUser(recipientId) }
+                ?.map(User::toDto)
+        }
+
+    /**
+     * Возвращает DTO представление участника сервера для [user].
+     */
+    private suspend fun Member.toDtoWithLinkData(user: User) =
+        this.toDto().apply {
+            this.user = user.toDto()
+            roles = memberRoleService.findMemberRoles(id)
+                .map { roleService.findRole(it.roleId) }
+                .map { it.toDto() }
+                .toList()
+            userWsStorage.sendMessage(SERVER_MEMBER_ADD, this)
+        }
 }

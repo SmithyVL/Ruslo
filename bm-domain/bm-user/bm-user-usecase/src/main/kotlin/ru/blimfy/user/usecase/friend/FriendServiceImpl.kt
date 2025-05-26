@@ -2,6 +2,7 @@ package ru.blimfy.user.usecase.friend
 
 import java.util.UUID
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.user.db.entity.Friend
 import ru.blimfy.user.db.repository.FriendRepository
@@ -19,25 +20,18 @@ class FriendServiceImpl(private val friendRepo: FriendRepository) : FriendServic
     override suspend fun createFriend(friend: Friend) =
         friendRepo.save(friend)
 
-    override suspend fun changeFriendNick(id: UUID, newNick: String, userId: UUID) =
-        findFriend(id).apply { nick = newNick }.let { friendRepo.save(it) }
+    override suspend fun changeFriendNick(toId: UUID, fromId: UUID, nick: String?): Friend {
+        val friend = friendRepo.findByFromIdAndToId(fromId, toId) ?: throw NotFoundException(FRIEND_NOT_FOUND.msg)
 
-    override suspend fun findFriend(fromId: UUID, toId: UUID) =
-        friendRepo.findByFromIdAndToId(fromId = fromId, toId = toId)
+        return friend.apply { this.nick = nick }.let { friendRepo.save(it) }
+    }
 
     override fun findFriends(fromId: UUID) =
         friendRepo.findAllByFromId(fromId)
 
-    override suspend fun deleteFriend(id: UUID) {
-        findFriend(id).apply {
-            friendRepo.deleteByIdAndFromId(id = id, fromId = fromId)
-            friendRepo.deleteByIdAndFromId(id = id, fromId = toId)
-        }
+    @Transactional
+    override suspend fun deleteFriend(fromId: UUID, toId: UUID) {
+        friendRepo.deleteByFromIdAndToId(fromId = fromId, toId = fromId)
+        friendRepo.deleteByFromIdAndToId(fromId = toId, toId = fromId)
     }
-
-    /**
-     * Возвращает друга с [id].
-     */
-    private suspend fun findFriend(id: UUID) =
-        friendRepo.findById(id) ?: throw NotFoundException(FRIEND_NOT_FOUND.msg)
 }

@@ -26,19 +26,19 @@ interface UserService {
     ): User
 
     /**
-     * Возвращает обновлённого пользователя с [id] и [newUsername].
+     * Возвращает обновлённого пользователя с [id] и новым [username].
      */
-    suspend fun setUsername(id: UUID, newUsername: String): User
+    suspend fun setUsername(id: UUID, username: String): User
 
     /**
-     * Возвращает обновлённого пользователя с [id] и [newPassword].
+     * Возвращает обновлённого пользователя с [id] и новым [password].
      */
-    suspend fun setPassword(id: UUID, newPassword: String): User
+    suspend fun setPassword(id: UUID, password: String): User
 
     /**
-     * Возвращает обновлённого пользователя с [id] и [newEmail].
+     * Возвращает обновлённого пользователя с [id] и новым [email].
      */
-    suspend fun setEmail(id: UUID, newEmail: String): User
+    suspend fun setEmail(id: UUID, email: String): User
 
     /**
      * Возвращает обновлённого пользователя с [id], который был верифицирован.

@@ -1,0 +1,199 @@
+databaseChangeLog:
+  - changeSet:
+      id: init_channel_tables_0
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: channel
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с каналами
+      changes:
+        - createTable:
+            tableName: channel
+            remarks: Каналы
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: channel_id_pkey
+              - column:
+                  name: type
+                  type: varchar
+                  remarks: Тип
+                  defaultValue: GROUP_DM
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: varchar(100)
+                  remarks: Название канала
+              - column:
+                  name: server_id
+                  type: uuid
+                  remarks: Идентификатор сервера
+              - column:
+                  name: parent_id
+                  type: uuid
+                  remarks: Идентификатор родительского канала
+              - column:
+                  name: topic
+                  type: varchar(1024)
+                  remarks: Тема канала
+              - column:
+                  name: nsfw
+                  type: boolean
+                  remarks: Является ли сообщение NSFW
+              - column:
+                  name: position
+                  type: bigint
+                  remarks: Номер сортировки каналов внутри сервера
+              - column:
+                  name: recipients
+                  type: uuid[10]
+                  remarks: Идентификаторы участников
+              - column:
+                  name: owner_id
+                  type: uuid
+                  remarks: Идентификатор пользователя-владельца канала
+              - column:
+                  name: icon
+                  type: varchar
+                  remarks: Иконка канала
+  - changeSet:
+      id: init_channel_tables_1
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: message
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с сообщениями каналов
+      changes:
+        - createTable:
+            tableName: message
+            remarks: Сообщения каналов
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: message_id_pkey
+              - column:
+                  name: author_id
+                  type: uuid
+                  remarks: Идентификатор пользователя-автора сообщения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: channel_id
+                  type: uuid
+                  remarks: Идентификатор канала
+                  constraints:
+                    nullable: false
+              - column:
+                  name: content
+                  type: varchar
+                  remarks: Содержимое
+              - column:
+                  name: pinned
+                  type: boolean
+                  remarks: Является ли сообщение закреплённым
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: position
+                  type: bigint
+                  remarks: Позиция сообщения
+                  defaultValueNumeric: "0"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar
+                  remarks: Тип
+                  defaultValue: DEFAULT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+              - column:
+                  name: updated_date
+                  type: timestamptz
+                  remarks: Дата обновления
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: channel_id
+            baseTableName: message
+            constraintName: fk_channel_message
+            referencedColumnNames: id
+            referencedTableName: channel
+  - changeSet:
+      id: init_channel_tables_2
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: invite
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с приглашениями на каналы
+      changes:
+        - createTable:
+            tableName: invite
+            remarks: Приглашения каналов
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: invite_id_pkey
+              - column:
+                  name: server_id
+                  type: uuid
+                  remarks: Идентификатор сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: channel_id
+                  type: uuid
+                  remarks: Идентификатор канала
+                  constraints:
+                    nullable: false
+              - column:
+                  name: author_id
+                  type: uuid
+                  remarks: Идентификатор создателя приглашения
+                  constraints:
+                    nullable: false
+              - column:
+                  name: type
+                  type: varchar
+                  remarks: Тип
+                  defaultValue: SERVER
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: channel_id
+            baseTableName: invite
+            constraintName: fk_channel_invite
+            referencedColumnNames: id
+            referencedTableName: channel

@@ -1,17 +1,16 @@
 package ru.blimfy.gateway.dto.server.channel
 
-import jakarta.validation.constraints.PositiveOrZero
+import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 
 /**
- * DTO с информацией для обновления позиции канала сервера.
+ * DTO с информацией о новой позиции канала сервера.
  *
  * @property id идентификатор.
- * @property position новый номер канала сервера.
+ * @property position новая позиция.
+ * @property parentId идентификатор родительского канала.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-data class ChannelPositionDto(
-    val id: UUID,
-    @PositiveOrZero(message = "Channel position must be positive or zero") val position: Int,
-)
+@Schema(description = "Информация о новой позиции канала сервера")
+data class ChannelPositionDto(val id: UUID, val position: Long, val parentId: UUID? = null)

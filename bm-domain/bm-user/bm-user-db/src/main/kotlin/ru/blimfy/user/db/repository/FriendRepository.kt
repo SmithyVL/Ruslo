@@ -15,17 +15,17 @@ import ru.blimfy.user.db.entity.Friend
 @Repository
 interface FriendRepository : CoroutineCrudRepository<Friend, UUID> {
     /**
-     * Возвращает сущность друга с [toId] у пользователя с [fromId].
-     */
-    suspend fun findByFromIdAndToId(fromId: UUID, toId: UUID): Friend?
-
-    /**
      * Возвращает сущности друзей у пользователя с [fromId].
      */
     fun findAllByFromId(fromId: UUID): Flow<Friend>
 
     /**
-     * Удаляет сущность друга с [id] у пользователя с [fromId].
+     * Возвращает сущность друга для пользователя с [fromId] с пользователем с [toId].
      */
-    suspend fun deleteByIdAndFromId(id: UUID, fromId: UUID)
+    suspend fun findByFromIdAndToId(fromId: UUID, toId: UUID): Friend?
+
+    /**
+     * Удаляет сущность друга между пользователем с [fromId] и пользователем с [toId].
+     */
+    suspend fun deleteByFromIdAndToId(fromId: UUID, toId: UUID)
 }

@@ -3,9 +3,7 @@ package ru.blimfy.gateway.service.friend.request
 import java.util.UUID
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
-import ru.blimfy.gateway.dto.user.friend.request.NewFriendRequestDto
 import ru.blimfy.gateway.dto.user.friend.request.toDto
-import ru.blimfy.gateway.dto.user.friend.request.toEntity
 import ru.blimfy.gateway.dto.user.toDto
 import ru.blimfy.user.db.entity.Friend
 import ru.blimfy.user.db.entity.FriendRequest
@@ -29,39 +27,36 @@ class FriendRequestControllerServiceImpl(
     private val friendService: FriendService,
     private val userService: UserService,
 ) : FriendRequestControllerService {
-    override suspend fun createFriendRequest(newFriendRequest: NewFriendRequestDto, currentUser: User) =
-        friendRequestService.createFriendRequest(newFriendRequest.toEntity(currentUser.id)).toDtoWithUsersInfos()
+    override suspend fun createFriendRequest(userId: UUID, user: User) =
+        friendRequestService.createFriendRequest(FriendRequest(fromId = user.id, toId = userId)).toDtoWithUsersInfos()
 
-    override fun findOutgoingFriendRequests(currentUser: User) =
-        friendRequestService.findOutgoingFriendRequests(currentUser.id).map { it.toDtoWithUsersInfos() }
+    override fun findOutgoingFriendRequests(user: User) =
+        friendRequestService.findOutgoingFriendRequests(user.id).map { it.toDtoWithUsersInfos() }
 
-    override fun findIncomingFriendRequests(currentUser: User) =
-        friendRequestService.findIncomingFriendRequests(currentUser.id).map { it.toDtoWithUsersInfos() }
+    override suspend fun deleteAllOutgoingFriendRequests(user: User) =
+        friendRequestService.deleteAllOutgoingFriendRequests(user.id)
 
-    override suspend fun deleteAllOutgoingFriendRequests(currentUser: User) =
-        friendRequestService.deleteAllOutgoingFriendRequests(currentUser.id)
+    override suspend fun deleteOutgoingFriendRequest(userId: UUID, user: User) =
+        friendRequestService.deleteFriendRequest(fromId = user.id, toId = userId)
 
-    override suspend fun deleteAllIncomingFriendRequests(currentUser: User) =
-        friendRequestService.deleteAllIncomingFriendRequests(currentUser.id)
+    override fun findIncomingFriendRequests(user: User) =
+        friendRequestService.findIncomingFriendRequests(user.id).map { it.toDtoWithUsersInfos() }
 
-    override suspend fun deleteOutgoingFriendRequest(friendRequestId: UUID, currentUser: User) =
-        friendRequestService.deleteOutgoingFriendRequest(id = friendRequestId, fromId = currentUser.id)
+    override suspend fun deleteAllIncomingFriendRequests(user: User) =
+        friendRequestService.deleteAllIncomingFriendRequests(user.id)
 
-    override suspend fun deleteIncomingFriendRequest(friendRequestId: UUID, currentUser: User) =
-        friendRequestService.deleteIncomingFriendRequest(id = friendRequestId, toId = currentUser.id)
+    override suspend fun deleteIncomingFriendRequest(userId: UUID, user: User) =
+        friendRequestService.deleteFriendRequest(fromId = userId, toId = user.id)
 
-    override suspend fun acceptFriendRequest(friendRequestId: UUID, currentUser: User) {
-        // Ищем заявку в друзья, чтобы на её основе создать две связи в друзья.
-        val friendRequest = friendRequestService.findFriendRequest(friendRequestId)
-
+    override suspend fun acceptFriendRequest(userId: UUID, user: User) {
         // Создаём связь с другом для создателя заявки в друзья.
-        friendService.createFriend(Friend(fromId = friendRequest.fromId, toId = currentUser.id))
+        friendService.createFriend(Friend(fromId = userId, toId = user.id))
 
         // Создаём связь с другом для приглашённого в друзья.
-        friendService.createFriend(Friend(fromId = currentUser.id, toId = friendRequest.fromId))
+        friendService.createFriend(Friend(fromId = user.id, toId = userId))
 
-        // Удаляем уже не нужную заявку в друзья
-        friendRequestService.deleteIncomingFriendRequest(id = friendRequestId, toId = currentUser.id)
+        // Удаляем уже не нужную заявку в друзья.
+        friendRequestService.deleteFriendRequest(fromId = userId, toId = user.id)
     }
 
     /**

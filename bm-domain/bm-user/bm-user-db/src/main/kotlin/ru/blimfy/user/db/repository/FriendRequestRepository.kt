@@ -25,14 +25,9 @@ interface FriendRequestRepository : CoroutineCrudRepository<FriendRequest, UUID>
     fun findAllByToId(toId: UUID): Flow<FriendRequest>
 
     /**
-     * Удаляет сущность запроса в друзья с [id] для пользователя с [fromId].
+     * Удаляет сущность запроса в друзья от пользователя с [fromId] с пользователем с [toId].
      */
-    suspend fun deleteByIdAndFromId(id: UUID, fromId: UUID)
-
-    /**
-     * Удаляет сущность запроса в друзья с [id] для пользователя с [toId].
-     */
-    suspend fun deleteByIdAndToId(id: UUID, toId: UUID)
+    suspend fun deleteByFromIdAndToId(fromId: UUID, toId: UUID)
 
     /**
      * Удаляет сущности запросов в друзья для пользователя с [fromId].

@@ -1,5 +1,5 @@
 [versions]
-springBoot = "3.4.5"
+springBoot = "3.5.0"
 kotlin = "2.1.21"
 jwt = "0.12.6"
 springDoc = "2.8.8"
@@ -32,9 +32,6 @@ databasePostgresR2dbc = { module = "org.postgresql:r2dbc-postgresql" }
 databasePostgres = { module = "org.postgresql:postgresql" }
 liquibaseCore = { module = "org.liquibase:liquibase-core" }
 hikari = { module = "com.zaxxer:HikariCP" }
-
-# Сериализация (например, для дат).
-jacksonJsr310 = { module = "com.fasterxml.jackson.datatype:jackson-datatype-jsr310" }
 
 # Котлин.
 kotlinxCoroutinesReactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }

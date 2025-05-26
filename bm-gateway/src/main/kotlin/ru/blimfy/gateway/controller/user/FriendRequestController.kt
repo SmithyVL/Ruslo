@@ -9,73 +9,71 @@ import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.blimfy.gateway.dto.user.friend.request.NewFriendRequestDto
 import ru.blimfy.gateway.integration.security.CustomUserDetails
 import ru.blimfy.gateway.service.friend.request.FriendRequestControllerService
 
 /**
  * Контроллер для работы с запросами в друзья.
  *
- * @property friendRequestControllerService сервис для обработки информации о запросах в друзья.
+ * @property service сервис для обработки информации о запросах в друзья.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 @Tag(name = "FriendRequestController", description = "Контроллер для работы с информацией о запросах в друзья")
 @RestController
-@RequestMapping("/v1/friend-requests")
-class FriendRequestController(private val friendRequestControllerService: FriendRequestControllerService) {
-    @Operation(summary = "Создать запрос в друзья")
-    @PostMapping
+@RequestMapping("/v1/users/@me/requests")
+class FriendRequestController(private val service: FriendRequestControllerService) {
+    @Operation(summary = "Создать запрос в друзья с пользователем")
+    @PostMapping("/{userId}")
     suspend fun createFriendRequest(
-        @RequestBody newFriendRequest: NewFriendRequestDto,
+        @PathVariable userId: UUID,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendRequestControllerService.createFriendRequest(newFriendRequest, userDetails.info)
+    ) = service.createFriendRequest(userId, userDetails.info)
 
-    @Operation(summary = "Получить все исходящие запросы в друзья")
+    @Operation(summary = "Получить исходящие запросы в друзья")
     @GetMapping("/outgoing")
     suspend fun findAllOutgoingFriendRequests(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendRequestControllerService.findOutgoingFriendRequests(userDetails.info)
+    ) = service.findOutgoingFriendRequests(userDetails.info)
 
-    @Operation(summary = "Получить все входящие запросы в друзья")
-    @GetMapping("/incoming")
-    suspend fun findAllIncomingFriendRequests(
-        @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendRequestControllerService.findIncomingFriendRequests(userDetails.info)
-
-    @Operation(summary = "Удалить все исходящие запросы в друзья")
+    @Operation(summary = "Удалить исходящие запросы в друзья")
     @DeleteMapping("/outgoing")
     suspend fun deleteAllOutgoingFriendRequests(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendRequestControllerService.deleteAllOutgoingFriendRequests(userDetails.info)
+    ) = service.deleteAllOutgoingFriendRequests(userDetails.info)
 
-    @Operation(summary = "Удалить все входящие запросы в друзья")
+    @Operation(summary = "Удалить исходящий запрос в друзья с пользователем")
+    @DeleteMapping("/outgoing/{userId}")
+    suspend fun deleteOutgoingFriendRequest(
+        @PathVariable userId: UUID,
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ) = service.deleteOutgoingFriendRequest(userId, userDetails.info)
+
+    @Operation(summary = "Получить входящие запросы в друзья")
+    @GetMapping("/incoming")
+    suspend fun findAllIncomingFriendRequests(
+        @AuthenticationPrincipal userDetails: CustomUserDetails,
+    ) = service.findIncomingFriendRequests(userDetails.info)
+
+    @Operation(summary = "Удалить входящие запросы в друзья")
     @DeleteMapping("/incoming")
     suspend fun deleteAllIncomingFriendRequests(
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendRequestControllerService.deleteAllIncomingFriendRequests(userDetails.info)
+    ) = service.deleteAllIncomingFriendRequests(userDetails.info)
 
-    @Operation(summary = "Удалить исходящий запрос в друзья")
-    @DeleteMapping("/outgoing/{friendRequestId}")
-    suspend fun deleteOutgoingFriendRequest(
-        @PathVariable friendRequestId: UUID,
-        @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendRequestControllerService.deleteOutgoingFriendRequest(friendRequestId, userDetails.info)
-
-    @Operation(summary = "Удалить входящий запрос в друзья")
-    @DeleteMapping("/incoming/{friendRequestId}")
+    @Operation(summary = "Удалить входящий запрос в друзья от пользователя")
+    @DeleteMapping("/incoming/{userId}")
     suspend fun deleteIncomingFriendRequest(
-        @PathVariable friendRequestId: UUID,
+        @PathVariable userId: UUID,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendRequestControllerService.deleteIncomingFriendRequest(friendRequestId, userDetails.info)
+    ) = service.deleteIncomingFriendRequest(userId, userDetails.info)
 
-    @Operation(summary = "Принять запрос в друзья")
-    @PutMapping("/incoming/{friendRequestId}")
+    @Operation(summary = "Принять запрос в друзья от пользователя")
+    @PutMapping("/incoming/{userId}")
     suspend fun acceptFriendRequest(
-        @PathVariable friendRequestId: UUID,
+        @PathVariable userId: UUID,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = friendRequestControllerService.acceptFriendRequest(friendRequestId, userDetails.info)
+    ) = service.acceptFriendRequest(userId, userDetails.info)
 }

@@ -1,8 +1,5 @@
 package ru.blimfy.gateway.config
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.databind.SerializationFeature.WRITE_DATES_AS_TIMESTAMPS
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
 import io.swagger.v3.oas.models.Components
 import io.swagger.v3.oas.models.OpenAPI
 import io.swagger.v3.oas.models.info.Info
@@ -11,10 +8,9 @@ import io.swagger.v3.oas.models.security.SecurityScheme
 import io.swagger.v3.oas.models.security.SecurityScheme.Type.HTTP
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.context.annotation.Primary
 
 /**
- * Конфигурация Web.
+ * Конфигурация WEB.
  *
  * @author Владислав Кузнецов.
  * @since 0.0.1.
@@ -35,11 +31,6 @@ class WebConfig {
                 ),
         )
         .info(Info().title(SWAGGER_TITLE).description(SWAGGER_DESC).version(SWAGGER_VERSION))
-
-    @Bean
-    @Primary
-    fun objectMapper(): ObjectMapper =
-        ObjectMapper().configure(WRITE_DATES_AS_TIMESTAMPS, false).registerModule(JavaTimeModule())
 
     companion object {
         /**

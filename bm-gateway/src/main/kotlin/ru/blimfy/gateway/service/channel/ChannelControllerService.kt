@@ -2,47 +2,45 @@ package ru.blimfy.gateway.service.channel
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
-import ru.blimfy.gateway.dto.server.channel.ChannelDto
-import ru.blimfy.gateway.dto.server.channel.ModifyChannelDto
-import ru.blimfy.gateway.dto.server.channel.NewChannelDto
-import ru.blimfy.gateway.dto.server.message.TextMessageDto
+import ru.blimfy.gateway.dto.channel.ChannelDto
+import ru.blimfy.gateway.dto.channel.ModifyChannelDto
+import ru.blimfy.gateway.dto.channel.invite.InviteDto
 import ru.blimfy.user.db.entity.User
 
 /**
- * Интерфейс для работы с обработкой запросов о каналах серверов.
+ * Интерфейс для работы с обработкой запросов о каналах.
  *
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 interface ChannelControllerService {
     /**
-     * Возвращает новый [newChannelDto], который создаёт [currentUser].
+     * Возвращает канал с [id], который хочет получить [user].
      */
-    suspend fun createChannel(newChannelDto: NewChannelDto, currentUser: User): ChannelDto
+    suspend fun findChannel(id: UUID, user: User): ChannelDto
 
     /**
-     * Возвращает обновлённый [modifyChannel], который обновляет [currentUser].
+     * Возвращает обновлённый [modifyChannel] с [id], который обновляет [user].
      */
-    suspend fun modifyChannel(modifyChannel: ModifyChannelDto, currentUser: User): ChannelDto
+    suspend fun modifyChannel(id: UUID, modifyChannel: ModifyChannelDto, user: User): ChannelDto
 
     /**
-     * Удаляет канал с [channelId], который удаляет [currentUser].
+     * Удаляет канал с [id], который удаляет [user].
      */
-    suspend fun deleteChannel(channelId: UUID, currentUser: User)
+    suspend fun deleteChannel(id: UUID, user: User): ChannelDto
 
     /**
-     * Возвращает канал с [channelId], который хочет получить [currentUser].
+     * Отправляет событие о начале набора текста [user] в канал с [id].
      */
-    suspend fun findChannel(channelId: UUID, currentUser: User): ChannelDto
+    suspend fun triggerTypingIndicator(id: UUID, user: User)
 
     /**
-     * Возвращает [pageNumber] страницу с [pageSize] сообщениями канала с [channelId], которые хочет получить
-     * [currentUser].
+     * Возвращает приглашения канала с [id], которые хочет получить [user].
      */
-    suspend fun findChannelMessages(
-        channelId: UUID,
-        pageNumber: Int,
-        pageSize: Int,
-        currentUser: User,
-    ): Flow<TextMessageDto>
+    suspend fun findInvites(id: UUID, user: User): Flow<InviteDto>
+
+    /**
+     * Возвращает новое приглашение для группы с [id], созданного [user].
+     */
+    suspend fun createGroupInvite(id: UUID, user: User): InviteDto
 }

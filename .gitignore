@@ -12,6 +12,7 @@
 /.idea/dataSources.local.xml
 /.idea/dataSources.xml
 /.idea/jpa.xml
+/.idea/modules.xml
 
 **/.gradle/
 **/build/

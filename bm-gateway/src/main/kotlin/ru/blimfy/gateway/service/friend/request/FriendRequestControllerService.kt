@@ -3,7 +3,6 @@ package ru.blimfy.gateway.service.friend.request
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import ru.blimfy.gateway.dto.user.friend.request.FriendRequestDto
-import ru.blimfy.gateway.dto.user.friend.request.NewFriendRequestDto
 import ru.blimfy.user.db.entity.User
 
 /**
@@ -14,42 +13,42 @@ import ru.blimfy.user.db.entity.User
  */
 interface FriendRequestControllerService {
     /**
-     * Возвращает новый [newFriendRequest] для [currentUser].
+     * Возвращает новый запрос в друзья с пользователем с [userId] для [user].
      */
-    suspend fun createFriendRequest(newFriendRequest: NewFriendRequestDto, currentUser: User): FriendRequestDto
+    suspend fun createFriendRequest(userId: UUID, user: User): FriendRequestDto
 
     /**
-     * Возвращает исходящие заявки в друзья для [currentUser].
+     * Возвращает исходящие заявки в друзья для [user].
      */
-    fun findOutgoingFriendRequests(currentUser: User): Flow<FriendRequestDto>
+    fun findOutgoingFriendRequests(user: User): Flow<FriendRequestDto>
 
     /**
-     * Возвращает входящие заявки в друзья для [currentUser].
+     * Удаляет все исходящие заявки в друзья для [user].
      */
-    fun findIncomingFriendRequests(currentUser: User): Flow<FriendRequestDto>
+    suspend fun deleteAllOutgoingFriendRequests(user: User)
 
     /**
-     * Удаляет все исходящие заявки в друзья для [currentUser].
+     * Удаляет исходящую от [user] заявку в друзья с пользователем с [userId].
      */
-    suspend fun deleteAllOutgoingFriendRequests(currentUser: User)
+    suspend fun deleteOutgoingFriendRequest(userId: UUID, user: User)
 
     /**
-     * Удаляет все входящие заявки в друзья для [currentUser].
+     * Возвращает входящие заявки в друзья для [user].
      */
-    suspend fun deleteAllIncomingFriendRequests(currentUser: User)
+    fun findIncomingFriendRequests(user: User): Flow<FriendRequestDto>
 
     /**
-     * Удаляет исходящую от [currentUser] заявку в друзья с [friendRequestId].
+     * Удаляет все входящие заявки в друзья для [user].
      */
-    suspend fun deleteOutgoingFriendRequest(friendRequestId: UUID, currentUser: User)
+    suspend fun deleteAllIncomingFriendRequests(user: User)
 
     /**
-     * Удаляет входящую заявку в друзья с идентификатором [friendRequestId] с [currentUser].
+     * Удаляет входящую заявку в друзья от пользователя с [userId] с [user].
      */
-    suspend fun deleteIncomingFriendRequest(friendRequestId: UUID, currentUser: User)
+    suspend fun deleteIncomingFriendRequest(userId: UUID, user: User)
 
     /**
-     * Принимает запрос в друзья с [friendRequestId] для [currentUser].
+     * Принимает запрос в друзья от пользователя с [userId] для [user].
      */
-    suspend fun acceptFriendRequest(friendRequestId: UUID, currentUser: User)
+    suspend fun acceptFriendRequest(userId: UUID, user: User)
 }

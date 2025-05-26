@@ -3,28 +3,27 @@ package ru.blimfy.gateway.service.friend
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
 import ru.blimfy.gateway.dto.user.friend.FriendDto
-import ru.blimfy.gateway.dto.user.friend.FriendNickDto
 import ru.blimfy.user.db.entity.User
 
 /**
- * Интерфейс для работы с обработкой запросов о запросах в друзья.
+ * Интерфейс для работы с обработкой запросов о друзьях.
  *
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
 interface FriendControllerService {
     /**
-     * Изменяет [nickInfo] друга с идентификатором связи [friendId] для [currentUser].
+     * Возвращает друзей [user].
      */
-    suspend fun changeFriendNick(friendId: UUID, nickInfo: FriendNickDto, currentUser: User): FriendDto
+    fun findUserFriends(user: User): Flow<FriendDto>
 
     /**
-     * Возвращает друзей для [currentUser].
+     * Удаляет из друзей [user] пользователя с [userId].
      */
-    fun findFriends(currentUser: User): Flow<FriendDto>
+    suspend fun deleteFriend(userId: UUID, user: User)
 
     /**
-     * Удаляет друга на основании связи с [id].
+     * Возвращает друга с новым [nick] пользователя с [userId] для [user].
      */
-    suspend fun deleteFriend(id: UUID)
+    suspend fun changeFriendNick(userId: UUID, nick: String? = null, user: User): FriendDto
 }

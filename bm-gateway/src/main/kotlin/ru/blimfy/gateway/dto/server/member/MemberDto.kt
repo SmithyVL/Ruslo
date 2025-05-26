@@ -1,6 +1,8 @@
 package ru.blimfy.gateway.dto.server.member
 
 import com.fasterxml.jackson.annotation.JsonFormat
+import com.fasterxml.jackson.annotation.JsonInclude
+import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.time.Instant
 import java.util.UUID
 import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_FORMAT
@@ -21,6 +23,7 @@ import ru.blimfy.server.db.entity.Member
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
+@JsonInclude(NON_NULL)
 data class MemberDto(
     val id: UUID,
     val serverId: UUID,

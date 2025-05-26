@@ -3,7 +3,7 @@ package ru.blimfy.server.usecase.exception
 /**
  * Сообщения ошибок при работе с серверами.
  *
- * @param msg текст ошибка.
+ * @param msg текст ошибки.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -19,11 +19,6 @@ enum class ServerErrors(val msg: String) {
     SERVER_BY_ID_NOT_FOUND("Server with id - '%s', not found!"),
 
     /**
-     * Канал сервера не найден по идентификатору.
-     */
-    CHANNEL_BY_ID_NOT_FOUND("Channel with id - '%s', not found!"),
-
-    /**
      * Участник сервера не найден по идентификатору пользователя и сервера.
      */
     MEMBER_BY_USER_ID_AND_SERVER_ID_NOT_FOUND("Member with user id - '%s', and server id - '%s', not found!"),
@@ -37,16 +32,6 @@ enum class ServerErrors(val msg: String) {
      * Роль сервера не найдена по идентификатору.
      */
     ROLE_BY_ID_NOT_FOUND("Role with id - '%s', not found!"),
-
-    /**
-     * Приглашение на сервер не найдено по идентификатору.
-     */
-    INVITE_BY_ID_NOT_FOUND("Invite with id - '%s', not found!"),
-
-    /**
-     * Текстовое сообщение не найдено по идентификатору.
-     */
-    TEXT_MESSAGE_BY_ID_NOT_FOUND("Text message with id - '%s', not found!"),
 
     /**
      * Доступ к редактированию сервера запрещён.
