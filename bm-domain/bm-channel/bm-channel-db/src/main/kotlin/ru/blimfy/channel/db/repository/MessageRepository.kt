@@ -16,15 +16,14 @@ import ru.blimfy.channel.db.entity.Message
 @Repository
 interface MessageRepository : CoroutineCrudRepository<Message, UUID> {
     /**
-     * Возвращает страницу из [limit] сущностей сообщений для канала с [channelId] с позиции [start] по [end].
+     * Возвращает страницу сущностей сообщений для канала с [channelId] с позиции [start] по [end].
      */
     @Query("""
-        select from message 
+        select * from message 
         where channel_id = :channelId and position >= :start and position <= :end
         order by position desc
-        limit :limit
     """)
-    fun findPageMessages(channelId: UUID, start: Long, end: Long, limit: Int): Flow<Message>
+    fun findPageMessages(channelId: UUID, start: Long, end: Long): Flow<Message>
 
     /**
      * Возвращает сущности закреплённых сообщений для канала с [channelId].
@@ -42,10 +41,9 @@ interface MessageRepository : CoroutineCrudRepository<Message, UUID> {
     suspend fun deleteByChannelId(channelId: UUID)
 
     /**
-     * Возвращает максимальную позицию сообщения в канале с [channelId]
+     * Возвращает количество сообщений в канале с [channelId]
      */
-    @Query("select max(position) from message where channel_id = :channelId")
-    suspend fun findMaxPositionByChannelId(channelId: UUID): Long
+    suspend fun countByChannelId(channelId: UUID): Long
 
     /**
      * Возвращает количество сущностей сообщений, которые закреплены в канале с [channelId]

@@ -12,9 +12,9 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.blimfy.gateway.dto.channel.ModifyChannelDto
+import ru.blimfy.gateway.api.channel.dto.ModifyChannelDto
+import ru.blimfy.gateway.api.channel.handler.ChannelApiService
 import ru.blimfy.gateway.integration.security.CustomUserDetails
-import ru.blimfy.gateway.service.channel.ChannelApiService
 
 /**
  * REST API контроллер для работы с каналами.

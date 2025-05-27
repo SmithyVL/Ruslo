@@ -33,8 +33,12 @@ interface ChannelRepository : CoroutineCrudRepository<Channel, UUID> {
     suspend fun findByRecipients(recipientIdOne: UUID, recipientIdTwo: UUID): Channel
 
     /**
-     * Возвращает максимальную позицию канала в рамках сервера с [serverId].
+     * Возвращает количество сущностей каналов на уровне сервера с [serverId].
      */
-    @Query("select max(position) from channel where server_id = :serverId")
-    suspend fun findMaxPositionByServerId(serverId: UUID): Long
+    suspend fun countByServerIdAndParentIdIsNull(serverId: UUID): Long
+
+    /**
+     * Возвращает количество сущностей каналов, которые расположены в категориях сервера с [serverId].
+     */
+    suspend fun countByServerIdAndParentIdIsNotNull(serverId: UUID): Long
 }

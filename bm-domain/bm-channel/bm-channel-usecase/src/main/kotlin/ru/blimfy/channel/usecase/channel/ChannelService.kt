@@ -37,9 +37,9 @@ interface ChannelService {
     suspend fun findChannel(id: UUID): Channel
 
     /**
-     * Возвращает личный диалог для [recipients], если такой есть.
+     * Возвращает личный канал для [recipients], если такой есть.
      */
-    suspend fun findDm(recipients: Set<UUID>): Channel?
+    suspend fun findChannel(recipients: Set<UUID>): Channel?
 
     /**
      * Возвращает личные каналы для [userId].
@@ -59,10 +59,10 @@ interface ChannelService {
     /**
      * Проверяет разрешение пользователя с [userId] на просмотр канала с [id].
      */
-    suspend fun checkChannelViewAccess(id: UUID, userId: UUID)
+    suspend fun checkChannelView(id: UUID, userId: UUID)
 
     /**
      * Проверяет разрешение пользователя с [userId] на изменение группы с [id].
      */
-    suspend fun checkGroupDmWriteAccess(id: UUID, userId: UUID)
+    suspend fun checkGroupDmWrite(id: UUID, userId: UUID)
 }

@@ -81,7 +81,7 @@ class ServerServiceImpl(
             memberRoleService.saveRoleToMember(MemberRole(memberId = id, roleId = defaultRoleId))
         }
 
-    override suspend fun checkServerModifyAccess(serverId: UUID, userId: UUID) {
+    override suspend fun checkServerWrite(serverId: UUID, userId: UUID) {
         val server = findServer(serverId)
 
         if (userId != server.ownerId) {
@@ -89,7 +89,7 @@ class ServerServiceImpl(
         }
     }
 
-    override suspend fun checkServerViewAccess(serverId: UUID, userId: UUID) {
+    override suspend fun checkServerView(serverId: UUID, userId: UUID) {
         try {
             memberService.findServerMember(serverId = serverId, userId = userId)
         } catch (_: NotFoundException) {

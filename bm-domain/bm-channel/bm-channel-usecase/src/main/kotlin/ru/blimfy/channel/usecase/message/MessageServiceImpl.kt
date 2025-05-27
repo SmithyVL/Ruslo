@@ -19,8 +19,8 @@ import ru.blimfy.common.exception.NotFoundException
 @Service
 class MessageServiceImpl(private val repo: MessageRepository) : MessageService {
     override suspend fun createMessage(message: Message) =
-        findMaxChannelPosition(message.channelId).let { maxPosition ->
-            message.position = maxPosition + 1
+        message.apply {
+            position = getCountMessages(message.channelId)
             repo.save(message)
         }
 
@@ -42,11 +42,11 @@ class MessageServiceImpl(private val repo: MessageRepository) : MessageService {
     override suspend fun findMessage(id: UUID) =
         repo.findById(id) ?: throw NotFoundException(MESSAGE_BY_ID_NOT_FOUND.msg.format(id))
 
-    override suspend fun findMaxChannelPosition(channelId: UUID) =
-        repo.findMaxPositionByChannelId(channelId)
+    override suspend fun getCountMessages(channelId: UUID) =
+        repo.countByChannelId(channelId)
 
-    override fun findMessages(channelId: UUID, start: Long, end: Long, limit: Int) =
-        repo.findPageMessages(channelId, start, end, limit)
+    override fun findMessages(channelId: UUID, start: Long, end: Long) =
+        repo.findPageMessages(channelId, start, end)
 
     override suspend fun findPinnedMessages(channelId: UUID) =
         repo.findAllByChannelIdAndPinnedIsTrue(channelId)

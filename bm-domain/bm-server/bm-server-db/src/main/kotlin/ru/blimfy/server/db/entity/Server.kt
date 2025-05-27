@@ -25,8 +25,8 @@ data class Server(var ownerId: UUID, var name: String) : BaseEntity() {
     var icon: String? = null
     var bannerColor: String? = null
     var description: String? = null
-    var afkChannelId: UUID? = null
-    var afkTimeout: Int? = null
+    //var afkChannelId: UUID? = null
+    //var afkTimeout: Int? = null
 
     @CreatedDate
     lateinit var createdDate: Instant

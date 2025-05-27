@@ -24,11 +24,17 @@ class ChannelServiceImpl(
     private val repo: ChannelRepository,
     private val messageService: MessageService,
 ) : ChannelService {
-    override suspend fun save(channel: Channel): Channel {
-        channel.serverId?.let { channel.position = repo.findMaxPositionByServerId(it) + 1 }
-
-        return repo.save(channel)
-    }
+    override suspend fun save(channel: Channel) =
+        channel.apply {
+            serverId?.let {
+                position = if (parentId == null) {
+                    repo.countByServerIdAndParentIdIsNull(it)
+                } else {
+                    repo.countByServerIdAndParentIdIsNotNull(it)
+                }
+            }
+            repo.save(this)
+        }
 
     override suspend fun addRecipients(id: UUID, recipients: Set<UUID>) =
         findChannel(id).apply { this.recipients = this.recipients!!.plus(recipients) }.let { repo.save(it) }
@@ -53,16 +59,16 @@ class ChannelServiceImpl(
             repo.delete(it)
         }
 
-    override suspend fun findDm(recipients: Set<UUID>) =
+    override suspend fun findChannel(recipients: Set<UUID>) =
         repo.findByRecipients(recipients.elementAt(0), recipients.elementAt(1))
 
-    override suspend fun checkChannelViewAccess(id: UUID, userId: UUID) {
-        if (findChannel(id).recipients!!.contains(userId)) {
+    override suspend fun checkChannelView(id: UUID, userId: UUID) {
+        if (!findChannel(id).recipients!!.contains(userId)) {
             throw AccessDeniedException(DM_CHANNEL_VIEW_ACCESS_DENIED.msg.format(id))
         }
     }
 
-    override suspend fun checkGroupDmWriteAccess(id: UUID, userId: UUID) {
+    override suspend fun checkGroupDmWrite(id: UUID, userId: UUID) {
         if (userId != findChannel(id).ownerId) {
             throw AccessDeniedException(GROUP_DM_MODIFY_ACCESS_DENIED.msg.format(id))
         }

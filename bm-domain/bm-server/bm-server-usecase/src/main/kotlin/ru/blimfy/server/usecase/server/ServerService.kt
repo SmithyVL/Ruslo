@@ -50,10 +50,10 @@ interface ServerService {
     /**
      * Проверяет разрешение пользователя с [userId] на изменение сервера с [serverId] и его связанных данных.
      */
-    suspend fun checkServerModifyAccess(serverId: UUID, userId: UUID)
+    suspend fun checkServerWrite(serverId: UUID, userId: UUID)
 
     /**
      * Проверяет разрешение пользователя с [userId] на просмотр сервера с [serverId] и его связанных данных.
      */
-    suspend fun checkServerViewAccess(serverId: UUID, userId: UUID)
+    suspend fun checkServerView(serverId: UUID, userId: UUID)
 }

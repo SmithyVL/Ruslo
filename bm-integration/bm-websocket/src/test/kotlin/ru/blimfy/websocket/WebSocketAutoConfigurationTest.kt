@@ -1,7 +1,6 @@
 package ru.blimfy.websocket
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import java.util.UUID
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE
@@ -45,7 +44,7 @@ class WebSocketAutoConfigurationTest {
                     // Логика не требуется.
                 }
 
-                override fun removeSession(userId: UUID) {
+                override fun removeSession(session: WebSocketSession) {
                     // Логика не требуется.
                 }
             }

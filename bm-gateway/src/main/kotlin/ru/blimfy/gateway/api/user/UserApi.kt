@@ -13,12 +13,12 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import ru.blimfy.gateway.dto.user.ModifyUserDto
-import ru.blimfy.gateway.dto.user.UsernameDto
-import ru.blimfy.gateway.dto.user.channel.NewDmChannelDto
-import ru.blimfy.gateway.dto.user.toDto
+import ru.blimfy.gateway.api.dto.toDto
+import ru.blimfy.gateway.api.user.dto.ModifyUserDto
+import ru.blimfy.gateway.api.user.dto.UsernameDto
+import ru.blimfy.gateway.api.user.dto.channel.NewDmChannelDto
+import ru.blimfy.gateway.api.user.handler.UserApiService
 import ru.blimfy.gateway.integration.security.CustomUserDetails
-import ru.blimfy.gateway.service.user.UserApiService
 
 /**
  * REST API контроллер для работы с пользователями.

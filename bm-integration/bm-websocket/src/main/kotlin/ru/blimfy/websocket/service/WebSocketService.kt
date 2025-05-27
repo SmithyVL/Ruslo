@@ -1,6 +1,5 @@
 package ru.blimfy.websocket.service
 
-import java.util.UUID
 import org.springframework.web.reactive.socket.WebSocketSession
 
 /**
@@ -16,7 +15,7 @@ internal interface WebSocketService {
     fun addSession(token: String, session: WebSocketSession)
 
     /**
-     * Удаляет существующую WebSocket сессию для пользователя с [userId].
+     * Удаляет существующую WebSocket [session].
      */
-    fun removeSession(userId: UUID)
+    fun removeSession(session: WebSocketSession)
 }

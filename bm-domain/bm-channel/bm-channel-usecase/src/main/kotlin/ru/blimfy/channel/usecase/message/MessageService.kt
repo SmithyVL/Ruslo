@@ -32,14 +32,14 @@ interface MessageService {
     suspend fun findMessage(id: UUID): Message
 
     /**
-     * Возвращает максимальную позицию сообщения в канале с [channelId].
+     * Возвращает количество сообщений в канале с [channelId].
      */
-    suspend fun findMaxChannelPosition(channelId: UUID): Long
+    suspend fun getCountMessages(channelId: UUID): Long
 
     /**
-     * Возвращает страницу из [limit] сообщений для канала с [channelId] с позиции [start] по [end].
+     * Возвращает страницу сообщений для канала с [channelId] с позиции [start] по [end].
      */
-    fun findMessages(channelId: UUID, start: Long, end: Long, limit: Int): Flow<Message>
+    fun findMessages(channelId: UUID, start: Long, end: Long): Flow<Message>
 
     /**
      * Возвращает закреплённые сообщения канала с [channelId].
