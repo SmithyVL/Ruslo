@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.util.UUID
 import ru.blimfy.channel.db.entity.Invite
 import ru.blimfy.common.enumeration.InviteTypes
+import ru.blimfy.common.enumeration.InviteTypes.SERVER
 import ru.blimfy.gateway.dto.channel.ChannelPartialDto
 import ru.blimfy.gateway.dto.server.ServerPartialDto
 import ru.blimfy.gateway.dto.user.UserDto
@@ -22,7 +23,7 @@ import ru.blimfy.gateway.dto.user.UserDto
  * @since 0.0.1.
  */
 @JsonInclude(NON_NULL)
-data class InviteDto(val id: UUID, val type: InviteTypes) {
+data class InviteDto(val id: UUID, val type: InviteTypes = SERVER) {
     lateinit var channel: ChannelPartialDto
     lateinit var inviter: UserDto
     var server: ServerPartialDto? = null

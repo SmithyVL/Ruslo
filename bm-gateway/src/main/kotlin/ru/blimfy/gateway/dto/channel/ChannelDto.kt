@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
 import ru.blimfy.channel.db.entity.Channel
 import ru.blimfy.common.enumeration.ChannelTypes
+import ru.blimfy.common.enumeration.ChannelTypes.TEXT
 import ru.blimfy.gateway.dto.user.UserDto
 
 /**
@@ -29,7 +30,7 @@ import ru.blimfy.gateway.dto.user.UserDto
 @JsonInclude(NON_NULL)
 data class ChannelDto(
     val id: UUID,
-    val type: ChannelTypes,
+    val type: ChannelTypes = TEXT,
     val serverId: UUID? = null,
     val name: String? = null,
     val icon: String? = null,

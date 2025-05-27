@@ -2,6 +2,7 @@ package ru.blimfy.gateway.dto.user.channel
 
 import java.util.UUID
 import ru.blimfy.common.enumeration.ChannelTypes
+import ru.blimfy.common.enumeration.ChannelTypes.DM
 
 /**
  * DTO с информацией о новом личном канале.
@@ -11,4 +12,4 @@ import ru.blimfy.common.enumeration.ChannelTypes
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-data class NewDmChannelDto(val recipients: Set<UUID>, val type: ChannelTypes)
+data class NewDmChannelDto(val recipients: Set<UUID> = emptySet(), val type: ChannelTypes = DM)

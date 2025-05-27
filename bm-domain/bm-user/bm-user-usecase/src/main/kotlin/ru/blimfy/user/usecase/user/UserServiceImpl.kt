@@ -28,24 +28,20 @@ class UserServiceImpl(private val userRepo: UserRepository) : UserService {
 
     override suspend fun modifyUser(
         id: UUID,
-        newGlobalName: String?,
-        newAvatar: String?,
-        newBannerColor: String?,
+        globalName: String?,
+        avatar: String?,
+        bannerColor: String?,
     ) =
         findUser(id)
             .apply {
-                globalName = newGlobalName
-                avatar = newAvatar
-                bannerColor = newBannerColor
+                this.globalName = globalName
+                this.avatar = avatar
+                this.bannerColor = bannerColor
             }
             .let { userRepo.save(it) }
 
     override suspend fun setUsername(id: UUID, username: String) =
-        findUser(id)
-            .apply { this.username = username }
-            .let {
-                userRepo.save(it)
-            }
+        findUser(id).apply { this.username = username }.let { userRepo.save(it) }
 
     override suspend fun setPassword(id: UUID, password: String) =
         findUser(id).apply { this.password = password }.let { userRepo.save(it) }

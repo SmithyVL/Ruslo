@@ -16,7 +16,7 @@ import ru.blimfy.channel.db.entity.Channel
  */
 @Schema(description = "Новая информация о канале")
 data class ModifyChannelDto(
-    val nsfw: Boolean,
+    val nsfw: Boolean = false,
     @Size(max = 1024, message = "Channel topic must be between 0 and 1024 characters long")
     val topic: String? = null,
     @Size(min = 1, max = 100, message = "Channel names must be between 1 and 100 characters long")

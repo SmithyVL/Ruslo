@@ -5,6 +5,7 @@ import jakarta.validation.constraints.Size
 import java.util.UUID
 import ru.blimfy.channel.db.entity.Channel
 import ru.blimfy.common.enumeration.ChannelTypes
+import ru.blimfy.common.enumeration.ChannelTypes.TEXT
 
 /**
  * DTO с информацией о новом канале сервера.
@@ -19,7 +20,7 @@ import ru.blimfy.common.enumeration.ChannelTypes
 data class ServerChannelDto(
     @Size(min = 1, max = 100, message = "Channel names must be between 1 and 100 characters long")
     val name: String,
-    val type: ChannelTypes,
+    val type: ChannelTypes = TEXT,
     val parentId: UUID? = null,
 )
 

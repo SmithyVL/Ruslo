@@ -29,7 +29,7 @@ data class UserDto(
     val id: UUID,
     val username: String,
     val email: String,
-    val verified: Boolean,
+    val verified: Boolean = false,
     val globalName: String? = null,
     val avatar: String? = null,
     val bannerColor: String? = null,

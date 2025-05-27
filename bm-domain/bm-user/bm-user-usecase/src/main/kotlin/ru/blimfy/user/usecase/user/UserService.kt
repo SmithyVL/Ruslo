@@ -16,13 +16,13 @@ interface UserService {
     suspend fun createUser(user: User): User
 
     /**
-     * Возвращает обновлённого пользователя с [id], [newGlobalName], [newAvatar] и [newBannerColor].
+     * Возвращает обновлённого пользователя с [id], [globalName], [avatar] и [bannerColor].
      */
     suspend fun modifyUser(
         id: UUID,
-        newGlobalName: String? = null,
-        newAvatar: String? = null,
-        newBannerColor: String? = null,
+        globalName: String? = null,
+        avatar: String? = null,
+        bannerColor: String? = null,
     ): User
 
     /**

@@ -22,10 +22,10 @@ import ru.blimfy.server.db.entity.Role
 data class RoleDto(
     val id: UUID,
     val name: String,
-    val permissions: String,
-    val position: Int,
-    val hoist: Boolean,
-    val mentionable: Boolean,
+    val permissions: String = "0",
+    val position: Int = 0,
+    val hoist: Boolean = false,
+    val mentionable: Boolean = false,
     val color: String? = null,
 )
 

@@ -3,6 +3,7 @@ package ru.blimfy.gateway.dto.channel.message
 import java.util.UUID
 import ru.blimfy.channel.db.entity.Message
 import ru.blimfy.common.enumeration.MessageTypes
+import ru.blimfy.common.enumeration.MessageTypes.DEFAULT
 
 /**
  * DTO с информацией о новом сообщении канала.
@@ -12,7 +13,7 @@ import ru.blimfy.common.enumeration.MessageTypes
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-data class NewMessageDto(val type: MessageTypes, val content: String? = null)
+data class NewMessageDto(val type: MessageTypes = DEFAULT, val content: String? = null)
 
 /**
  * Возвращает сущность сообщения канала из DTO представления.

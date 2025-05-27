@@ -22,7 +22,7 @@ data class ServerPartialDto(
     val name: String,
     val icon: String? = null,
     val bannerColor: String? = null,
-    val owner: Boolean,
+    val owner: Boolean = false,
 )
 
 /**

@@ -13,4 +13,4 @@ import java.util.UUID
  * @since 0.0.1.
  */
 @Schema(description = "Информация о новой позиции канала сервера")
-data class ChannelPositionDto(val id: UUID, val position: Long, val parentId: UUID? = null)
+data class ChannelPositionDto(val id: UUID, val position: Long = 0, val parentId: UUID? = null)

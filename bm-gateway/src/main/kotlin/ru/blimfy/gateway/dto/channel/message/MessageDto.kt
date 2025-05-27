@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.time.Instant
 import java.util.UUID
 import ru.blimfy.channel.db.entity.Message
+import ru.blimfy.common.enumeration.MessageTypes
+import ru.blimfy.common.enumeration.MessageTypes.DEFAULT
 import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_FORMAT
 import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_TIMEZONE
 import ru.blimfy.gateway.dto.user.UserDto
@@ -15,6 +17,7 @@ import ru.blimfy.gateway.dto.user.UserDto
  *
  * @property id идентификатор.
  * @property channelId идентификатор канала.
+ * @property type тип сообщения.
  * @property content содержимое сообщения.
  * @property pinned является ли сообщение закреплённым.
  * @property createdDate дата создания в UTC.
@@ -27,8 +30,9 @@ import ru.blimfy.gateway.dto.user.UserDto
 data class MessageDto(
     val id: UUID,
     val channelId: UUID,
+    val type: MessageTypes = DEFAULT,
     val content: String? = null,
-    val pinned: Boolean,
+    val pinned: Boolean = false,
     @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE)
     val createdDate: Instant,
     @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE)
@@ -40,4 +44,4 @@ data class MessageDto(
 /**
  * Возвращает DTO представления сущности сообщения канала.
  */
-fun Message.toDto() = MessageDto(id, channelId, content, pinned, createdDate, updatedDate)
+fun Message.toDto() = MessageDto(id, channelId, type, content, pinned, createdDate, updatedDate)

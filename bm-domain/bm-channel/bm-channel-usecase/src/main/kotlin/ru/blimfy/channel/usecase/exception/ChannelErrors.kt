@@ -19,6 +19,11 @@ enum class ChannelErrors(val msg: String) {
     MESSAGE_BY_ID_NOT_FOUND("Message with id - '%s', not found!"),
 
     /**
+     * В канале уже максимальное количество закреплённых сообщений.
+     */
+    MESSAGE_PINNED_LIMIT("Maximum number (50) of pinned messages in the channel ('%s') has been reached!"),
+
+    /**
      * Приглашение на канал не найдено по идентификатору.
      */
     INVITE_BY_ID_NOT_FOUND("Invite with id - '%s', not found!"),

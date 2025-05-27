@@ -18,9 +18,11 @@ import ru.blimfy.user.db.entity.User
 @Schema(description = "Данные нового пользователя")
 data class SignUpDto(
     @Email(message = "Email should be valid")
+    //@Pattern(regexp = "^[\\w.-]+@([\\w-]+\\.)+[\\w-]{2,4}$")
     val email: String,
 
     @Size(min = 2, max = 32, message = "Usernames must be between 2 and 32 characters long")
+    //@Pattern(regexp = "^[a-zA-Z][a-zA-Z0-9_]+")
     val username: String,
 
     @NotBlank(message = "Password is mandatory")
