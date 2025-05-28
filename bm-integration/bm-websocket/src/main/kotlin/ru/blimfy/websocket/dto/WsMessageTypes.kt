@@ -28,11 +28,6 @@ enum class WsMessageTypes {
     CHANNEL_PINS_UPDATE,
 
     /**
-     * Сервер создан.
-     */
-    SERVER_CREATE,
-
-    /**
      * Сервер обновлён.
      */
     SERVER_UPDATE,
@@ -41,6 +36,16 @@ enum class WsMessageTypes {
      * Сервер удалён.
      */
     SERVER_DELETE,
+
+    /**
+     * Бан сервера создан.
+     */
+    SERVER_BAN_ADD,
+
+    /**
+     * Бан сервера удалён.
+     */
+    SERVER_BAN_REMOVE,
 
     /**
      * К серверу присоединился новый пользователь.

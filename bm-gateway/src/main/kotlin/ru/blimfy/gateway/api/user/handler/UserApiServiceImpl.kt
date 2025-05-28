@@ -117,8 +117,13 @@ class UserApiServiceImpl(
             user.id
         }
 
-        val newDmChannel = Channel(channel.type, ownerId).apply { this.recipients = recipients }
-        return channelService.save(newDmChannel).toDtoWithData()
+        return Channel(channel.type)
+            .apply {
+                this.ownerId = ownerId
+                this.recipients = recipients
+                channelService.save(this)
+            }
+            .toDtoWithData()
     }
 
     override fun findUserDmChannels(user: User) =

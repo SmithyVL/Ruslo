@@ -16,6 +16,7 @@ import ru.blimfy.gateway.api.dto.toPartialDto
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.gateway.integration.websockets.base.EntityDeleteDto
 import ru.blimfy.server.db.entity.Member
+import ru.blimfy.server.usecase.ban.BanService
 import ru.blimfy.server.usecase.member.MemberService
 import ru.blimfy.server.usecase.member.role.MemberRoleService
 import ru.blimfy.server.usecase.role.RoleService
@@ -35,6 +36,7 @@ import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_MEMBER_ADD
  * @property memberService сервис для работы с участниками серверов.
  * @property roleService сервис для работы с ролями серверов.
  * @property memberRoleService сервис для работы с ролями участников серверов.
+ * @property banService сервис для работы с банами серверов.
  * @property userService сервис для работы с пользователями.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
  * @author Владислав Кузнецов.
@@ -48,6 +50,7 @@ class InviteApiServiceImpl(
     private val memberService: MemberService,
     private val roleService: RoleService,
     private val memberRoleService: MemberRoleService,
+    private val banService: BanService,
     private val userService: UserService,
     private val userWsStorage: UserWebSocketStorage,
 ) : InviteApiService {
@@ -64,20 +67,23 @@ class InviteApiServiceImpl(
         return inviteService.deleteInvite(id = id).toDtoWithLinkData()
             .apply {
                 val data = EntityDeleteDto(id = id, channelId = invite.channelId, serverId = serverId)
-                userWsStorage.sendMessage(INVITE_DELETE, data) 
+                userWsStorage.sendMessage(INVITE_DELETE, data)
             }
     }
 
     override suspend fun useInvite(id: UUID, user: User) {
         inviteService.findInvite(id).let { invite ->
             when (invite.type) {
-                SERVER -> serverService.addNewMember(serverId = invite.serverId!!, userId = user.id)
-                    .toDtoWithLinkData(user)
-                    .apply { userWsStorage.sendMessage(SERVER_MEMBER_ADD, this) }
+                SERVER ->
+                    if (banService.findBan(serverId = invite.serverId!!, userId = user.id) == null) {
+                        serverService.addNewMember(serverId = invite.serverId!!, userId = user.id)
+                            .toDtoWithLinkData(user)
+                            .apply { userWsStorage.sendMessage(SERVER_MEMBER_ADD, this) }
+                    }
 
                 GROUP_DM -> channelService.addRecipients(invite.channelId, setOf(user.id))
-                    .toDtoWithLinkData()
-                    .apply { userWsStorage.sendMessage(CHANNEL_UPDATE, this) }
+                        .toDtoWithLinkData()
+                        .apply { userWsStorage.sendMessage(CHANNEL_UPDATE, this) }
             }
         }
     }

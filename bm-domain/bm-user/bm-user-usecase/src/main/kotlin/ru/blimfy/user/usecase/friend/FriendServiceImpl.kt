@@ -31,7 +31,7 @@ class FriendServiceImpl(private val friendRepo: FriendRepository) : FriendServic
 
     @Transactional
     override suspend fun deleteFriend(fromId: UUID, toId: UUID) {
-        friendRepo.deleteByFromIdAndToId(fromId = fromId, toId = fromId)
+        friendRepo.deleteByFromIdAndToId(fromId = fromId, toId = toId)
         friendRepo.deleteByFromIdAndToId(fromId = toId, toId = fromId)
     }
 }

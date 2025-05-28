@@ -117,7 +117,7 @@ class ChannelApiServiceImpl(
         channelService.findChannel(id).let { channel ->
             channel.serverId.apply {
                 when (channel.type.group) {
-                    USER -> channelService.checkGroupDmWrite(id = channel.id, userId = userId)
+                    USER -> channelService.checkGroupDmWrite(id = id, userId = userId)
                     SERVER -> serverService.checkServerWrite(serverId = this!!, userId = userId)
                 }
             }

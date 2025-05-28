@@ -18,11 +18,13 @@ interface MessageRepository : CoroutineCrudRepository<Message, UUID> {
     /**
      * Возвращает страницу сущностей сообщений для канала с [channelId] с позиции [start] по [end].
      */
-    @Query("""
-        select * from message 
-        where channel_id = :channelId and position >= :start and position <= :end
-        order by position desc
-    """)
+    @Query(
+        """
+            select * from message 
+            where channel_id = :channelId and position >= :start and position <= :end
+            order by position desc
+        """
+    )
     fun findPageMessages(channelId: UUID, start: Long, end: Long): Flow<Message>
 
     /**

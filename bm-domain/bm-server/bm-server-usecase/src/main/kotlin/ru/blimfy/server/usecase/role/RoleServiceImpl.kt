@@ -32,6 +32,6 @@ class RoleServiceImpl(private val roleRepo: RoleRepository) : RoleService {
         /**
          * Название дефолтной роли.
          */
-        const val DEFAULT_ROLE_NAME = "@everyone"
+        const val DEFAULT_ROLE_NAME = "@все"
     }
 }

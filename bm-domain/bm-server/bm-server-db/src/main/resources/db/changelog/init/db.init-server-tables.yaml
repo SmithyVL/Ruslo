@@ -236,3 +236,59 @@ databaseChangeLog:
             constraintName: fk_role_member_role
             referencedColumnNames: id
             referencedTableName: role
+  - changeSet:
+      id: init_server_tables_4
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: ban
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с банами
+      changes:
+        - createTable:
+            tableName: ban
+            remarks: Баны
+            columns:
+              - column:
+                  name: id
+                  type: uuid
+                  remarks: Идентификатор
+                  defaultValueComputed: gen_random_uuid()
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: ban_id_pkey
+              - column:
+                  name: server_id
+                  type: uuid
+                  remarks: Идентификатор сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: uuid
+                  remarks: Идентификатор пользователя
+                  constraints:
+                    nullable: false
+              - column:
+                  name: reason
+                  type: uuid
+                  remarks: Причина
+              - column:
+                  name: position
+                  type: bigint
+                  remarks: Номер внутри сервера
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: server_id, user_id
+            constraintName: const_unique_ban
+            tableName: ban
+        - addForeignKeyConstraint:
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+            baseColumnNames: server_id
+            baseTableName: ban
+            constraintName: fk_server_ban
+            referencedColumnNames: id
+            referencedTableName: server

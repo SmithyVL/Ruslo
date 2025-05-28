@@ -21,7 +21,7 @@ class MessageServiceImpl(private val repo: MessageRepository) : MessageService {
     override suspend fun createMessage(message: Message) =
         message.apply {
             position = getCountMessages(message.channelId)
-            repo.save(message)
+            repo.save(this)
         }
 
     override suspend fun setContent(id: UUID, content: String) =
