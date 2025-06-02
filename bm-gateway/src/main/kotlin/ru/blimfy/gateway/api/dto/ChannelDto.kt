@@ -50,4 +50,4 @@ fun Channel.toDto() = ChannelDto(id, type, serverId, name, icon, ownerId, parent
 /**
  * Возвращает DTO частичного представления сущности канала.
  */
-fun Channel.toPartialDto() = ChannelPartialDto(id, type, name!!)
+fun Channel.toPartialDto() = ChannelPartialDto(id, serverId, type, name!!)

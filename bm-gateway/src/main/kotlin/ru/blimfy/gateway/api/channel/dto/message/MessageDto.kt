@@ -19,10 +19,12 @@ import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_TIMEZONE
  * @property channelId идентификатор канала.
  * @property type тип сообщения.
  * @property content содержимое сообщения.
+ * @property mentionEveryone упоминает ли это сообщение всех.
  * @property pinned является ли сообщение закреплённым.
  * @property createdDate дата создания в UTC.
  * @property updatedDate дата обновления в UTC.
  * @property author информация об авторе.
+ * @property mentions упомянутые пользователи.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -32,6 +34,7 @@ data class MessageDto(
     val channelId: UUID,
     val type: MessageTypes = DEFAULT,
     val content: String? = null,
+    val mentionEveryone: Boolean = false,
     val pinned: Boolean = false,
     @JsonFormat(pattern = INSTANT_FORMAT, timezone = INSTANT_TIMEZONE)
     val createdDate: Instant,
@@ -39,9 +42,19 @@ data class MessageDto(
     val updatedDate: Instant? = null,
 ) {
     lateinit var author: UserDto
+    var mentions: List<UserDto>? = null
 }
 
 /**
  * Возвращает DTO представления сущности сообщения канала.
  */
-fun Message.toDto() = MessageDto(id, channelId, type, content, pinned, createdDate, updatedDate)
+fun Message.toDto() = MessageDto(
+    id,
+    channelId,
+    type,
+    content,
+    mentionEveryone,
+    pinned,
+    createdDate,
+    updatedDate,
+)

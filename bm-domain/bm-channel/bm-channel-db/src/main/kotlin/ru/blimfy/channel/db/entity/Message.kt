@@ -16,6 +16,8 @@ import ru.blimfy.common.enumeration.MessageTypes.DEFAULT
  * @property authorId идентификатор пользователя, создавшего сообщение.
  * @property type тип сообщения.
  * @property content содержимое сообщения.
+ * @property mentions идентификаторы упомянутых пользователей.
+ * @property mentionEveryone упоминает ли это сообщение всех.
  * @property pinned является ли сообщение закреплённым.
  * @property position обычно возрастающее целое число, которое представляет собой приблизительное положение сообщения.
  * @property createdDate дата создания.
@@ -26,6 +28,8 @@ import ru.blimfy.common.enumeration.MessageTypes.DEFAULT
 @Table
 class Message(val channelId: UUID, val authorId: UUID, val type: MessageTypes = DEFAULT) : BaseEntity() {
     var content: String? = null
+    var mentions: Set<UUID>? = null
+    var mentionEveryone: Boolean = false
     var pinned: Boolean = false
     var position: Long = 0
 

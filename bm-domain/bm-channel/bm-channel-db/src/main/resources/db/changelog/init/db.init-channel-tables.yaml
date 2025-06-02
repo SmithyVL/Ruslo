@@ -103,6 +103,17 @@ databaseChangeLog:
                   type: varchar
                   remarks: Содержимое
               - column:
+                  name: mentions
+                  type: uuid[25]
+                  remarks: Идентификаторы упоминаемых пользователей
+              - column:
+                  name: mention_everyone
+                  type: boolean
+                  remarks: Упоминает ли это сообщение всех
+                  defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
                   name: pinned
                   type: boolean
                   remarks: Является ли сообщение закреплённым

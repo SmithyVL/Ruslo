@@ -1,6 +1,7 @@
 package ru.blimfy.gateway.api.channel.message.handler
 
 import java.util.UUID
+import java.util.UUID.fromString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
@@ -19,6 +20,7 @@ import ru.blimfy.gateway.integration.websockets.base.EntityDeleteDto
 import ru.blimfy.gateway.integration.websockets.base.PartialMemberDto
 import ru.blimfy.gateway.integration.websockets.extra.MemberInfoDto
 import ru.blimfy.server.usecase.member.MemberService
+import ru.blimfy.server.usecase.role.RoleServiceImpl.Companion.DEFAULT_ROLE_NAME
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
 import ru.blimfy.user.usecase.user.UserService
@@ -80,14 +82,26 @@ class MessageApiServiceImpl(
                 val start = end - limit
                 messageService.findMessages(channelId, start, end)
             }
-        }.map { it.toDto().apply { author = userService.findUser(it.authorId).toDto() } }
+        }.map { message ->
+            message.toDto().apply {
+                author = userService.findUser(message.authorId).toDto()
+                mentions = message.mentions?.map { mention -> userService.findUser(mention).toDto() }
+            }
+        }
     }
 
     override suspend fun createMessage(channelId: UUID, message: NewMessageDto, user: User): MessageDto {
         val userId = user.id
         val extraFields: Any? = checkMessageViewAccess(channelId, userId)
 
-        return messageService.createMessage(message.toEntity(channelId, userId))
+        return message.toEntity(channelId, userId)
+            .apply {
+                content?.let {
+                    mentionEveryone = hasMentionEveryone(it)
+                    mentions = getMentions(it)
+                }
+            }
+            .let { messageService.createMessage(it) }
             .let { it.toDto().apply { author = userService.findUser(it.authorId).toDto() } }
             .apply { userWsStorage.sendMessage(MESSAGE_CREATE, this, extraFields) }
     }
@@ -131,4 +145,29 @@ class MessageApiServiceImpl(
                 }
             }
         }
+
+    /**
+     * Возвращает флаг того, что сообщение в своём [content] упоминает всех.
+     */
+    private fun hasMentionEveryone(content: String) =
+        content.contains(DEFAULT_ROLE_NAME) || content.contains(MENTION_ONLINE_USERS)
+
+    /**
+     * Возвращает идентификаторы упоминаний пользователей из [content] сообщения.
+     */
+    private fun getMentions(content: String): Set<UUID>? {
+        val regex = Regex("<@(.+?)>")
+        val matches = regex.findAll(content)
+        return matches
+            .map { it.groupValues[1] }
+            .map { fromString(it) }
+            .toSet()
+    }
+
+    private companion object {
+        /**
+         * Упоминание пользователей, находящихся онлайн.
+         */
+        private const val MENTION_ONLINE_USERS = "@онлайн"
+    }
 }
