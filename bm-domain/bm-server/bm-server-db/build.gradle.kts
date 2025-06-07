@@ -8,7 +8,6 @@ dependencies {
     // использования его методов.
     api(libs.springBootStarterDataR2dbc)
 
-    runtimeOnly(libs.databasePostgresR2dbc)
     runtimeOnly(libs.databasePostgres)
     runtimeOnly(libs.kotlinReflect)
     runtimeOnly(libs.hikari)
@@ -16,6 +15,8 @@ dependencies {
     implementation(project(":bm-common"))
     implementation(libs.springBootStarter)
     implementation(libs.kotlinxCoroutinesReactor)
+    implementation(libs.databasePostgresR2dbc)
+    implementation(libs.jacksonDatabind)
     implementation(libs.liquibaseCore)
 
     testImplementation(libs.springBootStarterTest)

@@ -5,16 +5,17 @@ import java.util.UUID.fromString
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
+import ru.blimfy.channel.db.entity.toSnapshot
 import ru.blimfy.channel.usecase.channel.ChannelService
 import ru.blimfy.channel.usecase.message.MessageService
 import ru.blimfy.common.enumeration.ChannelGroups.SERVER
 import ru.blimfy.common.enumeration.ChannelGroups.USER
+import ru.blimfy.common.json.MessageReferenceTypes.FORWARD
 import ru.blimfy.gateway.api.channel.dto.message.MessageDto
 import ru.blimfy.gateway.api.channel.dto.message.ModifyMessageDto
 import ru.blimfy.gateway.api.channel.dto.message.NewMessageDto
-import ru.blimfy.gateway.api.channel.dto.message.toDto
 import ru.blimfy.gateway.api.channel.dto.message.toEntity
-import ru.blimfy.gateway.api.dto.toDto
+import ru.blimfy.gateway.api.mapper.MessageMapper
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.gateway.integration.websockets.base.EntityDeleteDto
 import ru.blimfy.gateway.integration.websockets.base.PartialMemberDto
@@ -23,7 +24,6 @@ import ru.blimfy.server.usecase.member.MemberService
 import ru.blimfy.server.usecase.role.RoleServiceImpl.Companion.DEFAULT_ROLE_NAME
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
-import ru.blimfy.user.usecase.user.UserService
 import ru.blimfy.websocket.dto.WsMessageTypes.MESSAGE_CREATE
 import ru.blimfy.websocket.dto.WsMessageTypes.MESSAGE_DELETE
 import ru.blimfy.websocket.dto.WsMessageTypes.MESSAGE_UPDATE
@@ -33,8 +33,10 @@ import ru.blimfy.websocket.dto.WsMessageTypes.MESSAGE_UPDATE
  *
  * @property messageService сервис для работы с сообщениями.
  * @property channelService сервис для работы с каналами.
- * @property userService сервис для работы с пользователями.
+ * @property serverService сервис для работы с серверами.
+ * @property memberService сервис для работы с участниками серверов.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
+ * @property msgMapper маппер для сообщений.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -44,8 +46,8 @@ class MessageApiServiceImpl(
     private val channelService: ChannelService,
     private val serverService: ServerService,
     private val memberService: MemberService,
-    private val userService: UserService,
     private val userWsStorage: UserWebSocketStorage,
+    private val msgMapper: MessageMapper,
 ) : MessageApiService {
     override suspend fun findMessages(
         channelId: UUID,
@@ -82,12 +84,7 @@ class MessageApiServiceImpl(
                 val start = end - limit
                 messageService.findMessages(channelId, start, end)
             }
-        }.map { message ->
-            message.toDto().apply {
-                author = userService.findUser(message.authorId).toDto()
-                mentions = message.mentions?.map { mention -> userService.findUser(mention).toDto() }
-            }
-        }
+        }.map { msgMapper.toDtoWithRelations(it) }
     }
 
     override suspend fun createMessage(channelId: UUID, message: NewMessageDto, user: User): MessageDto {
@@ -100,9 +97,16 @@ class MessageApiServiceImpl(
                     mentionEveryone = hasMentionEveryone(it)
                     mentions = getMentions(it)
                 }
+
+                messageReference?.let {
+                    if (it.type == FORWARD) {
+                        val snapshotMessage = messageService.findMessage(messageReference!!.messageId)
+                        messageSnapshot = snapshotMessage.toSnapshot()
+                    }
+                }
             }
             .let { messageService.createMessage(it) }
-            .let { it.toDto().apply { author = userService.findUser(it.authorId).toDto() } }
+            .let { msgMapper.toDtoWithRelations(it) }
             .apply { userWsStorage.sendMessage(MESSAGE_CREATE, this, extraFields) }
     }
 
@@ -111,7 +115,7 @@ class MessageApiServiceImpl(
         val extraFields: Any? = checkMessageViewAccess(channelId, userId)
 
         return messageService.setContent(id, message.content)
-            .let { it.toDto().apply { author = userService.findUser(it.authorId).toDto() } }
+            .let { msgMapper.toDtoWithRelations(it) }
             .apply { userWsStorage.sendMessage(MESSAGE_UPDATE, this, extraFields) }
     }
 

@@ -9,13 +9,11 @@ import ru.blimfy.channel.usecase.message.MessageService
 import ru.blimfy.common.enumeration.ChannelGroups.SERVER
 import ru.blimfy.common.enumeration.ChannelGroups.USER
 import ru.blimfy.gateway.api.channel.dto.message.MessageDto
-import ru.blimfy.gateway.api.channel.dto.message.toDto
-import ru.blimfy.gateway.api.dto.toDto
+import ru.blimfy.gateway.api.mapper.MessageMapper
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.gateway.integration.websockets.dto.ChannelPinsUpdateDto
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
-import ru.blimfy.user.usecase.user.UserService
 import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_PINS_UPDATE
 
 /**
@@ -24,8 +22,8 @@ import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_PINS_UPDATE
  * @property messageService сервис для работы с сообщениями.
  * @property channelService сервис для работы с каналами.
  * @property serverService сервис для работы с серверами.
- * @property userService сервис для работы с пользователями.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
+ * @property msgMapper маппер для сообщений.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -34,14 +32,13 @@ class PinApiServiceImpl(
     private val messageService: MessageService,
     private val channelService: ChannelService,
     private val serverService: ServerService,
-    private val userService: UserService,
     private val userWsStorage: UserWebSocketStorage,
+    private val msgMapper: MessageMapper,
 ) : PinApiService {
     override suspend fun findPins(channelId: UUID, user: User): Flow<MessageDto> {
         checkMessageViewAccess(id = channelId, userId = user.id)
 
-        return messageService.findPinnedMessages(channelId)
-            .map { it.toDto().apply { author = userService.findUser(it.authorId).toDto() } }
+        return messageService.findPinnedMessages(channelId).map { msgMapper.toDtoWithRelations(it) }
     }
 
     override suspend fun changePinned(channelId: UUID, messageId: UUID, pinned: Boolean, user: User) {

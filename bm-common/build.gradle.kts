@@ -4,7 +4,11 @@ plugins {
 }
 
 dependencies {
-    implementation(libs.springCore)
-    implementation(libs.springBeans)
     implementation(libs.springDataCommons)
+
+    // Использование "Json".
+    implementation(libs.databasePostgresR2dbc)
+
+    // Использование "ObjectMapper".
+    implementation(libs.jacksonDatabind)
 }

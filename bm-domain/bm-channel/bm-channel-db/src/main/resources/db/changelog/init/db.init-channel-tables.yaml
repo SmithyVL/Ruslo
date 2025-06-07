@@ -114,6 +114,14 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: message_reference
+                  type: jsonb
+                  remarks: Ссылка на сообщение
+              - column:
+                  name: message_snapshot
+                  type: jsonb
+                  remarks: Моментальный снимок связанного сообщения
+              - column:
                   name: pinned
                   type: boolean
                   remarks: Является ли сообщение закреплённым

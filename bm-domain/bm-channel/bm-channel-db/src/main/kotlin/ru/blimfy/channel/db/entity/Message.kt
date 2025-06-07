@@ -8,6 +8,8 @@ import org.springframework.data.relational.core.mapping.Table
 import ru.blimfy.channel.db.entity.base.BaseEntity
 import ru.blimfy.common.enumeration.MessageTypes
 import ru.blimfy.common.enumeration.MessageTypes.DEFAULT
+import ru.blimfy.common.json.MessageReference
+import ru.blimfy.common.json.MessageSnapshot
 
 /**
  * Сущность с информацией о сообщениях каналов.
@@ -16,6 +18,8 @@ import ru.blimfy.common.enumeration.MessageTypes.DEFAULT
  * @property authorId идентификатор пользователя, создавшего сообщение.
  * @property type тип сообщения.
  * @property content содержимое сообщения.
+ * @property messageReference информация о пересланном сообщении.
+ * @property messageSnapshot моментальный снимок связанного сообщения.
  * @property mentions идентификаторы упомянутых пользователей.
  * @property mentionEveryone упоминает ли это сообщение всех.
  * @property pinned является ли сообщение закреплённым.
@@ -28,6 +32,8 @@ import ru.blimfy.common.enumeration.MessageTypes.DEFAULT
 @Table
 class Message(val channelId: UUID, val authorId: UUID, val type: MessageTypes = DEFAULT) : BaseEntity() {
     var content: String? = null
+    var messageReference: MessageReference? = null
+    var messageSnapshot: MessageSnapshot? = null
     var mentions: Set<UUID>? = null
     var mentionEveryone: Boolean = false
     var pinned: Boolean = false
@@ -39,3 +45,9 @@ class Message(val channelId: UUID, val authorId: UUID, val type: MessageTypes = 
     @LastModifiedDate
     var updatedDate: Instant? = null
 }
+
+/**
+ * Возвращает моментальный снимок сообщения.
+ */
+fun Message.toSnapshot() =
+    MessageSnapshot(content!!, authorId, createdDate, type, mentions, updatedDate)
