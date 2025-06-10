@@ -6,7 +6,6 @@ plugins {
 dependencies {
     runtimeOnly(libs.springBootStarterValidation)
 
-    implementation(project(":bm-common"))
     implementation(project(":bm-integration:bm-security"))
     implementation(project(":bm-integration:bm-websocket"))
     implementation(project(":bm-domain:bm-user:bm-user-usecase"))

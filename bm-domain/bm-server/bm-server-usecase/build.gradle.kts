@@ -4,9 +4,8 @@ plugins {
 }
 
 dependencies {
-    // "Отправляем" зависимость "наружу" для того, чтобы появились классы сущностей.
+    // "Отправляем" зависимость "наружу" для того, чтобы появился интерфейс "CoroutineCrudRepository".
     api(project(":bm-domain:bm-server:bm-server-db"))
 
-    implementation(project(":bm-common"))
     implementation(libs.kotlinxCoroutinesReactor)
 }

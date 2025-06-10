@@ -7,6 +7,5 @@ dependencies {
     // "Отправляем" зависимость "наружу" для того, чтобы появились классы сущностей.
     api(project(":bm-domain:bm-user:bm-user-db"))
 
-    implementation(project(":bm-common"))
     implementation(libs.kotlinxCoroutinesReactor)
 }

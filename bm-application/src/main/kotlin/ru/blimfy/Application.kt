@@ -13,11 +13,12 @@ import org.springframework.web.reactive.config.EnableWebFlux
  */
 @SpringBootApplication
 @EnableWebFlux
+// Эта аннотация должна быть в единственном экземпляре иначе пытается создать несколько одинаковых бинов.
 @EnableR2dbcAuditing
 class Application
 
 /**
- * Запускает Spring Boot приложение с аргументами - [args].
+ * Запускает Spring Boot приложение с [args].
  */
 fun main(args: Array<String>) {
     run(Application::class.java, *args)

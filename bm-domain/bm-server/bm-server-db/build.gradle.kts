@@ -4,15 +4,14 @@ plugins {
 }
 
 dependencies {
-    // "Отправляем" зависимость "наружу" для того, чтобы появился интерфейс - "CoroutineCrudRepository", для
-    // использования его методов.
+    // "Отправляем" зависимость "наружу" для того, чтобы появился интерфейс "CoroutineCrudRepository".
     api(libs.springBootStarterDataR2dbc)
+    api(project(":bm-common"))
 
     runtimeOnly(libs.databasePostgres)
     runtimeOnly(libs.kotlinReflect)
     runtimeOnly(libs.hikari)
 
-    implementation(project(":bm-common"))
     implementation(libs.springBootStarter)
     implementation(libs.kotlinxCoroutinesReactor)
     implementation(libs.databasePostgresR2dbc)

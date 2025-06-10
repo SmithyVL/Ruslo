@@ -4,9 +4,8 @@ plugins {
 }
 
 dependencies {
-    api(project(":bm-domain:bm-channel:bm-channel-db"))
     // "Отправляем" зависимость "наружу" для того, чтобы появились классы сущностей.
+    api(project(":bm-domain:bm-channel:bm-channel-db"))
 
-    implementation(project(":bm-common"))
     implementation(libs.kotlinxCoroutinesReactor)
 }
