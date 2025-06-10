@@ -35,11 +35,11 @@ class WebSocketAutoConfigurationTest {
     private class TestConfig {
         /**
          * Создаёт бин, который требуется стартеру для работоспособности. Нужен для тестов, потому что этот бин должен
-         * создаваться извне стартера.
+         * создаваться извне стартера. Используется так же [objectMapper].
          */
         @Bean
-        fun tokenWebSocketStorage() =
-            object : WebSocketStorage<Any>(ObjectMapper()) {
+        fun tokenWebSocketStorage(objectMapper: ObjectMapper) =
+            object : WebSocketStorage<Any>(objectMapper) {
                 override fun addSession(token: String, session: WebSocketSession) {
                     // Логика не требуется.
                 }

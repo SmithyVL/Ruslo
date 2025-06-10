@@ -22,8 +22,8 @@ import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_PINS_UPDATE
  * @property messageService сервис для работы с сообщениями.
  * @property channelService сервис для работы с каналами.
  * @property serverService сервис для работы с серверами.
+ * @property messageMapper маппер для сообщений.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
- * @property msgMapper маппер для сообщений.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -32,13 +32,13 @@ class PinApiServiceImpl(
     private val messageService: MessageService,
     private val channelService: ChannelService,
     private val serverService: ServerService,
+    private val messageMapper: MessageMapper,
     private val userWsStorage: UserWebSocketStorage,
-    private val msgMapper: MessageMapper,
 ) : PinApiService {
     override suspend fun findPins(channelId: UUID, user: User): Flow<MessageDto> {
         checkMessageViewAccess(id = channelId, userId = user.id)
 
-        return messageService.findPinnedMessages(channelId).map { msgMapper.toDtoWithRelations(it) }
+        return messageService.findPinnedMessages(channelId).map { messageMapper.toDto(it) }
     }
 
     override suspend fun changePinned(channelId: UUID, messageId: UUID, pinned: Boolean, user: User) {

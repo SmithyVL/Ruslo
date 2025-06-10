@@ -31,13 +31,6 @@ class FriendApi(private val service: FriendApiService) {
     suspend fun findUserFriends(@AuthenticationPrincipal userDetails: CustomUserDetails) =
         service.findUserFriends(userDetails.info)
 
-    @Operation(summary = "Удалить дружбу с пользователем")
-    @DeleteMapping("/{userId}")
-    suspend fun deleteFriend(
-        @PathVariable userId: UUID,
-        @AuthenticationPrincipal userDetails: CustomUserDetails
-    ) = service.deleteFriend(userId, userDetails.info)
-
     @Operation(summary = "Обновить ник для друга")
     @PutMapping("/{userId}/nick")
     suspend fun changeFriendNick(
@@ -45,4 +38,11 @@ class FriendApi(private val service: FriendApiService) {
         @RequestBody nickInfo: NewNickDto,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
     ) = service.changeFriendNick(userId, nickInfo.nick, userDetails.info)
+
+    @Operation(summary = "Удалить дружбу с пользователем")
+    @DeleteMapping("/{userId}")
+    suspend fun deleteFriend(
+        @PathVariable userId: UUID,
+        @AuthenticationPrincipal userDetails: CustomUserDetails
+    ) = service.deleteFriend(userId, userDetails.info)
 }

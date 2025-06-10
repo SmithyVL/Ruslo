@@ -1,19 +1,13 @@
 package ru.blimfy.gateway.api.server.member.handler
 
 import java.util.UUID
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
-import ru.blimfy.gateway.api.dto.MemberDto
-import ru.blimfy.gateway.api.dto.toDto
+import ru.blimfy.gateway.api.mapper.MemberMapper
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.server.usecase.member.MemberService
-import ru.blimfy.server.usecase.member.role.MemberRoleService
-import ru.blimfy.server.usecase.role.RoleService
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
-import ru.blimfy.user.usecase.user.UserService
 import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_MEMBER_REMOVE
 import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_MEMBER_UPDATE
 
@@ -22,9 +16,7 @@ import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_MEMBER_UPDATE
  *
  * @property memberService сервис для работы с участниками серверов.
  * @property serverService сервис для работы с серверами.
- * @property roleService сервис для работы с ролями серверов.
- * @property memberRoleService сервис для работы с ролями участников серверов.
- * @property userService сервис для работы с пользователями.
+ * @property memberMapper маппер для работы с участниками серверов.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
@@ -33,66 +25,35 @@ import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_MEMBER_UPDATE
 class MemberApiServiceImpl(
     private val memberService: MemberService,
     private val serverService: ServerService,
-    private val roleService: RoleService,
-    private val memberRoleService: MemberRoleService,
-    private val userService: UserService,
+    private val memberMapper: MemberMapper,
     private val userWsStorage: UserWebSocketStorage,
 ) : MemberApiService {
-    override suspend fun findMembers(serverId: UUID, user: User): Flow<MemberDto> {
+    override suspend fun findMembers(serverId: UUID, user: User) =
         // Получить участников сервера может только его участник.
-        serverService.checkServerView(serverId = serverId, userId = user.id)
-
-        return memberService.findServerMembers(serverId)
-            .map { member ->
-                member.toDto()
-                    .apply {
-                        roles = memberRoleService.findMemberRoles(serverId)
-                            .map { roleService.findRole(it.roleId) }
-                            .map { it.toDto() }
-                            .toList()
-
-                        this.user = userService.findUser(member.userId).toDto()
-                    }
-            }
-    }
+        serverService.checkServerView(serverId, user.id)
+            .let { memberService.findServerMembers(serverId) }
+            .map { memberMapper.toDto(it) }
 
     override suspend fun removeMember(serverId: UUID, userId: UUID, user: User) {
         // Удалить участника сервера может только его создатель.
-        serverService.checkServerWrite(serverId = serverId, userId = user.id)
-
-        memberService.deleteUserMember(userId = userId, serverId = serverId)
+        serverService.checkServerWrite(serverId, user.id)
+            .let { memberService.deleteUserMember(userId, serverId) }
             .apply { userWsStorage.sendMessage(SERVER_MEMBER_REMOVE, userId) }
     }
 
-    override suspend fun changeMemberNick(serverId: UUID, userId: UUID, nick: String?, user: User): MemberDto {
+    override suspend fun changeMemberNick(serverId: UUID, userId: UUID, nick: String?, user: User) =
         // Изменить ник участника на сервере может только его создатель.
-        serverService.checkServerWrite(serverId = serverId, userId = user.id)
-
-        return changeNick(serverId, userId, nick)
+        serverService.checkServerWrite(serverId, user.id)
+            .let { memberService.setNick(serverId, userId, nick) }
+            .let { memberMapper.toDto(it) }
             .apply { userWsStorage.sendMessage(SERVER_MEMBER_UPDATE, this) }
-    }
 
-    override suspend fun changeCurrentMemberNick(serverId: UUID, nick: String?, user: User): MemberDto {
-        val currentUserId = user.id
-
-        // Изменить свой ник на сервере может только его участник.
-        serverService.checkServerView(serverId = serverId, userId = currentUserId)
-
-        return changeNick(serverId, currentUserId, nick)
-            .apply { userWsStorage.sendMessage(SERVER_MEMBER_UPDATE, this) }
-    }
-
-    /**
-     * Возвращает обновлённого участника с [userId] и новым [nick] для [serverId].
-     */
-    private suspend fun changeNick(serverId: UUID, userId: UUID, nick: String? = null) =
-        memberService.setNick(serverId, userId, nick)
-            .toDto()
-            .apply {
-                user = userService.findUser(userId).toDto()
-                roles = memberRoleService.findMemberRoles(id)
-                    .map { roleService.findRole(it.roleId) }
-                    .map { it.toDto() }
-                    .toList()
-            }
+    override suspend fun changeCurrentMemberNick(serverId: UUID, nick: String?, user: User) =
+        user.id.let { currentUserId ->
+            // Изменить свой ник на сервере может только его участник.
+            serverService.checkServerView(serverId, currentUserId)
+                .let { memberService.setNick(serverId, currentUserId, nick) }
+                .let { memberMapper.toDto(it) }
+                .apply { userWsStorage.sendMessage(SERVER_MEMBER_UPDATE, this) }
+        }
 }

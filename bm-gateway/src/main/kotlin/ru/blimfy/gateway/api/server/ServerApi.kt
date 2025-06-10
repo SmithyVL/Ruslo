@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import ru.blimfy.gateway.api.dto.channel.NewChannelDto
 import ru.blimfy.gateway.api.server.dto.ModifyServerDto
 import ru.blimfy.gateway.api.server.dto.NewServerDto
 import ru.blimfy.gateway.api.server.dto.channel.ChannelPositionDto
-import ru.blimfy.gateway.api.server.dto.channel.ServerChannelDto
 import ru.blimfy.gateway.api.server.handler.ServerApiService
 import ru.blimfy.gateway.integration.security.CustomUserDetails
 
@@ -79,7 +79,7 @@ class ServerApi(private val service: ServerApiService) {
     @PostMapping("/{id}/channels")
     suspend fun createChannel(
         @PathVariable id: UUID,
-        @RequestBody channel: ServerChannelDto,
+        @RequestBody channel: NewChannelDto,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
     ) = service.createChannel(id, channel, userDetails.info)
 

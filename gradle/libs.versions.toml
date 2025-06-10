@@ -2,7 +2,7 @@
 springBoot = "3.5.0"
 kotlin = "2.1.21"
 jwt = "0.12.6"
-springDoc = "2.8.8"
+springDoc = "2.8.9"
 
 [libraries]
 # Spring Boot.

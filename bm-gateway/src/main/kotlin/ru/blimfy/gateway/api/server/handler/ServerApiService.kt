@@ -2,13 +2,13 @@ package ru.blimfy.gateway.api.server.handler
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
-import ru.blimfy.gateway.api.dto.ChannelDto
 import ru.blimfy.gateway.api.dto.InviteDto
+import ru.blimfy.gateway.api.dto.channel.ChannelDto
+import ru.blimfy.gateway.api.dto.channel.NewChannelDto
 import ru.blimfy.gateway.api.server.dto.ModifyServerDto
 import ru.blimfy.gateway.api.server.dto.NewServerDto
 import ru.blimfy.gateway.api.server.dto.ServerDto
 import ru.blimfy.gateway.api.server.dto.channel.ChannelPositionDto
-import ru.blimfy.gateway.api.server.dto.channel.ServerChannelDto
 import ru.blimfy.user.db.entity.User
 
 /**
@@ -49,9 +49,9 @@ interface ServerApiService {
     suspend fun findServerChannels(id: UUID, user: User): Flow<ChannelDto>
 
     /**
-     * Возвращает новый [channel] на сервере с [id], который создаёт [user].
+     * Возвращает новый [channelDto] на сервере с [id], который создаёт [user].
      */
-    suspend fun createChannel(id: UUID, channel: ServerChannelDto, user: User): ChannelDto
+    suspend fun createChannel(id: UUID, channelDto: NewChannelDto, user: User): ChannelDto
 
     /**
      * [user] изменяет [positions] каналов на сервере с [id].

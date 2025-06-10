@@ -18,12 +18,12 @@ interface FriendApiService {
     fun findUserFriends(user: User): Flow<FriendDto>
 
     /**
-     * Удаляет из друзей [user] пользователя с [userId].
-     */
-    suspend fun deleteFriend(userId: UUID, user: User)
-
-    /**
      * Возвращает друга с новым [nick] пользователя с [userId] для [user].
      */
     suspend fun changeFriendNick(userId: UUID, nick: String? = null, user: User): FriendDto
+
+    /**
+     * Удаляет из друзей [user] пользователя с [userId].
+     */
+    suspend fun deleteFriend(userId: UUID, user: User)
 }

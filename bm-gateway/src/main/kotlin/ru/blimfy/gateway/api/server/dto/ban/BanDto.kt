@@ -2,7 +2,6 @@ package ru.blimfy.gateway.api.server.dto.ban
 
 import java.util.UUID
 import ru.blimfy.gateway.api.dto.UserDto
-import ru.blimfy.server.db.entity.Ban
 
 /**
  * DTO с информацией о бане сервера.
@@ -17,8 +16,3 @@ import ru.blimfy.server.db.entity.Ban
 data class BanDto(val id: UUID, val serverId: UUID, val reason: String? = null) {
     lateinit var user: UserDto
 }
-
-/**
- * Возвращает DTO представление сущности бана сервера.
- */
-fun Ban.toDto() = BanDto(id, serverId, reason)

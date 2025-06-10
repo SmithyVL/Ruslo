@@ -5,8 +5,8 @@ import org.springframework.stereotype.Service
 import ru.blimfy.gateway.api.auth.dto.SignInDto
 import ru.blimfy.gateway.api.auth.dto.SignUpDto
 import ru.blimfy.gateway.api.auth.dto.TokenDto
-import ru.blimfy.gateway.api.auth.dto.toUserEntity
 import ru.blimfy.gateway.service.AccessService
+import ru.blimfy.user.db.entity.User
 import ru.blimfy.user.usecase.user.UserService
 
 /**
@@ -22,9 +22,14 @@ class AuthApiServiceImpl(
     private val userService: UserService,
     private val accessService: AccessService,
 ) : AuthApiService {
-    override suspend fun signUp(signUpDto: SignUpDto) =
-        userService.createUser(signUpDto.toUserEntity(accessService.encodePassword(signUpDto.password)))
-            .let { createUserToken(it.username, it.id) }
+    override suspend fun signUp(signUpDto: SignUpDto): TokenDto {
+        val user = User(
+            signUpDto.username,
+            signUpDto.email,
+            accessService.encodePassword(signUpDto.password),
+        )
+        return userService.createUser(user).let { createUserToken(it.username, it.id) }
+    }
 
     override suspend fun signIn(signInDto: SignInDto) =
         userService.findUser(signInDto.username)

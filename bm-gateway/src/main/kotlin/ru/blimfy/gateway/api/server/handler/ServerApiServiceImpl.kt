@@ -12,23 +12,20 @@ import ru.blimfy.channel.usecase.invite.InviteService
 import ru.blimfy.common.enumeration.ChannelTypes.TEXT
 import ru.blimfy.common.enumeration.ChannelTypes.VOICE
 import ru.blimfy.common.enumeration.InviteTypes.SERVER
-import ru.blimfy.gateway.api.dto.ChannelDto
 import ru.blimfy.gateway.api.dto.InviteDto
-import ru.blimfy.gateway.api.dto.toDto
-import ru.blimfy.gateway.api.dto.toPartialDto
+import ru.blimfy.gateway.api.dto.channel.ChannelDto
+import ru.blimfy.gateway.api.dto.channel.NewChannelDto
+import ru.blimfy.gateway.api.mapper.ChannelMapper
+import ru.blimfy.gateway.api.mapper.InviteMapper
 import ru.blimfy.gateway.api.server.dto.ModifyServerDto
 import ru.blimfy.gateway.api.server.dto.NewServerDto
 import ru.blimfy.gateway.api.server.dto.ServerDto
 import ru.blimfy.gateway.api.server.dto.channel.ChannelPositionDto
-import ru.blimfy.gateway.api.server.dto.channel.ServerChannelDto
-import ru.blimfy.gateway.api.server.dto.channel.toEntity
 import ru.blimfy.gateway.api.server.dto.toDto
 import ru.blimfy.gateway.api.server.dto.toEntity
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
-import ru.blimfy.server.usecase.member.MemberService
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
-import ru.blimfy.user.usecase.user.UserService
 import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_CREATE
 import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_UPDATE
 import ru.blimfy.websocket.dto.WsMessageTypes.INVITE_CREATE
@@ -39,9 +36,9 @@ import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_UPDATE
  *
  * @property serverService сервис для работы с серверами.
  * @property channelService сервис для работы с каналами серверов.
- * @property memberService сервис для работы с участниками серверов.
  * @property inviteService сервис для работы с приглашениями серверов.
- * @property userService сервис для работы с пользователями.
+ * @property channelMapper маппер для работы с каналами.
+ * @property inviteMapper маппер для работы с приглашениями.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
@@ -50,9 +47,9 @@ import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_UPDATE
 class ServerApiServiceImpl(
     private val serverService: ServerService,
     private val channelService: ChannelService,
-    private val memberService: MemberService,
     private val inviteService: InviteService,
-    private val userService: UserService,
+    private val channelMapper: ChannelMapper,
+    private val inviteMapper: InviteMapper,
     private val userWsStorage: UserWebSocketStorage,
 ) : ServerApiService {
     @Transactional
@@ -61,28 +58,33 @@ class ServerApiServiceImpl(
             .apply { createDefaultServerChannels(id) }
             .toDto()
 
-    override suspend fun findServer(id: UUID, user: User): ServerDto {
+    override suspend fun findServer(id: UUID, user: User) =
         // Получить сервер может только его участник.
-        serverService.checkServerView(serverId = id, userId = user.id)
-
-        return serverService.findServer(id).toDto()
-    }
+        serverService.checkServerView(id, user.id)
+            .let { serverService.findServer(id) }
+            .toDto()
 
     override suspend fun modifyServer(id: UUID, modifyServer: ModifyServerDto, user: User): ServerDto {
         val userId = user.id
 
         // Обновить сервер может только создатель сервера.
-        serverService.checkServerWrite(serverId = id, userId = userId)
+        serverService.checkServerWrite(id, userId)
 
         return serverService
-            .modifyServer(id, modifyServer.name, modifyServer.icon, modifyServer.bannerColor, modifyServer.description)
+            .modifyServer(
+                id,
+                modifyServer.name,
+                modifyServer.icon,
+                modifyServer.bannerColor,
+                modifyServer.description
+            )
             .toDto()
             .apply { userWsStorage.sendMessage(SERVER_UPDATE, this) }
     }
 
     override suspend fun changeOwner(id: UUID, userId: UUID, user: User): ServerDto {
         // Изменить владельца сервера может только создатель сервера.
-        serverService.checkServerWrite(serverId = id, userId = user.id)
+        serverService.checkServerWrite(id, user.id)
 
         return serverService
             .setOwner(id = id, ownerId = userId)
@@ -91,26 +93,27 @@ class ServerApiServiceImpl(
     }
 
     override suspend fun deleteServer(id: UUID, user: User) =
-        serverService.deleteServer(serverId = id, ownerId = user.id)
+        serverService.deleteServer(id, user.id)
 
     override suspend fun findServerChannels(id: UUID, user: User): Flow<ChannelDto> {
         // Получить каналы сервера может только его участник.
-        serverService.checkServerView(serverId = id, userId = user.id)
+        serverService.checkServerView(id, user.id)
 
-        return channelService.findServerChannels(id).map { it.toDto() }
+        return channelService.findServerChannels(id).map { channelMapper.toDto(it) }
     }
 
-    override suspend fun createChannel(id: UUID, channel: ServerChannelDto, user: User): ChannelDto {
+    override suspend fun createChannel(id: UUID, channelDto: NewChannelDto, user: User): ChannelDto {
         // Создать канал сервера может только создатель сервера.
-        serverService.checkServerWrite(serverId = id, userId = user.id)
+        serverService.checkServerWrite(id, user.id)
 
-        return channelService.save(channel.toEntity(id)).toDto()
+        return channelService.save(channelMapper.toEntity(channelDto, null, id))
+            .let { channelMapper.toDto(it) }
             .apply { userWsStorage.sendMessage(CHANNEL_CREATE, this) }
     }
 
     override suspend fun modifyServerChannelPositions(id: UUID, positions: List<ChannelPositionDto>, user: User) {
         // Изменить позиции каналов сервера может только его создатель.
-        serverService.checkServerWrite(serverId = id, userId = user.id)
+        serverService.checkServerWrite(id, user.id)
 
         positions.forEach {
             channelService.findChannel(it.id).apply {
@@ -124,16 +127,16 @@ class ServerApiServiceImpl(
 
     override suspend fun findServerInvites(id: UUID, user: User): Flow<InviteDto> {
         // Получить приглашения сервера может только его создатель.
-        serverService.checkServerWrite(serverId = id, userId = user.id)
+        serverService.checkServerWrite(id, user.id)
 
-        return inviteService.findInvites(id, SERVER).map { it.toDtoWithLinkData() }
+        return inviteService.findInvites(id, SERVER).map { inviteMapper.toDto(it) }
     }
 
     override suspend fun createInvite(id: UUID, channelId: UUID, user: User) =
-        serverService.checkServerWrite(serverId = id, userId = user.id)
-            .let { Invite(authorId = user.id, channelId = channelId, type = SERVER).apply { serverId = id } }
+        serverService.checkServerWrite(id, user.id)
+            .let { Invite(user.id, channelId, SERVER).apply { serverId = id } }
             .let { inviteService.saveInvite(it) }
-            .toDtoWithLinkData()
+            .let { inviteMapper.toDto(it) }
             .apply { userWsStorage.sendMessage(INVITE_CREATE, this) }
 
     /**
@@ -148,19 +151,6 @@ class ServerApiServiceImpl(
         Channel(VOICE, serverId).apply {
             name = SERVER_DEFAULT_VOICE_CHANNEL
             channelService.save(this)
-        }
-    }
-
-    /**
-     * Возвращает DTO представление приглашения.
-     */
-    private suspend fun Invite.toDtoWithLinkData() = this.toDto().apply {
-        channel = channelService.findChannel(channelId).toPartialDto()
-        inviter = userService.findUser(authorId).toDto()
-
-        serverId?.let { serverId ->
-            server = serverService.findServer(serverId).toPartialDto(false)
-            approximateMemberCount = memberService.getCountServerMembers(serverId)
         }
     }
 

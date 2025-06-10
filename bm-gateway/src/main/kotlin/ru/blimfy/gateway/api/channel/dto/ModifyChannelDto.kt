@@ -2,7 +2,6 @@ package ru.blimfy.gateway.api.channel.dto
 
 import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Size
-import ru.blimfy.channel.db.entity.Channel
 
 /**
  * DTO с новой информацией о канале.
@@ -23,18 +22,3 @@ data class ModifyChannelDto(
     val name: String,
     val icon: String? = null,
 )
-
-/**
- * Возвращает сущность канала из DTO представления на основе существующего [channel].
- */
-fun ModifyChannelDto.toEntity(channel: Channel) = Channel(channel.type, channel.serverId).apply {
-    nsfw = this@toEntity.nsfw
-    topic = this@toEntity.topic
-    name = this@toEntity.name
-    icon = this@toEntity.icon
-    id = channel.id
-    parentId = channel.parentId
-    position = channel.position
-    ownerId = channel.ownerId
-    recipients = channel.recipients
-}

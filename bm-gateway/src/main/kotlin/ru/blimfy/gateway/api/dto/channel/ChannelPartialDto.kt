@@ -1,4 +1,4 @@
-package ru.blimfy.gateway.api.dto
+package ru.blimfy.gateway.api.dto.channel
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import io.swagger.v3.oas.annotations.media.Schema

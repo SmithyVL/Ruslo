@@ -3,11 +3,9 @@ package ru.blimfy.security.service
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.Jwts.parser
 import io.jsonwebtoken.security.Keys.hmacShaKeyFor
-import java.security.Principal
 import java.util.Date
 import java.util.UUID
 import java.util.UUID.fromString
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
 import org.springframework.stereotype.Service
 import ru.blimfy.security.config.properties.SecurityProperties
 
@@ -46,17 +44,6 @@ class TokenService(private val securityProperties: SecurityProperties) {
      * Возвращает имя пользователя из [token].
      */
     fun extractUsername(token: String): String = extractAllClaims(token).subject
-
-    /**
-     * Возвращает идентификатор пользователя из информации об авторизации [principal], в которой хранится токен
-     * авторизации.
-     */
-    fun extractUserId(principal: Principal): UUID =
-        (principal as UsernamePasswordAuthenticationToken)
-            .credentials
-            .toString()
-            .let { extractAllClaims(it).get(CLAIM_USER_ID, String::class.java) }
-            .let { fromString(it) }
 
     /**
      * Возвращает идентификатор пользователя из [token] авторизации.

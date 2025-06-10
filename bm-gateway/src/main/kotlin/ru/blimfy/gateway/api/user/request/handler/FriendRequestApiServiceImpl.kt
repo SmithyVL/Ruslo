@@ -3,9 +3,8 @@ package ru.blimfy.gateway.api.user.request.handler
 import java.util.UUID
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
-import ru.blimfy.gateway.api.dto.toDto
+import ru.blimfy.gateway.api.mapper.FriendRequestMapper
 import ru.blimfy.gateway.api.user.dto.friend.request.FriendRequestDto
-import ru.blimfy.gateway.api.user.dto.friend.request.toDto
 import ru.blimfy.user.db.entity.Friend
 import ru.blimfy.user.db.entity.FriendRequest
 import ru.blimfy.user.db.entity.User
@@ -19,6 +18,7 @@ import ru.blimfy.user.usecase.user.UserService
  * @property friendRequestService сервис для работы с заявками в друзья.
  * @property friendService сервис для работы с друзьями.
  * @property userService сервис для работы с пользователями.
+ * @property friendRequestMapper маппер для работы с запроса в друзья.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -27,15 +27,17 @@ class FriendRequestApiServiceImpl(
     private val friendRequestService: FriendRequestService,
     private val friendService: FriendService,
     private val userService: UserService,
+    private val friendRequestMapper: FriendRequestMapper,
 ) : FriendRequestApiService {
     override suspend fun createFriendRequest(username: String, user: User): FriendRequestDto {
         val toUserId = userService.findUser(username).id
         return friendRequestService.createFriendRequest(FriendRequest(fromId = user.id, toId = toUserId))
-            .toDtoWithUsersInfos()
+            .let { friendRequestMapper.toDto(it) }
     }
 
     override fun findOutgoingFriendRequests(user: User) =
-        friendRequestService.findOutgoingFriendRequests(user.id).map { it.toDtoWithUsersInfos() }
+        friendRequestService.findOutgoingFriendRequests(user.id)
+            .map { friendRequestMapper.toDto(it) }
 
     override suspend fun deleteAllOutgoingFriendRequests(user: User) =
         friendRequestService.deleteAllOutgoingFriendRequests(user.id)
@@ -44,7 +46,8 @@ class FriendRequestApiServiceImpl(
         friendRequestService.deleteFriendRequest(fromId = user.id, toId = userId)
 
     override fun findIncomingFriendRequests(user: User) =
-        friendRequestService.findIncomingFriendRequests(user.id).map { it.toDtoWithUsersInfos() }
+        friendRequestService.findIncomingFriendRequests(user.id)
+            .map { friendRequestMapper.toDto(it) }
 
     override suspend fun deleteAllIncomingFriendRequests(user: User) =
         friendRequestService.deleteAllIncomingFriendRequests(user.id)
@@ -62,13 +65,4 @@ class FriendRequestApiServiceImpl(
         // Удаляем уже не нужную заявку в друзья.
         friendRequestService.deleteFriendRequest(fromId = userId, toId = user.id)
     }
-
-    /**
-     * Возвращает DTO представление запроса в друзья с информацией о пользователях, которые планируют стать друзьями.
-     */
-    private suspend fun FriendRequest.toDtoWithUsersInfos() =
-        this.toDto().apply {
-            from = userService.findUser(fromId).toDto()
-            to = userService.findUser(toId).toDto()
-        }
 }

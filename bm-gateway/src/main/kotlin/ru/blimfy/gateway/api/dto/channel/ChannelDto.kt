@@ -1,12 +1,12 @@
-package ru.blimfy.gateway.api.dto
+package ru.blimfy.gateway.api.dto.channel
 
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import io.swagger.v3.oas.annotations.media.Schema
 import java.util.UUID
-import ru.blimfy.channel.db.entity.Channel
 import ru.blimfy.common.enumeration.ChannelTypes
 import ru.blimfy.common.enumeration.ChannelTypes.TEXT
+import ru.blimfy.gateway.api.dto.UserDto
 
 /**
  * DTO с информацией о канале.
@@ -41,13 +41,3 @@ data class ChannelDto(
 ) {
     var recipients: List<UserDto>? = null
 }
-
-/**
- * Возвращает DTO представление сущности канала.
- */
-fun Channel.toDto() = ChannelDto(id, type, serverId, name, icon, ownerId, parentId, position, topic, nsfw)
-
-/**
- * Возвращает DTO частичного представления сущности канала.
- */
-fun Channel.toPartialDto() = ChannelPartialDto(id, serverId, type, name!!)

@@ -1,8 +1,8 @@
 package ru.blimfy.gateway.api.channel.group.handler
 
 import java.util.UUID
-import ru.blimfy.gateway.api.dto.ChannelDto
 import ru.blimfy.gateway.api.dto.InviteDto
+import ru.blimfy.gateway.api.dto.channel.ChannelDto
 import ru.blimfy.user.db.entity.User
 
 /**

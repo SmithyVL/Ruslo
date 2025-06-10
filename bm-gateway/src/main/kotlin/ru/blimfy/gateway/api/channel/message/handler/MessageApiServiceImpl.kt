@@ -1,27 +1,21 @@
 package ru.blimfy.gateway.api.channel.message.handler
 
 import java.util.UUID
-import java.util.UUID.fromString
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
-import ru.blimfy.channel.db.entity.toSnapshot
 import ru.blimfy.channel.usecase.channel.ChannelService
 import ru.blimfy.channel.usecase.message.MessageService
 import ru.blimfy.common.enumeration.ChannelGroups.SERVER
 import ru.blimfy.common.enumeration.ChannelGroups.USER
-import ru.blimfy.common.json.MessageReferenceTypes.FORWARD
 import ru.blimfy.gateway.api.channel.dto.message.MessageDto
 import ru.blimfy.gateway.api.channel.dto.message.ModifyMessageDto
 import ru.blimfy.gateway.api.channel.dto.message.NewMessageDto
-import ru.blimfy.gateway.api.channel.dto.message.toEntity
 import ru.blimfy.gateway.api.mapper.MessageMapper
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.gateway.integration.websockets.base.EntityDeleteDto
 import ru.blimfy.gateway.integration.websockets.base.PartialMemberDto
 import ru.blimfy.gateway.integration.websockets.extra.MemberInfoDto
 import ru.blimfy.server.usecase.member.MemberService
-import ru.blimfy.server.usecase.role.RoleServiceImpl.Companion.DEFAULT_ROLE_NAME
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
 import ru.blimfy.websocket.dto.WsMessageTypes.MESSAGE_CREATE
@@ -35,8 +29,8 @@ import ru.blimfy.websocket.dto.WsMessageTypes.MESSAGE_UPDATE
  * @property channelService сервис для работы с каналами.
  * @property serverService сервис для работы с серверами.
  * @property memberService сервис для работы с участниками серверов.
+ * @property messageMapper маппер для сообщений.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
- * @property msgMapper маппер для сообщений.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -46,8 +40,8 @@ class MessageApiServiceImpl(
     private val channelService: ChannelService,
     private val serverService: ServerService,
     private val memberService: MemberService,
+    private val messageMapper: MessageMapper,
     private val userWsStorage: UserWebSocketStorage,
-    private val msgMapper: MessageMapper,
 ) : MessageApiService {
     override suspend fun findMessages(
         channelId: UUID,
@@ -56,57 +50,46 @@ class MessageApiServiceImpl(
         after: UUID?,
         limit: Int,
         user: User,
-    ): Flow<MessageDto> {
+    ) =
         checkMessageViewAccess(channelId, user.id)
+            .let {
+                var end: Long
+                var start: Long
 
-        return when {
-            before != null -> {
-                val end = messageService.findMessage(before).position
-                val start = end - limit
+                when {
+                    before != null -> {
+                        end = messageService.findMessage(before).position
+                        start = end - limit
+                    }
+
+                    after != null -> {
+                        start = messageService.findMessage(after).position
+                        end = start + limit
+                    }
+
+                    around != null -> {
+                        val position = messageService.findMessage(around).position
+                        start = position - limit
+                        end = position + limit
+                    }
+
+                    else -> {
+                        end = messageService.getCountMessages(channelId)
+                        start = end - limit
+                    }
+                }
+
                 messageService.findMessages(channelId, start, end)
             }
-
-            after != null -> {
-                val start = messageService.findMessage(after).position
-                val end = start + limit
-                messageService.findMessages(channelId, start, end)
-            }
-
-            around != null -> {
-                val position = messageService.findMessage(around).position
-                val start = position - limit
-                val end = position + limit
-                messageService.findMessages(channelId, start, end)
-            }
-
-            else -> {
-                val end = messageService.getCountMessages(channelId)
-                val start = end - limit
-                messageService.findMessages(channelId, start, end)
-            }
-        }.map { msgMapper.toDtoWithRelations(it) }
-    }
+            .map { messageMapper.toDto(it) }
 
     override suspend fun createMessage(channelId: UUID, message: NewMessageDto, user: User): MessageDto {
         val userId = user.id
         val extraFields: Any? = checkMessageViewAccess(channelId, userId)
 
-        return message.toEntity(channelId, userId)
-            .apply {
-                content?.let {
-                    mentionEveryone = hasMentionEveryone(it)
-                    mentions = getMentions(it)
-                }
-
-                messageReference?.let {
-                    if (it.type == FORWARD) {
-                        val snapshotMessage = messageService.findMessage(messageReference!!.messageId)
-                        messageSnapshot = snapshotMessage.toSnapshot()
-                    }
-                }
-            }
+        return messageMapper.toEntity(message, channelId, userId)
             .let { messageService.createMessage(it) }
-            .let { msgMapper.toDtoWithRelations(it) }
+            .let { messageMapper.toDto(it) }
             .apply { userWsStorage.sendMessage(MESSAGE_CREATE, this, extraFields) }
     }
 
@@ -115,7 +98,7 @@ class MessageApiServiceImpl(
         val extraFields: Any? = checkMessageViewAccess(channelId, userId)
 
         return messageService.setContent(id, message.content)
-            .let { msgMapper.toDtoWithRelations(it) }
+            .let { messageMapper.toDto(it) }
             .apply { userWsStorage.sendMessage(MESSAGE_UPDATE, this, extraFields) }
     }
 
@@ -149,29 +132,4 @@ class MessageApiServiceImpl(
                 }
             }
         }
-
-    /**
-     * Возвращает флаг того, что сообщение в своём [content] упоминает всех.
-     */
-    private fun hasMentionEveryone(content: String) =
-        content.contains(DEFAULT_ROLE_NAME) || content.contains(MENTION_ONLINE_USERS)
-
-    /**
-     * Возвращает идентификаторы упоминаний пользователей из [content] сообщения.
-     */
-    private fun getMentions(content: String): Set<UUID>? {
-        val regex = Regex("<@(.+?)>")
-        val matches = regex.findAll(content)
-        return matches
-            .map { it.groupValues[1] }
-            .map { fromString(it) }
-            .toSet()
-    }
-
-    private companion object {
-        /**
-         * Упоминание пользователей, находящихся онлайн.
-         */
-        private const val MENTION_ONLINE_USERS = "@онлайн"
-    }
 }

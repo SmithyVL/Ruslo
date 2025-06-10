@@ -1,7 +1,5 @@
 package ru.blimfy.gateway.api.channel.dto.message
 
-import java.util.UUID
-import ru.blimfy.channel.db.entity.Message
 import ru.blimfy.common.enumeration.MessageTypes
 import ru.blimfy.common.enumeration.MessageTypes.DEFAULT
 import ru.blimfy.common.json.MessageReference
@@ -20,12 +18,3 @@ data class NewMessageDto(
     val content: String? = null,
     var messageReference: MessageReference? = null,
 )
-
-/**
- * Возвращает сущность сообщения с [channelId] и [authorId] из DTO.
- */
-fun NewMessageDto.toEntity(channelId: UUID, authorId: UUID) = Message(channelId, authorId, type)
-    .apply {
-        content = this@toEntity.content
-        messageReference = this@toEntity.messageReference
-    }

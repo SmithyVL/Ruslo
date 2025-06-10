@@ -73,4 +73,11 @@ class ServerDatabaseAutoConfiguration {
         )
         return of(INSTANCE, converters)
     }
+
+    /**
+     * Создаёт бин, отвечающего за маппинг JSON в объекты и наоборот.
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    fun objectMapper() = ObjectMapper()
 }

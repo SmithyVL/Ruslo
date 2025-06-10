@@ -28,7 +28,9 @@ abstract class WebSocketStorage<SESSION_VALUE>(private val objectMapper: ObjectM
      */
     fun sendMessage(type: WsMessageTypes, data: Any, extra: Any? = null) {
         sessions.keys.forEach {
-            it.send(just(it.textMessage(objectMapper.writeValueAsString(WsMessage(type, data, extra))))).subscribe()
+            val payload = objectMapper.writeValueAsString(WsMessage(type, data, extra))
+            val message = just(it.textMessage(payload))
+            it.send(message).subscribe()
         }
     }
 }

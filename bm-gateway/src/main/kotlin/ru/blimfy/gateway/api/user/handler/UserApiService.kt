@@ -2,13 +2,13 @@ package ru.blimfy.gateway.api.user.handler
 
 import java.util.UUID
 import kotlinx.coroutines.flow.Flow
-import ru.blimfy.gateway.api.dto.ChannelDto
 import ru.blimfy.gateway.api.dto.MemberDto
 import ru.blimfy.gateway.api.dto.ServerPartialDto
 import ru.blimfy.gateway.api.dto.UserDto
+import ru.blimfy.gateway.api.dto.channel.ChannelDto
+import ru.blimfy.gateway.api.dto.channel.NewChannelDto
 import ru.blimfy.gateway.api.user.dto.ModifyUserDto
 import ru.blimfy.gateway.api.user.dto.UsernameDto
-import ru.blimfy.gateway.api.user.dto.channel.NewDmChannelDto
 import ru.blimfy.user.db.entity.User
 
 /**
@@ -44,9 +44,9 @@ interface UserApiService {
     suspend fun leaveServer(serverId: UUID, user: User)
 
     /**
-     * Возвращает личный [channel] для [user].
+     * Возвращает личный [channelDto] для [user].
      */
-    suspend fun createDmChannel(channel: NewDmChannelDto, user: User): ChannelDto
+    suspend fun createDmChannel(channelDto: NewChannelDto, user: User): ChannelDto
 
     /**
      * Возвращает личные диалоги [user].

@@ -13,10 +13,10 @@ import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
+import ru.blimfy.gateway.api.dto.channel.NewChannelDto
 import ru.blimfy.gateway.api.dto.toDto
 import ru.blimfy.gateway.api.user.dto.ModifyUserDto
 import ru.blimfy.gateway.api.user.dto.UsernameDto
-import ru.blimfy.gateway.api.user.dto.channel.NewDmChannelDto
 import ru.blimfy.gateway.api.user.handler.UserApiService
 import ru.blimfy.gateway.integration.security.CustomUserDetails
 
@@ -77,7 +77,7 @@ class UserApi(private val service: UserApiService) {
     @Operation(summary = "Создать личный канал")
     @PostMapping("/channels")
     suspend fun createDmChannel(
-        @RequestBody channel: NewDmChannelDto,
+        @RequestBody channel: NewChannelDto,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
     ) = service.createDmChannel(channel, userDetails.info)
 }

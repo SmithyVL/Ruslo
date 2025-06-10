@@ -1,6 +1,9 @@
 package ru.blimfy.websocket
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import org.springframework.boot.autoconfigure.AutoConfiguration
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.ComponentScan
 
 /**
@@ -11,4 +14,11 @@ import org.springframework.context.annotation.ComponentScan
  */
 @AutoConfiguration
 @ComponentScan
-class WebSocketAutoConfiguration
+class WebSocketAutoConfiguration {
+    /**
+     * Создаёт бин, отвечающего за маппинг JSON в объекты и наоборот.
+     */
+    @Bean
+    @ConditionalOnMissingBean
+    fun objectMapper() = ObjectMapper()
+}

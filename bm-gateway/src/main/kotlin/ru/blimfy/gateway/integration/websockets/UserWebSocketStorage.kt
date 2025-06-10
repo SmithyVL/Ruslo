@@ -21,7 +21,7 @@ class UserWebSocketStorage(
     private val tokenService: TokenService,
 ) : WebSocketStorage<UUID>(objectMapper) {
     override fun addSession(token: String, session: WebSocketSession) {
-        sessions[session] = tokenService.extractUserId(token)
+        sessions.put(session, tokenService.extractUserId(token))
     }
 
     override fun removeSession(session: WebSocketSession) {

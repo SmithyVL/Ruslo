@@ -5,18 +5,18 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
-import ru.blimfy.channel.db.entity.Channel
 import ru.blimfy.channel.usecase.channel.ChannelService
 import ru.blimfy.common.enumeration.ChannelTypes.DM
 import ru.blimfy.common.exception.IncorrectDataException
-import ru.blimfy.gateway.api.dto.ChannelDto
 import ru.blimfy.gateway.api.dto.ServerPartialDto
 import ru.blimfy.gateway.api.dto.UserDto
+import ru.blimfy.gateway.api.dto.channel.ChannelDto
+import ru.blimfy.gateway.api.dto.channel.NewChannelDto
 import ru.blimfy.gateway.api.dto.toDto
 import ru.blimfy.gateway.api.dto.toPartialDto
+import ru.blimfy.gateway.api.mapper.ChannelMapper
 import ru.blimfy.gateway.api.user.dto.ModifyUserDto
 import ru.blimfy.gateway.api.user.dto.UsernameDto
-import ru.blimfy.gateway.api.user.dto.channel.NewDmChannelDto
 import ru.blimfy.gateway.exception.GatewayErrors.INCORRECT_LEAVING_SERVER
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.gateway.service.AccessService
@@ -38,8 +38,9 @@ import ru.blimfy.websocket.dto.WsMessageTypes.USER_UPDATE
  * @property roleService сервис для работы с ролями серверов.
  * @property memberRoleService сервис для работы с ролями участников серверов.
  * @property channelService сервис для работы с личными каналами.
- * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
  * @property accessService сервис для работы с доступами.
+ * @property channelMapper маппер для работы с каналами.
+ * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
@@ -51,11 +52,18 @@ class UserApiServiceImpl(
     private val roleService: RoleService,
     private val memberRoleService: MemberRoleService,
     private val channelService: ChannelService,
-    private val userWsStorage: UserWebSocketStorage,
     private val accessService: AccessService,
+    private val channelMapper: ChannelMapper,
+    private val userWsStorage: UserWebSocketStorage,
 ) : UserApiService {
     override suspend fun modifyUser(modifyUser: ModifyUserDto, user: User) =
-        userService.modifyUser(user.id, modifyUser.globalName, modifyUser.avatar, modifyUser.bannerColor)
+        userService
+            .modifyUser(
+                user.id,
+                modifyUser.globalName,
+                modifyUser.avatar,
+                modifyUser.bannerColor,
+            )
             .toDto()
             .apply { userWsStorage.sendMessage(USER_UPDATE, this) }
 
@@ -100,47 +108,23 @@ class UserApiServiceImpl(
         }
     }
 
-    override suspend fun createDmChannel(channel: NewDmChannelDto, user: User): ChannelDto {
-        // Формируем итоговый список участников нового личного канала вместе с текущим пользователем.
-        val recipients = channel.recipients + user.id
-
+    override suspend fun createDmChannel(channelDto: NewChannelDto, user: User): ChannelDto {
         // Если пользователь создает личный диалог, то сначала ищем нет ли такого диалога и возвращаем его, а иначе
         // формируем поле "ownerId", которое является пустым для личных диалогов.
-        val ownerId = if (channel.type == DM) {
-            val existedDm = channelService.findChannel(recipients)
-            if (existedDm != null) {
-                return existedDm.toDtoWithData()
+        val ownerId = if (channelDto.type == DM) {
+            check(channelDto.recipients?.size == 1)
+            channelService.findChannel(channelDto.recipients + user.id)?.let {
+                return channelMapper.toDto(it)
             }
-
-            null
         } else {
             user.id
         }
 
-        return Channel(channel.type)
-            .apply {
-                this.ownerId = ownerId
-                this.recipients = recipients
-                channelService.save(this)
-            }
-            .toDtoWithData()
+        return channelMapper.toEntity(channelDto, ownerId)
+            .apply { channelService.save(this) }
+            .let { channelMapper.toDto(it) }
     }
 
     override fun findUserDmChannels(user: User) =
-        channelService.findDmChannels(user.id)
-            .map { dmChannel ->
-                dmChannel.toDto().apply {
-                    recipients = dmChannel.recipients!!.map { userId -> userService.findUser(userId).toDto() }
-                }
-            }
-
-    /**
-     * Возвращает DTO представление канала.
-     */
-    private suspend fun Channel.toDtoWithData() =
-        this.toDto().apply {
-            recipients = this@toDtoWithData.recipients
-                ?.map { recipientId -> userService.findUser(recipientId) }
-                ?.map(User::toDto)
-        }
+        channelService.findDmChannels(user.id).map { channelMapper.toDto(it) }
 }

@@ -3,9 +3,9 @@ package ru.blimfy.gateway.api.dto
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.util.UUID
-import ru.blimfy.channel.db.entity.Invite
 import ru.blimfy.common.enumeration.InviteTypes
 import ru.blimfy.common.enumeration.InviteTypes.SERVER
+import ru.blimfy.gateway.api.dto.channel.ChannelPartialDto
 
 /**
  * DTO с информацией о приглашении на канал.
@@ -26,8 +26,3 @@ data class InviteDto(val id: UUID, val type: InviteTypes = SERVER) {
     var server: ServerPartialDto? = null
     var approximateMemberCount: Long? = null
 }
-
-/**
- * Возвращает DTO представление сущности приглашения канала.
- */
-fun Invite.toDto() = InviteDto(id = id, type = type)

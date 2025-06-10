@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.media.Schema
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import ru.blimfy.user.db.entity.User
 
 /**
  * DTO для регистрации нового пользователя.
@@ -28,8 +27,3 @@ data class SignUpDto(
     @NotBlank(message = "Password is mandatory")
     val password: String,
 )
-
-/**
- * Возвращает сущность пользователя из DTO регистрации нового пользователя.
- */
-fun SignUpDto.toUserEntity(password: String) = User(username, email, password)

@@ -3,6 +3,7 @@ package ru.blimfy.gateway.integration.websockets.dto
 import com.fasterxml.jackson.annotation.JsonInclude
 import com.fasterxml.jackson.annotation.JsonInclude.Include.NON_NULL
 import java.time.Instant
+import java.time.Instant.now
 import java.util.UUID
 import ru.blimfy.gateway.integration.websockets.extra.MemberInfoDto
 
@@ -17,9 +18,6 @@ import ru.blimfy.gateway.integration.websockets.extra.MemberInfoDto
  * @since 0.0.1.
  */
 @JsonInclude(NON_NULL)
-data class TypingStartDto(
-    val channelId: UUID,
-    val userId: UUID,
-    val timestamp: Instant,
-    val member: MemberInfoDto? = null,
-)
+data class TypingStartDto(val channelId: UUID, val userId: UUID, val timestamp: Instant = now()) {
+    var member: MemberInfoDto? = null
+}
