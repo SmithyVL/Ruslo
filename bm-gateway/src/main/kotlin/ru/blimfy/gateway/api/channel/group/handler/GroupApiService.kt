@@ -30,5 +30,5 @@ interface GroupApiService {
     /**
      * Возвращает новое приглашение для группы с [id], созданного [user].
      */
-    suspend fun createGroupInvite(id: UUID, user: User): InviteDto
+    suspend fun createInvite(id: UUID, user: User): InviteDto
 }

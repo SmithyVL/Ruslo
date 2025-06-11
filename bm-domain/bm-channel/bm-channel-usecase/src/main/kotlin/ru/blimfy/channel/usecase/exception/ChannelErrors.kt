@@ -27,14 +27,4 @@ enum class ChannelErrors(val msg: String) {
      * Приглашение на канал не найдено по идентификатору.
      */
     INVITE_BY_ID_NOT_FOUND("Invite with id - '%s', not found!"),
-
-    /**
-     * Доступ к просмотру личного канала запрещён.
-     */
-    DM_CHANNEL_VIEW_ACCESS_DENIED("View access denied for dm channel with id - '%s'!"),
-
-    /**
-     * Доступ к редактированию группы запрещён.
-     */
-    GROUP_DM_MODIFY_ACCESS_DENIED("Modify access denied for group dm with id - '%s'!"),
 }

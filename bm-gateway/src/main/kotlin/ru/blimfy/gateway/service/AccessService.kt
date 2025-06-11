@@ -10,9 +10,29 @@ import java.util.UUID
  */
 interface AccessService {
     /**
-     * Возвращает флаг того, что пользователь с [userId] является владельцем сервера с [serverId]
+     * Есть ли у пользователя с [userId] доступ к просмотру канала с [channelId].
      */
-    suspend fun isServerOwner(serverId: UUID, userId: UUID): Boolean
+    suspend fun isChannelViewAccess(channelId: UUID, userId: UUID)
+
+    /**
+     * Есть ли у пользователя с [userId] доступ к редактированию канала с [channelId].
+     */
+    suspend fun isChannelWriteAccess(channelId: UUID, userId: UUID)
+
+    /**
+     * Есть ли у пользователя с [userId] доступ к закреплению сообщений в канале с [channelId].
+     */
+    suspend fun isPinsWriteAccess(channelId: UUID, userId: UUID)
+
+    /**
+     * Является ли пользователь с [userId] владельцем сервера с [serverId].
+     */
+    suspend fun isServerOwner(serverId: UUID, userId: UUID)
+
+    /**
+     * Является ли пользователь с [userId] участником сервера с [serverId].
+     */
+    suspend fun isServerMember(serverId: UUID, userId: UUID)
 
     /**
      * Проверяет совпадение [checkPassword] с текущим [password].

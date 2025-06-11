@@ -54,5 +54,5 @@ class GroupApi(private val service: GroupApiService) {
     suspend fun createGroupInvite(
         @PathVariable id: UUID,
         @AuthenticationPrincipal userDetails: CustomUserDetails,
-    ) = service.createGroupInvite(id, userDetails.info)
+    ) = service.createInvite(id, userDetails.info)
 }

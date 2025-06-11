@@ -32,14 +32,4 @@ enum class ServerErrors(val msg: String) {
      * Роль сервера не найдена по идентификатору.
      */
     ROLE_BY_ID_NOT_FOUND("Role with id - '%s', not found!"),
-
-    /**
-     * Доступ к редактированию сервера запрещён.
-     */
-    SERVER_MODIFY_ACCESS_DENIED("Modify access denied for server with id - '%s'!"),
-
-    /**
-     * Доступ к просмотру сервера запрещён.
-     */
-    SERVER_VIEW_ACCESS_DENIED("View access denied for server with id - '%s'!"),
 }

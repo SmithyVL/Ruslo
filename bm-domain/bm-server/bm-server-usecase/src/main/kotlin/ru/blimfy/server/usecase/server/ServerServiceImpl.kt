@@ -3,7 +3,6 @@ package ru.blimfy.server.usecase.server
 import java.util.UUID
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ru.blimfy.common.exception.AccessDeniedException
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.server.db.entity.Member
 import ru.blimfy.server.db.entity.MemberRole
@@ -11,8 +10,6 @@ import ru.blimfy.server.db.entity.Role
 import ru.blimfy.server.db.entity.Server
 import ru.blimfy.server.db.repository.ServerRepository
 import ru.blimfy.server.usecase.exception.ServerErrors.SERVER_BY_ID_NOT_FOUND
-import ru.blimfy.server.usecase.exception.ServerErrors.SERVER_MODIFY_ACCESS_DENIED
-import ru.blimfy.server.usecase.exception.ServerErrors.SERVER_VIEW_ACCESS_DENIED
 import ru.blimfy.server.usecase.member.MemberService
 import ru.blimfy.server.usecase.member.role.MemberRoleService
 import ru.blimfy.server.usecase.role.RoleService
@@ -42,7 +39,9 @@ class ServerServiceImpl(
 
             // Создание дефолтной роли для нового сервера, которая будет присваиваться каждому нового участнику
             // навсегда.
-            val defaultRoleId = roleService.createRole(Role(serverId, DEFAULT_ROLE_NAME, getDefaultRolePermission())).id
+            val defaultRoleId = roleService.createRole(
+                Role(serverId, DEFAULT_ROLE_NAME, getDefaultRolePermission())
+            ).id
 
             // Создание участника для пользователя-создателя сервера с дефолтной ролью.
             val ownerMember = Member(serverId = serverId, userId = this.ownerId)
@@ -80,22 +79,6 @@ class ServerServiceImpl(
             val defaultRoleId = roleService.findDefaultServerRole(serverId).id
             memberRoleService.saveRoleToMember(MemberRole(memberId = id, roleId = defaultRoleId))
         }
-
-    override suspend fun checkServerWrite(serverId: UUID, userId: UUID) {
-        val server = findServer(serverId)
-
-        if (userId != server.ownerId) {
-            throw AccessDeniedException(SERVER_MODIFY_ACCESS_DENIED.msg.format(server.id))
-        }
-    }
-
-    override suspend fun checkServerView(serverId: UUID, userId: UUID) {
-        try {
-            memberService.findServerMember(serverId = serverId, userId = userId)
-        } catch (_: NotFoundException) {
-            throw AccessDeniedException(SERVER_VIEW_ACCESS_DENIED.msg.format(serverId))
-        }
-    }
 
     /**
      * Возвращает дефолтное значение битовой маски разрешений.

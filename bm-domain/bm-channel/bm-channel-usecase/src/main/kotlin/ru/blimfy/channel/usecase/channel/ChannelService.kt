@@ -55,14 +55,4 @@ interface ChannelService {
      * Удаляет канал с [id].
      */
     suspend fun deleteChannel(id: UUID): Channel
-
-    /**
-     * Проверяет разрешение пользователя с [userId] на просмотр канала с [id].
-     */
-    suspend fun checkChannelView(id: UUID, userId: UUID)
-
-    /**
-     * Проверяет разрешение пользователя с [userId] на изменение группы с [id].
-     */
-    suspend fun checkGroupDmWrite(id: UUID, userId: UUID)
 }

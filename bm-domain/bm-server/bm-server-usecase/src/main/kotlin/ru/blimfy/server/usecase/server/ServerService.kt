@@ -46,14 +46,4 @@ interface ServerService {
      * Возвращает нового пользователя с [userId] на сервер с [serverId].
      */
     suspend fun addNewMember(serverId: UUID, userId: UUID): Member
-
-    /**
-     * Проверяет разрешение пользователя с [userId] на изменение сервера с [serverId] и его связанных данных.
-     */
-    suspend fun checkServerWrite(serverId: UUID, userId: UUID)
-
-    /**
-     * Проверяет разрешение пользователя с [userId] на просмотр сервера с [serverId] и его связанных данных.
-     */
-    suspend fun checkServerView(serverId: UUID, userId: UUID)
 }

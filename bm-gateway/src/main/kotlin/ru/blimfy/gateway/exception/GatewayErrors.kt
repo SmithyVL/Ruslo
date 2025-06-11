@@ -14,7 +14,22 @@ enum class GatewayErrors(val msg: String) {
     INCORRECT_PASSWORD("Incorrect password - '%s'!"),
 
     /**
-     * Попытка удаления участника сервера, который является его владельцем.
+     * Попытка выполнить запрещённое действие над сервером.
      */
-    INCORRECT_LEAVING_SERVER("You cannot leave the server ('%s') as its owner!"),
+    SERVER_ACCESS_DENIED("You don't have access to this action on the server (\"%s\")!"),
+
+    /**
+     * Доступ к просмотру сервера запрещён.
+     */
+    SERVER_VIEW_ACCESS_DENIED("You don't have access to view your server (\"%s\")!"),
+
+    /**
+     * Доступ к просмотру личного канала запрещён.
+     */
+    DM_VIEW_ACCESS_DENIED("You don't have access to view your dm channel (\"%s\")!"),
+
+    /**
+     * Попытка выполнить запрещённое действие над группой.
+     */
+    GROUP_ACCESS_DENIED("You don't have access to this action on the group (\"%s\")!"),
 }

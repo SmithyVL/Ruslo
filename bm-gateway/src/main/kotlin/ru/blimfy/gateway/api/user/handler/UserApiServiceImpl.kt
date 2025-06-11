@@ -7,7 +7,6 @@ import kotlinx.coroutines.flow.toList
 import org.springframework.stereotype.Service
 import ru.blimfy.channel.usecase.channel.ChannelService
 import ru.blimfy.common.enumeration.ChannelTypes.DM
-import ru.blimfy.common.exception.IncorrectDataException
 import ru.blimfy.gateway.api.dto.ServerPartialDto
 import ru.blimfy.gateway.api.dto.UserDto
 import ru.blimfy.gateway.api.dto.channel.ChannelDto
@@ -17,7 +16,6 @@ import ru.blimfy.gateway.api.dto.toPartialDto
 import ru.blimfy.gateway.api.mapper.ChannelMapper
 import ru.blimfy.gateway.api.user.dto.ModifyUserDto
 import ru.blimfy.gateway.api.user.dto.UsernameDto
-import ru.blimfy.gateway.exception.GatewayErrors.INCORRECT_LEAVING_SERVER
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.gateway.service.AccessService
 import ru.blimfy.server.usecase.member.MemberService
@@ -86,7 +84,7 @@ class UserApiServiceImpl(
     }
 
     override suspend fun findMember(serverId: UUID, user: User) =
-        memberService.findServerMember(serverId = serverId, userId = user.id)
+        memberService.findServerMember(serverId, user.id)
             .toDto()
             .apply {
                 this.user = user.toDto()
@@ -97,14 +95,10 @@ class UserApiServiceImpl(
             }
 
     override suspend fun leaveServer(serverId: UUID, user: User) {
-        val userId = user.id
-
-        if (accessService.isServerOwner(serverId = serverId, userId = userId)) {
-            throw IncorrectDataException(INCORRECT_LEAVING_SERVER.msg.format(serverId))
-        }
-
-        memberService.deleteUserMember(userId = userId, serverId = serverId).apply {
-            userWsStorage.sendMessage(SERVER_MEMBER_REMOVE, userId)
+        user.id.apply {
+            accessService.isServerOwner(serverId, this)
+                .let { memberService.deleteUserMember(this, serverId) }
+                .apply { userWsStorage.sendMessage(SERVER_MEMBER_REMOVE, this) }
         }
     }
 

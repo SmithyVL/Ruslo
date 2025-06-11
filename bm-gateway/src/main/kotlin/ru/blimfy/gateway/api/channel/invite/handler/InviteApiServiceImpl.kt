@@ -11,6 +11,7 @@ import ru.blimfy.gateway.api.mapper.InviteMapper
 import ru.blimfy.gateway.api.mapper.MemberMapper
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.gateway.integration.websockets.base.EntityDeleteDto
+import ru.blimfy.gateway.service.AccessService
 import ru.blimfy.server.usecase.ban.BanService
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
@@ -21,6 +22,7 @@ import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_MEMBER_ADD
 /**
  * Реализация интерфейса для работы с обработкой запросов о приглашениях.
  *
+ * @property accessService сервис для работы с доступами.
  * @property inviteService сервис для работы с приглашениями.
  * @property channelService сервис для работы с каналами.
  * @property serverService сервис для работы с серверами.
@@ -34,6 +36,7 @@ import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_MEMBER_ADD
  */
 @Service
 class InviteApiServiceImpl(
+    private val accessService: AccessService,
     private val inviteService: InviteService,
     private val channelService: ChannelService,
     private val serverService: ServerService,
@@ -50,7 +53,7 @@ class InviteApiServiceImpl(
         inviteService.findInvite(id)
             .apply {
                 // Удалить приглашение на сервер может только его создатель.
-                serverService.checkServerWrite(serverId!!, user.id)
+                accessService.isServerOwner(serverId!!, user.id)
             }
             .let { inviteService.deleteInvite(id) }
             .let { inviteMapper.toDto(it) }
