@@ -3,6 +3,8 @@ package ru.blimfy.server.usecase.server
 import java.util.UUID
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
+import ru.blimfy.common.enumeration.Permissions
+import ru.blimfy.common.enumeration.Permissions.entries
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.server.db.entity.Member
 import ru.blimfy.server.db.entity.MemberRole
@@ -13,7 +15,6 @@ import ru.blimfy.server.usecase.exception.ServerErrors.SERVER_BY_ID_NOT_FOUND
 import ru.blimfy.server.usecase.member.MemberService
 import ru.blimfy.server.usecase.member.role.MemberRoleService
 import ru.blimfy.server.usecase.role.RoleService
-import ru.blimfy.server.usecase.role.RoleServiceImpl.Companion.DEFAULT_ROLE_NAME
 
 /**
  * Реализация интерфейса для работы с серверами пользователей.
@@ -37,16 +38,12 @@ class ServerServiceImpl(
         serverRepo.save(server).apply {
             val serverId = this.id
 
-            // Создание дефолтной роли для нового сервера, которая будет присваиваться каждому нового участнику
-            // навсегда.
-            val defaultRoleId = roleService.createRole(
-                Role(serverId, DEFAULT_ROLE_NAME, getDefaultRolePermission())
-            ).id
+            val defaultRole = Role(serverId).apply { permissions = getDefaultPermissions() }
+            val roleId = roleService.createRole(defaultRole).id
 
-            // Создание участника для пользователя-создателя сервера с дефолтной ролью.
-            val ownerMember = Member(serverId = serverId, userId = this.ownerId)
+            val ownerMember = Member(serverId, this.ownerId)
             val memberId = memberService.saveMember(ownerMember).id
-            memberRoleService.saveRoleToMember(MemberRole(memberId = memberId, roleId = defaultRoleId))
+            memberRoleService.saveRoleToMember(MemberRole(memberId, roleId))
         }
 
     override suspend fun modifyServer(
@@ -72,16 +69,20 @@ class ServerServiceImpl(
         ?: throw NotFoundException(SERVER_BY_ID_NOT_FOUND.msg.format(id))
 
     override suspend fun deleteServer(serverId: UUID, ownerId: UUID) =
-        serverRepo.deleteByIdAndOwnerId(id = serverId, ownerId = ownerId)
+        serverRepo.deleteByIdAndOwnerId(serverId, ownerId)
 
     override suspend fun addNewMember(serverId: UUID, userId: UUID) =
-        memberService.saveMember(Member(serverId = serverId, userId = userId)).apply {
+        memberService.saveMember(Member(serverId, userId)).apply {
             val defaultRoleId = roleService.findDefaultServerRole(serverId).id
-            memberRoleService.saveRoleToMember(MemberRole(memberId = id, roleId = defaultRoleId))
+            memberRoleService.saveRoleToMember(MemberRole(id, defaultRoleId))
         }
 
     /**
-     * Возвращает дефолтное значение битовой маски разрешений.
+     * Возвращает дефолтное значение разрешений.
      */
-    private fun getDefaultRolePermission() = "0"
+    private fun getDefaultPermissions() =
+        entries
+            .filter(Permissions::defaultGranted)
+            .sumOf(Permissions::bitMask)
+            .toString()
 }

@@ -1,6 +1,5 @@
 package ru.blimfy.gateway.api.server.handler
 
-import java.util.UUID
 import kotlinx.coroutines.flow.map
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,19 +13,16 @@ import ru.blimfy.common.enumeration.InviteTypes.SERVER
 import ru.blimfy.gateway.api.dto.channel.NewChannelDto
 import ru.blimfy.gateway.api.mapper.ChannelMapper
 import ru.blimfy.gateway.api.mapper.InviteMapper
+import ru.blimfy.gateway.api.mapper.ServerMapper
 import ru.blimfy.gateway.api.server.dto.ModifyServerDto
 import ru.blimfy.gateway.api.server.dto.NewServerDto
 import ru.blimfy.gateway.api.server.dto.channel.ChannelPositionDto
-import ru.blimfy.gateway.api.server.dto.toDto
-import ru.blimfy.gateway.api.server.dto.toEntity
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
 import ru.blimfy.gateway.service.AccessService
 import ru.blimfy.server.usecase.server.ServerService
 import ru.blimfy.user.db.entity.User
-import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_CREATE
-import ru.blimfy.websocket.dto.WsMessageTypes.CHANNEL_UPDATE
-import ru.blimfy.websocket.dto.WsMessageTypes.INVITE_CREATE
-import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_UPDATE
+import ru.blimfy.websocket.dto.WsMessageTypes.*
+import java.util.*
 
 /**
  * Реализация интерфейса для работы с обработкой запросов о серверах.
@@ -35,6 +31,7 @@ import ru.blimfy.websocket.dto.WsMessageTypes.SERVER_UPDATE
  * @property serverService сервис для работы с серверами.
  * @property channelService сервис для работы с каналами серверов.
  * @property inviteService сервис для работы с приглашениями серверов.
+ * @property serverMapper маппер для работы с серверами.
  * @property channelMapper маппер для работы с каналами.
  * @property inviteMapper маппер для работы с приглашениями.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
@@ -47,43 +44,49 @@ class ServerApiServiceImpl(
     private val serverService: ServerService,
     private val channelService: ChannelService,
     private val inviteService: InviteService,
+    private val serverMapper: ServerMapper,
     private val channelMapper: ChannelMapper,
     private val inviteMapper: InviteMapper,
     private val userWsStorage: UserWebSocketStorage,
 ) : ServerApiService {
     @Transactional
     override suspend fun createServer(newServer: NewServerDto, user: User) =
-        serverService.createServer(newServer.toEntity(user.id))
-            .apply { createDefaultServerChannels(id) }
-            .toDto()
+        user.id.let { userId ->
+            serverService.createServer(serverMapper.toEntity(newServer, userId))
+                .apply { createDefaultServerChannels(id) }
+                .let { serverMapper.toDto(it, userId) }
+        }
 
     override suspend fun findServer(id: UUID, user: User) =
-        accessService.isServerMember(id, user.id)
-            .let { serverService.findServer(id) }
-            .toDto()
+        user.id.let { userId ->
+            accessService.isServerMember(id, userId)
+                .let { serverService.findServer(id) }
+                .let { serverMapper.toDto(it, userId) }
+        }
 
     override suspend fun modifyServer(id: UUID, modifyServer: ModifyServerDto, user: User) =
         user.id.let { userId ->
             accessService.isServerOwner(id, userId)
                 .let {
-                    serverService
-                        .modifyServer(
-                            id,
-                            modifyServer.name,
-                            modifyServer.icon,
-                            modifyServer.bannerColor,
-                            modifyServer.description
-                        )
+                    serverService.modifyServer(
+                        id,
+                        modifyServer.name,
+                        modifyServer.icon,
+                        modifyServer.bannerColor,
+                        modifyServer.description
+                    )
                 }
-                .toDto()
+                .let { serverMapper.toDto(it, userId) }
                 .apply { userWsStorage.sendMessage(SERVER_UPDATE, this) }
         }
 
     override suspend fun changeOwner(id: UUID, userId: UUID, user: User) =
-        accessService.isServerOwner(id, user.id)
-            .let { serverService.setOwner(id = id, ownerId = userId) }
-            .toDto()
-            .apply { userWsStorage.sendMessage(SERVER_UPDATE, this) }
+        user.id.let { userId ->
+            accessService.isServerOwner(id, userId)
+                .let { serverService.setOwner(id = id, ownerId = userId) }
+                .let { serverMapper.toDto(it, userId) }
+                .apply { userWsStorage.sendMessage(SERVER_UPDATE, this) }
+        }
 
     override suspend fun deleteServer(id: UUID, user: User) =
         serverService.deleteServer(id, user.id)
@@ -126,7 +129,7 @@ class ServerApiServiceImpl(
             .apply { userWsStorage.sendMessage(INVITE_CREATE, this) }
 
     /**
-     * Создаёт набор стандартных каналов для сервера с [serverId]
+     * Создаёт набор стандартных каналов для сервера с [serverId].
      */
     private suspend fun createDefaultServerChannels(serverId: UUID) {
         Channel(TEXT, serverId).apply {
@@ -144,11 +147,11 @@ class ServerApiServiceImpl(
         /**
          * Стандартное название текстового канала сервера.
          */
-        const val SERVER_DEFAULT_TEXT_CHANNEL = "Текстовый канал"
+        private const val SERVER_DEFAULT_TEXT_CHANNEL = "Текстовый канал"
 
         /**
          * Стандартное название голосового канала сервера.
          */
-        const val SERVER_DEFAULT_VOICE_CHANNEL = "Голосовой канал"
+        private const val SERVER_DEFAULT_VOICE_CHANNEL = "Голосовой канал"
     }
 }

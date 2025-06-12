@@ -14,6 +14,7 @@ import ru.blimfy.gateway.api.dto.channel.NewChannelDto
 import ru.blimfy.gateway.api.dto.toDto
 import ru.blimfy.gateway.api.dto.toPartialDto
 import ru.blimfy.gateway.api.mapper.ChannelMapper
+import ru.blimfy.gateway.api.mapper.MemberMapper
 import ru.blimfy.gateway.api.user.dto.ModifyUserDto
 import ru.blimfy.gateway.api.user.dto.UsernameDto
 import ru.blimfy.gateway.integration.websockets.UserWebSocketStorage
@@ -36,8 +37,9 @@ import ru.blimfy.websocket.dto.WsMessageTypes.USER_UPDATE
  * @property roleService сервис для работы с ролями серверов.
  * @property memberRoleService сервис для работы с ролями участников серверов.
  * @property channelService сервис для работы с личными каналами.
- * @property accessService сервис для работы с доступами.
  * @property channelMapper маппер для работы с каналами.
+ * @property memberMapper маппер для работы с участниками серверов.
+ * @property accessService сервис для работы с доступами.
  * @property userWsStorage хранилище для WebSocket соединений с ключом по идентификатору пользователя.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
@@ -50,8 +52,9 @@ class UserApiServiceImpl(
     private val roleService: RoleService,
     private val memberRoleService: MemberRoleService,
     private val channelService: ChannelService,
-    private val accessService: AccessService,
     private val channelMapper: ChannelMapper,
+    private val memberMapper: MemberMapper,
+    private val accessService: AccessService,
     private val userWsStorage: UserWebSocketStorage,
 ) : UserApiService {
     override suspend fun modifyUser(modifyUser: ModifyUserDto, user: User) =
@@ -85,14 +88,7 @@ class UserApiServiceImpl(
 
     override suspend fun findMember(serverId: UUID, user: User) =
         memberService.findServerMember(serverId, user.id)
-            .toDto()
-            .apply {
-                this.user = user.toDto()
-                roles = memberRoleService.findMemberRoles(id)
-                    .map { roleService.findRole(it.roleId) }
-                    .map { it.toDto() }
-                    .toList()
-            }
+            .let { memberMapper.toDto(it) }
 
     override suspend fun leaveServer(serverId: UUID, user: User) {
         user.id.apply {

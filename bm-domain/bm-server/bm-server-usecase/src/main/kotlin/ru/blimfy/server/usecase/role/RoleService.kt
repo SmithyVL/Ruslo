@@ -1,5 +1,6 @@
 package ru.blimfy.server.usecase.role
 
+import kotlinx.coroutines.flow.Flow
 import java.util.UUID
 import ru.blimfy.server.db.entity.Role
 
@@ -26,7 +27,17 @@ interface RoleService {
     suspend fun findDefaultServerRole(serverId: UUID): Role
 
     /**
+     * Возвращает роль c [id] для сервера с [serverId].
+     */
+    suspend fun findServerRole(id: UUID, serverId: UUID): Role
+
+    /**
      * Возвращает роль с идентификатором [id].
      */
     suspend fun findRole(id: UUID): Role
+
+    /**
+     * Возвращает роли сервера с [serverId].
+     */
+    fun findServerRoles(serverId: UUID): Flow<Role>
 }

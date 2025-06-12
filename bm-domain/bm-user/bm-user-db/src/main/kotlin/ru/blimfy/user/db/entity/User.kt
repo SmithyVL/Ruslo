@@ -15,7 +15,7 @@ import ru.blimfy.user.db.entity.base.BaseEntity
  * @property globalName отображаемое имя пользователя.
  * @property avatar ссылка на файл аватарки.
  * @property bannerColor цвет баннера пользователя.
- * @property createdDate дата создания. Записывается только один раз при создании новой записи в БД.
+ * @property createdDate дата создания.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */

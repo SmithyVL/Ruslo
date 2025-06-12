@@ -1,11 +1,11 @@
 package ru.blimfy.server.usecase.role
 
-import java.util.UUID
 import org.springframework.stereotype.Service
 import ru.blimfy.common.exception.NotFoundException
 import ru.blimfy.server.db.entity.Role
 import ru.blimfy.server.db.repository.RoleRepository
 import ru.blimfy.server.usecase.exception.ServerErrors.ROLE_BY_ID_NOT_FOUND
+import java.util.*
 
 /**
  * Реализация интерфейса для работы с ролями сервера.
@@ -23,15 +23,16 @@ class RoleServiceImpl(private val roleRepo: RoleRepository) : RoleService {
         roleRepo.save(role)
 
     override suspend fun findDefaultServerRole(serverId: UUID) =
-        roleRepo.findAllByServerIdAndPosition(serverId, 0)
+        roleRepo.findDefaultServerRole(serverId)
 
-    override suspend fun findRole(id: UUID) = roleRepo.findById(id)
-        ?: throw NotFoundException(ROLE_BY_ID_NOT_FOUND.msg.format(id))
+    override suspend fun findServerRole(id: UUID, serverId: UUID) =
+        roleRepo.findByIdAndServerId(id, serverId)
+            ?: throw NotFoundException(ROLE_BY_ID_NOT_FOUND.msg.format(id))
 
-    companion object {
-        /**
-         * Название дефолтной роли.
-         */
-        const val DEFAULT_ROLE_NAME = "@все"
-    }
+    override suspend fun findRole(id: UUID) =
+        roleRepo.findById(id)
+            ?: throw NotFoundException(ROLE_BY_ID_NOT_FOUND.msg.format(id))
+
+    override fun findServerRoles(serverId: UUID) =
+        roleRepo.findAllByServerId(serverId)
 }

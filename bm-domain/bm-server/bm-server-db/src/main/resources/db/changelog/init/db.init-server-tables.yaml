@@ -144,19 +144,6 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
-                  name: permissions
-                  type: varchar
-                  remarks: Битовая маска с разрешениями
-                  constraints:
-                    nullable: false
-              - column:
-                  name: position
-                  type: integer
-                  remarks: Номер в сортировке внутри сервера
-                  defaultValue: "0"
-                  constraints:
-                    nullable: false
-              - column:
                   name: color
                   type: varchar
                   remarks: Цвет роли
@@ -168,10 +155,30 @@ databaseChangeLog:
                   constraints:
                     nullable: false
               - column:
+                  name: position
+                  type: integer
+                  remarks: Номер в сортировке внутри сервера
+                  defaultValue: "0"
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permissions
+                  type: varchar
+                  remarks: Битовая маска с разрешениями
+                  constraints:
+                    nullable: false
+              - column:
                   name: mentionable
                   type: boolean
                   remarks: Является ли роль упоминаемой
                   defaultValueBoolean: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
                   constraints:
                     nullable: false
         - addForeignKeyConstraint:

@@ -10,6 +10,7 @@ import ru.blimfy.gateway.api.dto.toDto
 import ru.blimfy.gateway.integration.websockets.base.PartialMemberDto
 import ru.blimfy.gateway.integration.websockets.extra.MemberInfoDto
 import ru.blimfy.server.db.entity.Member
+import ru.blimfy.server.db.entity.Role
 import ru.blimfy.server.usecase.member.MemberService
 import ru.blimfy.server.usecase.member.role.MemberRoleService
 import ru.blimfy.server.usecase.role.RoleService
@@ -63,7 +64,7 @@ class MemberMapper(
         MemberDto(id, serverId, nick, createdDate).apply {
             roles = memberRoleService.findMemberRoles(id)
                 .map { roleService.findRole(it.roleId) }
-                .map { it.toDto() }
+                .map(Role::toDto)
                 .toList()
         }
 }

@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ru.blimfy.gateway.api.dto.NewNickDto
-import ru.blimfy.gateway.api.server.member.handler.MemberApiService
+import ru.blimfy.gateway.api.server.role.handler.RoleApiService
 import ru.blimfy.gateway.integration.security.CustomUserDetails
 
 /**
@@ -25,7 +25,7 @@ import ru.blimfy.gateway.integration.security.CustomUserDetails
 @Tag(name = "MemberApi", description = "REST API контроллер для работы с участниками серверов")
 @RestController
 @RequestMapping("/v1/servers/{serverId}/members")
-class MemberApi(private val service: MemberApiService) {
+class MemberApi(private val service: RoleApiService) {
     @Operation(summary = "Получить участников сервера")
     @GetMapping
     suspend fun findMembers(

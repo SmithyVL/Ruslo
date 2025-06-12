@@ -13,7 +13,7 @@ import ru.blimfy.gateway.api.channel.dto.message.MessageDto
 import ru.blimfy.gateway.api.channel.dto.message.MessageSnapshotDto
 import ru.blimfy.gateway.api.channel.dto.message.NewMessageDto
 import ru.blimfy.gateway.api.dto.toDto
-import ru.blimfy.server.usecase.role.RoleServiceImpl.Companion.DEFAULT_ROLE_NAME
+import ru.blimfy.server.db.entity.ROLE_DEFAULT_NAME
 import ru.blimfy.user.db.entity.User
 import ru.blimfy.user.usecase.user.UserService
 
@@ -80,7 +80,7 @@ class MessageMapper(private val messageService: MessageService, private val user
      * Возвращает флаг того, что сообщение в своём [content] упоминает всех.
      */
     private fun hasMentionEveryone(content: String) =
-        content.contains(DEFAULT_ROLE_NAME) || content.contains(MENTION_ONLINE_USERS)
+        content.contains(ROLE_DEFAULT_NAME) || content.contains(MENTION_ONLINE_USERS)
 
     /**
      * Возвращает идентификаторы упоминаний пользователей из [content] сообщения.

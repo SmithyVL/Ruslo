@@ -7,7 +7,6 @@ import java.time.Instant
 import java.util.UUID
 import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_FORMAT
 import ru.blimfy.gateway.config.WebConfig.Companion.INSTANT_TIMEZONE
-import ru.blimfy.server.db.entity.Member
 
 /**
  * DTO с информацией об участнике сервера.
@@ -31,8 +30,3 @@ data class MemberDto(
     lateinit var roles: List<RoleDto>
     lateinit var user: UserDto
 }
-
-/**
- * Возвращает DTO представления с информацией об участнике сервера.
- */
-fun Member.toDto() = MemberDto(id, serverId, nick, createdDate)
