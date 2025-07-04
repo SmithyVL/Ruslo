@@ -1,19 +1,5 @@
-# .idea
-/.idea/codeStyles
-/.idea/dataSources
-/.idea/.gitignore
-/.idea/AndroidProjectSystem.xml
-/.idea/compiler.xml
-/.idea/gradle.xml
-/.idea/kotlinc.xml
-/.idea/misc.xml
-/.idea/vcs.xml
-/.idea/workspace.xml
-/.idea/dataSources.local.xml
-/.idea/dataSources.xml
-/.idea/jpa.xml
-/.idea/modules.xml
-
+.idea/
+!.idea/icon.svg
 **/.gradle/
 **/build/
 **/.kotlin/

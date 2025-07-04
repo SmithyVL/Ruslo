@@ -1,6 +1,6 @@
 plugins {
     // Включает логику общую для всех модулей.
-    id("blimfy-plugin")
+    id("conventional-plugin")
 }
 
 dependencies {
@@ -12,6 +12,7 @@ dependencies {
     runtimeOnly(libs.kotlinReflect)
     runtimeOnly(libs.hikari)
 
+    implementation(project(":bm-domain:bm-converter"))
     implementation(libs.springBootStarter)
     implementation(libs.kotlinxCoroutinesReactor)
     implementation(libs.databasePostgresR2dbc)

@@ -1,23 +1,16 @@
-pluginManagement {
-    repositories {
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-
 dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
-    repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
-
-    @Suppress("UnstableApiUsage")
+    // Использование репозиториев в "buildSrc".
     repositories {
         mavenCentral()
     }
 
-    // Включает возможность поиска информации в Version Catalog.
+    // Использование каталога версий в "buildSrc".
     versionCatalogs {
         create("libs") {
             from(files("../gradle/libs.versions.toml"))
         }
     }
 }
+
+rootProject.name = "buildSrc"

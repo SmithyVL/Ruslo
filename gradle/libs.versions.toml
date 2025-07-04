@@ -1,8 +1,8 @@
 [versions]
-springBoot = "3.5.0"
-kotlin = "2.1.21"
-jwt = "0.12.6"
-springDoc = "2.8.9"
+springBoot = "3.5.6"
+kotlin = "2.2.20"
+jwt = "0.13.0"
+springDoc = "2.8.13"
 
 [libraries]
 # Spring Boot.
@@ -11,19 +11,18 @@ springBootStarterIntegration = { module = "org.springframework.boot:spring-boot-
 springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootStarter = { module = "org.springframework.boot:spring-boot-starter" }
 
-# Spring Data.
-springDataCommons = { module = "org.springframework.data:spring-data-commons" }
-
 # Документация.
 springDocWebflux = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springDoc" }
 
 # Безопасность.
 springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
+springSecurityCore = { module = "org.springframework.security:spring-security-core" }
 jwtJackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jwt" }
 jwtImpl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jwt" }
 
 # Работа с базой данных.
 springBootStarterDataR2dbc = { module = "org.springframework.boot:spring-boot-starter-data-r2dbc" }
+springDataCommons = { module = "org.springframework.data:spring-data-commons" }
 databasePostgresR2dbc = { module = "org.postgresql:r2dbc-postgresql" }
 databasePostgres = { module = "org.postgresql:postgresql" }
 liquibaseCore = { module = "org.liquibase:liquibase-core" }

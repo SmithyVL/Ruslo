@@ -1,13 +1,11 @@
-import org.springframework.boot.gradle.tasks.bundling.BootJar
-
 plugins {
     // Включает логику общую для всех модулей.
-    id("blimfy-plugin")
+    id("conventional-plugin")
 }
 
 dependencies {
     // Подключение основной логики микросервиса, которая в будущем будет разделена на отдельные микросервисы.
-    implementation(project(":bm-gateway"))
+    implementation(project(":bm-gateway:bm-api"))
 
     // Включение авто-конфигурации с помощью аннотаций "SpringBootApplication" и "EnableWebFlux".
     implementation(libs.springBootStarterWebflux)
@@ -19,7 +17,7 @@ dependencies {
     testImplementation(libs.testcontainersPostgres)
 }
 
-// Включаем эту задачу для подмодуля, который является приложением.
-tasks.named<BootJar>("bootJar") {
+// Включаем эту задачу для подмодуля, который является "Spring Boot" приложением.
+tasks.bootJar {
     enabled = true
 }

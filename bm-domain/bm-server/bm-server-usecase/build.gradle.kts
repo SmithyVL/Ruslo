@@ -1,11 +1,12 @@
 plugins {
     // Включает логику общую для всех модулей.
-    id("blimfy-plugin")
+    id("conventional-plugin")
 }
 
 dependencies {
-    // "Отправляем" зависимость "наружу" для того, чтобы появился интерфейс "CoroutineCrudRepository".
+    api(project(":bm-domain:bm-converter"))
     api(project(":bm-domain:bm-server:bm-server-db"))
+    api(project(":bm-domain:bm-server:bm-server-api-dto"))
 
     implementation(libs.kotlinxCoroutinesReactor)
 }

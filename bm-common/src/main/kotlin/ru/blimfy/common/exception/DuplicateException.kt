@@ -1,11 +1,11 @@
 package ru.blimfy.common.exception
 
 /**
- * Найден дубликат при создании объекта.
+ * Найден дубликат.
  *
- * @param message сообщение об ошибке.
+ * @param message описание ошибки.
  * @param cause причина ошибки.
  * @author Владислав Кузнецов.
  * @since 0.0.1.
  */
-class DuplicateException(message: String? = null, cause: Throwable? = null) : BusinessException(message, cause)
+class DuplicateException(message: String? = null, cause: Throwable? = null) : RuntimeException(message, cause)

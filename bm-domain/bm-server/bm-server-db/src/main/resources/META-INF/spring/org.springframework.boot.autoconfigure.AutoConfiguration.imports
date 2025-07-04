@@ -1,1 +1,1 @@
-ru.blimfy.server.db.ServerDatabaseAutoConfiguration
+ru.blimfy.domain.server.db.ServerDatabaseAutoConfiguration

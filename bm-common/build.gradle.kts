@@ -1,6 +1,6 @@
 plugins {
     // Включает логику общую для всех модулей.
-    id("blimfy-plugin")
+    id("conventional-plugin")
 }
 
 dependencies {

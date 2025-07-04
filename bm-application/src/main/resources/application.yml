@@ -19,7 +19,7 @@ logging:
 spring:
   # Настройки реактивности.
   webflux:
-    base-path: /blimfy
+    base-path: /ruslo
 
   # Общие настройки Spring.
   main:
