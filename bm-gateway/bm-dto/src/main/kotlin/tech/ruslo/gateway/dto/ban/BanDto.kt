@@ -1,0 +1,18 @@
+package tech.ruslo.gateway.dto.ban
+
+import java.util.UUID
+import tech.ruslo.gateway.dto.user.UserDto
+
+/**
+ * DTO с информацией о бане сервера.
+ *
+ * @property id идентификатор.
+ * @property serverId идентификатор сервера.
+ * @property reason причина.
+ * @property user заблокированный пользователь.
+ * @author Владислав Кузнецов.
+ * @since 0.0.1.
+ */
+data class BanDto(val id: UUID, val serverId: UUID, val reason: String? = null) {
+    lateinit var user: UserDto
+}

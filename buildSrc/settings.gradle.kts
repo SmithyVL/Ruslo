@@ -3,6 +3,7 @@ dependencyResolutionManagement {
     // Использование репозиториев в "buildSrc".
     repositories {
         mavenCentral()
+        mavenLocal()
     }
 
     // Использование каталога версий в "buildSrc".

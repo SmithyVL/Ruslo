@@ -1,5 +1,5 @@
 services:
-  blimfy:
+  ruslo-app:
     depends_on:
       - db
     build:
@@ -8,32 +8,32 @@ services:
     ports:
       - "8080:8080"
     networks:
-      - blimfy_network
+      - ruslo_network
     command:
       - java
       - -jar
-      - bm-application.jar
+      - ruslo.jar
     environment:
-      BM_FULL_DEBUG: true
-      BM_DB_HOST: db
+      RUSLO_FULL_DEBUG: true
+      RUSLO_DB_HOST: db
 
-  db:
+  ruslo-db:
     image: postgres:latest
     container_name: postgres_container
     environment:
-      POSTGRES_USER: blimfy_admin
-      POSTGRES_PASSWORD: blimfy_password
-      POSTGRES_DB: blimfy
+      POSTGRES_USER: ruslo_admin
+      POSTGRES_PASSWORD: ruslo_password
+      POSTGRES_DB: ruslo
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     networks:
-      - blimfy_network
+      - ruslo_network
 
 volumes:
   db_data:
 
 networks:
-  blimfy_network:
+  ruslo_network:
     driver: bridge

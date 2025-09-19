@@ -1,12 +1,17 @@
-rootProject.name = "RusloBackend"
+rootProject.name = "Ruslo"
 
 dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
     repositories {
         mavenCentral()
+        mavenLocal()
     }
 }
 
+include("library")
+include("library:yml-expander")
+include("microservice")
+include("starter")
 include("bm-common")
 include("bm-domain")
 include("bm-domain:bm-converter")
