@@ -1,0 +1,24 @@
+# Для локального запуска каждого сервиса нужно в ручную указать порт.
+server:
+  port: ${GATEWAY_SERVICE_PORT:8083}
+
+# Количество логов. При "true" будет отображено больше логов.
+debug: ${RUSLO_FULL_DEBUG:false}
+
+# Общее логирование.
+logging:
+  level:
+    tech:
+      ruslo: ${RUSLO_LOGGING_LEVEL:debug}
+
+spring:
+  # Настройки реактивности.
+  webflux:
+    base-path: /ruslo/gateway
+
+  # Общие настройки Spring.
+  main:
+    # Выключить баннер в логах.
+    banner-mode: off
+    # Уменьшение количества начальных логов.
+    log-startup-info: false

@@ -1,38 +1,50 @@
 services:
-  ruslo-app:
-    depends_on:
-      - db
-    build:
-      context: ./bm-application
-    container_name: blimfy
-    ports:
-      - "8080:8080"
-    networks:
-      - ruslo_network
-    command:
-      - java
-      - -jar
-      - ruslo.jar
-    environment:
-      RUSLO_FULL_DEBUG: true
-      RUSLO_DB_HOST: db
-
-  ruslo-db:
+  user-service-db:
     image: postgres:latest
-    container_name: postgres_container
+    container_name: user-postgres
     environment:
-      POSTGRES_USER: ruslo_admin
-      POSTGRES_PASSWORD: ruslo_password
-      POSTGRES_DB: ruslo
+      POSTGRES_USER: user_admin
+      POSTGRES_PASSWORD: user_password
+      POSTGRES_DB: user_service
     ports:
       - "5432:5432"
     volumes:
-      - db_data:/var/lib/postgresql/data
+      - user_db_data:/var/lib/postgresql/data
+    networks:
+      - ruslo_network
+
+  channel-service-db:
+    image: postgres:latest
+    container_name: channel-postgres
+    environment:
+      POSTGRES_USER: channel_admin
+      POSTGRES_PASSWORD: channel_password
+      POSTGRES_DB: channel_service
+    ports:
+      - "5433:5432"
+    volumes:
+      - channel_db_data:/var/lib/postgresql/data
+    networks:
+      - ruslo_network
+
+  server-service-db:
+    image: postgres:latest
+    container_name: server-postgres
+    environment:
+      POSTGRES_USER: server_admin
+      POSTGRES_PASSWORD: server_password
+      POSTGRES_DB: server_service
+    ports:
+      - "5434:5432"
+    volumes:
+      - server_db_data:/var/lib/postgresql/data
     networks:
       - ruslo_network
 
 volumes:
-  db_data:
+  user_db_data:
+  channel_db_data:
+  server_db_data:
 
 networks:
   ruslo_network:

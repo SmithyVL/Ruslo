@@ -1,4 +1,0 @@
-databaseChangeLog:
-  - include:
-      file: init/db.init-server-tables.yaml
-      relativeToChangelogFile: true

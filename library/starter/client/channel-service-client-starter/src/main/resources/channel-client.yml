@@ -1,0 +1,4 @@
+ruslo:
+  channel-service:
+    client:
+      url: ${CHANNEL_SERVICE_CLIENT_URL:http://localhost:8081/ruslo/channel-service}

@@ -1,35 +1,39 @@
 [versions]
-springBoot = "3.5.6"
-kotlin = "2.2.20"
+springBoot = "4.0.0-RC1"
+kotlin = "2.2.21"
 jwt = "0.13.0"
-springDoc = "2.8.13"
+springDoc = "3.0.0-RC1"
 
 [libraries]
 # Spring Boot.
 springBootStarterWebflux = { module = "org.springframework.boot:spring-boot-starter-webflux" }
 springBootStarterIntegration = { module = "org.springframework.boot:spring-boot-starter-integration" }
-springBootStarterValidation = { module = "org.springframework.boot:spring-boot-starter-validation" }
 springBootStarter = { module = "org.springframework.boot:spring-boot-starter" }
+
+# Spring.
+springWebflux = { module = "org.springframework:spring-webflux" }
+springContext = { module = "org.springframework:spring-context" }
+
+# Валидация.
+jakartaValidation = { module = "jakarta.validation:jakarta.validation-api" }
 
 # Документация.
 springDocWebflux = { module = "org.springdoc:springdoc-openapi-starter-webflux-ui", version.ref = "springDoc" }
 
 # Безопасность.
 springBootStarterSecurity = { module = "org.springframework.boot:spring-boot-starter-security" }
-springSecurityCore = { module = "org.springframework.security:spring-security-core" }
 jwtJackson = { module = "io.jsonwebtoken:jjwt-jackson", version.ref = "jwt" }
 jwtImpl = { module = "io.jsonwebtoken:jjwt-impl", version.ref = "jwt" }
 
 # Работа с базой данных.
 springBootStarterDataR2dbc = { module = "org.springframework.boot:spring-boot-starter-data-r2dbc" }
+springBootStarterLiquibase = { module = "org.springframework.boot:spring-boot-starter-liquibase" }
 springDataCommons = { module = "org.springframework.data:spring-data-commons" }
 databasePostgresR2dbc = { module = "org.postgresql:r2dbc-postgresql" }
 databasePostgres = { module = "org.postgresql:postgresql" }
-liquibaseCore = { module = "org.liquibase:liquibase-core" }
-hikari = { module = "com.zaxxer:HikariCP" }
 
 # Работа с JSON.
-jacksonDatabind = { module = "com.fasterxml.jackson.core:jackson-databind" }
+jacksonDatabind = { module = "tools.jackson.core:jackson-databind" }
 
 # Котлин.
 kotlinxCoroutinesReactor = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-reactor" }
@@ -37,7 +41,8 @@ kotlinReflect = { module = "org.jetbrains.kotlin:kotlin-reflect" }
 
 # Тесты.
 springBootStarterTest = { module = "org.springframework.boot:spring-boot-starter-test" }
-testcontainersPostgres = { module = "org.testcontainers:postgresql" }
+testcontainersPostgres = { module = "org.testcontainers:testcontainers-postgresql" }
+testcontainersJunit5 = { module = "org.testcontainers:testcontainers-junit-jupiter" }
 
 [plugins]
 springBoot = { id = "org.springframework.boot", version.ref = "springBoot" }

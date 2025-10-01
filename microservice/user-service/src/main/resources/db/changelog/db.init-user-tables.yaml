@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - changeSet:
+      id: init_user_tables_0
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: users
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с пользователями
+      changes:
+        - createTable:
+            tableName: users # Так как просто "user" использовать нельзя - будет "users".
+            remarks: Пользователи
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  remarks: Идентификатор
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: users_id_pkey
+              - column:
+                  name: username
+                  type: text
+                  remarks: Логин пользователя
+                  constraints:
+                    nullable: false
+                    unique: true
+              - column:
+                  name: password
+                  type: text
+                  remarks: Хэш пароля
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false

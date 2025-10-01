@@ -1,0 +1,47 @@
+# Для локального запуска каждого сервиса нужно в ручную указать порт.
+server:
+  port: ${SERVER_SERVICE_PORT:8082}
+
+# Количество логов. При "true" будет отображено больше логов.
+debug: ${RUSLO_FULL_DEBUG:false}
+
+# Логирование запросов к БД.
+logging:
+  level:
+    tech:
+      ruslo: ${RUSLO_LOGGING_LEVEL:debug}
+    org:
+      springframework:
+        # Логирование SQL запросов.
+        r2dbc: ${RUSLO_LOGGING_LEVEL_R2DBC:debug}
+    io:
+      r2dbc:
+        postgresql:
+          # Логирование параметров SQL запросов.
+          PARAM: ${RUSLO_LOGGING_LEVEL_R2DBC:debug}
+
+spring:
+  # Настройки реактивности.
+  webflux:
+    base-path: /ruslo/server-service
+
+  # Общие настройки Spring.
+  main:
+    # Выключить баннер в логах.
+    banner-mode: off
+    # Уменьшение количества начальных логов.
+    log-startup-info: false
+
+  # Настройки реактивной БД.
+  r2dbc:
+    url: r2dbc:postgresql://${SERVER_SERVICE_DB_HOST:localhost}:${SERVER_SERVICE_DB_PORT:5434}/server_service
+    username: ${SERVER_SERVICE_DB_USERNAME:server_admin}
+    password: ${SERVER_SERVICE_DB_PASSWORD:server_password}
+
+  # Настройки версионирования БД.
+  liquibase:
+    show-summary: off
+    url: jdbc:postgresql://${SERVER_SERVICE_DB_HOST:localhost}:${SERVER_SERVICE_DB_PORT:5434}/server_service
+    user: ${SERVER_SERVICE_DB_USERNAME:server_admin}
+    password: ${SERVER_SERVICE_DB_PASSWORD:server_password}
+    driver-class-name: org.postgresql.Driver

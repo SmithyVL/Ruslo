@@ -1,0 +1,204 @@
+databaseChangeLog:
+  - changeSet:
+      id: init_server_tables_0
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: server
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с серверами
+      changes:
+        - createTable:
+            tableName: server
+            remarks: Сервера
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  remarks: Идентификатор сервера
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: server_id_pkey
+              - column:
+                  name: name
+                  type: text
+                  remarks: Название сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: owner_id
+                  type: bigint
+                  remarks: Идентификатор владельца сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: default_role_id
+                  type: bigint
+                  remarks: Идентификатор стандартной роли сервера. Появляется такая роль уже после создания сервера
+              - column:
+                  name: created_date
+                  type: timestamptz
+                  remarks: Дата создания сервера
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+  - changeSet:
+      id: init_server_tables_1
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: member
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с участниками серверов
+      changes:
+        - createTable:
+            tableName: member
+            remarks: Участники серверов
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  remarks: Идентификатор участника сервера
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: member_id_pkey
+              - column:
+                  name: server_id
+                  type: bigint
+                  remarks: Идентификатор сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: bigint
+                  remarks: Идентификатор пользователя
+                  constraints:
+                    nullable: false
+              - column:
+                  name: joining_date
+                  type: timestamptz
+                  remarks: Дата присоединения к серверу
+                  defaultValueDate: now()
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: server_id, user_id
+            constraintName: const_unique_server_user
+            tableName: member
+        - addForeignKeyConstraint:
+            onDelete: cascade
+            onUpdate: restrict
+            baseColumnNames: server_id
+            baseTableName: member
+            constraintName: fk_server_member
+            referencedColumnNames: id
+            referencedTableName: server
+  - changeSet:
+      id: init_server_tables_2
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: role
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с ролями
+      changes:
+        - createTable:
+            tableName: role
+            remarks: Роли сервера
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  remarks: Идентификатор роли
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: role_id_pkey
+              - column:
+                  name: server_id
+                  type: bigint
+                  remarks: Идентификатор сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: name
+                  type: text
+                  remarks: Название роли
+                  constraints:
+                    nullable: false
+              - column:
+                  name: position
+                  type: bigint
+                  remarks: Порядковый номер роли на сервере
+                  defaultValueNumeric: '0'
+                  constraints:
+                    nullable: false
+              - column:
+                  name: permissions
+                  type: text
+                  remarks: Битовая маска с разрешениями
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            onDelete: cascade
+            onUpdate: restrict
+            baseColumnNames: server_id
+            baseTableName: role
+            constraintName: fk_server_role
+            referencedColumnNames: id
+            referencedTableName: server
+  - changeSet:
+      id: init_server_tables_3
+      preConditions:
+        - onFail: MARK_RAN
+        - not:
+            - tableExists:
+                tableName: member_role
+      author: Владислав Кузнецов
+      comment: Инициализация таблицы с участниками ролей
+      changes:
+        - createTable:
+            tableName: member_role
+            remarks: Участники ролей
+            columns:
+              - column:
+                  name: id
+                  type: bigserial
+                  remarks: Идентификатор связи участника сервера с ролью сервера
+                  constraints:
+                    primaryKey: true
+                    primaryKeyName: member_role_id_pkey
+              - column:
+                  name: member_id
+                  type: bigint
+                  remarks: Идентификатор участника сервера
+                  constraints:
+                    nullable: false
+              - column:
+                  name: role_id
+                  type: bigint
+                  remarks: Идентификатор роли сервера
+                  constraints:
+                    nullable: false
+        - addUniqueConstraint:
+            columnNames: member_id, role_id
+            constraintName: const_unique_member_role
+            tableName: member_role
+        - addForeignKeyConstraint:
+            onDelete: cascade
+            onUpdate: restrict
+            baseColumnNames: member_id
+            baseTableName: member_role
+            constraintName: fk_member_member_role
+            referencedColumnNames: id
+            referencedTableName: member
+        - addForeignKeyConstraint:
+            onDelete: cascade
+            onUpdate: restrict
+            baseColumnNames: role_id
+            baseTableName: member_role
+            constraintName: fk_role_member_role
+            referencedColumnNames: id
+            referencedTableName: role

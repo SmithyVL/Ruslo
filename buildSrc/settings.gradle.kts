@@ -2,13 +2,13 @@ dependencyResolutionManagement {
     @Suppress("UnstableApiUsage")
     // Использование репозиториев в "buildSrc".
     repositories {
-        mavenCentral()
         mavenLocal()
+        mavenCentral()
     }
 
     // Использование каталога версий в "buildSrc".
     versionCatalogs {
-        create("libs") {
+        register("libs") {
             from(files("../gradle/libs.versions.toml"))
         }
     }

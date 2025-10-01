@@ -1,0 +1,11 @@
+jwt:
+  issuer: ${JWT_ISSUER:Ruslo}
+  key: ${JWT_KEY:secret_key_is_very_well_and_good}
+
+security:
+  permitAllPaths:
+    - "/swagger-ui/**"
+    - "/v3/api-docs/**"
+    - "/auth/sign-up"
+    - "/auth/sign-in"
+    - "/ws/**"

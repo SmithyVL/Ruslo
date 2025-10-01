@@ -1,0 +1,47 @@
+# Для локального запуска каждого сервиса нужно в ручную указать порт.
+server:
+  port: ${CHANNEL_SERVICE_PORT:8081}
+
+# Количество логов. При "true" будет отображено больше логов.
+debug: ${RUSLO_FULL_DEBUG:false}
+
+# Логирование запросов к БД.
+logging:
+  level:
+    tech:
+      ruslo: ${RUSLO_LOGGING_LEVEL:debug}
+    org:
+      springframework:
+        # Логирование SQL запросов.
+        r2dbc: ${RUSLO_LOGGING_LEVEL_R2DBC:debug}
+    io:
+      r2dbc:
+        postgresql:
+          # Логирование параметров SQL запросов.
+          PARAM: ${RUSLO_LOGGING_LEVEL_R2DBC:debug}
+
+spring:
+  # Настройки реактивности.
+  webflux:
+    base-path: /ruslo/channel-service
+
+  # Общие настройки Spring.
+  main:
+    # Выключить баннер в логах.
+    banner-mode: off
+    # Уменьшение количества начальных логов.
+    log-startup-info: false
+
+  # Настройки реактивной БД.
+  r2dbc:
+    url: r2dbc:postgresql://${CHANNEL_SERVICE_DB_HOST:localhost}:${CHANNEL_SERVICE_DB_PORT:5433}/channel_service
+    username: ${CHANNEL_SERVICE_DB_USERNAME:channel_admin}
+    password: ${CHANNEL_SERVICE_DB_PASSWORD:channel_password}
+
+  # Настройки версионирования БД.
+  liquibase:
+    show-summary: off
+    url: jdbc:postgresql://${CHANNEL_SERVICE_DB_HOST:localhost}:${CHANNEL_SERVICE_DB_PORT:5433}/channel_service
+    user: ${CHANNEL_SERVICE_DB_USERNAME:channel_admin}
+    password: ${CHANNEL_SERVICE_DB_PASSWORD:channel_password}
+    driver-class-name: org.postgresql.Driver

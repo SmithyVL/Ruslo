@@ -11,13 +11,9 @@ plugins {
     // Плагин компилятора Kotlin для JVM.
     kotlin("jvm")
 
-    // Плагин Kotlin для того, чтобы все классы, используемые Spring стали открытыми (open).
+    // Плагин Kotlin для того чтобы все классы, используемые Spring, стали открытыми (open).
     kotlin("plugin.spring")
 }
-
-// Общая информация о подмодуле.
-group = "tech.ruslo"
-version = "0.0.1-SNAPSHOT"
 
 // В более старших версиях Mockito требуется явно указывать "javaagent" для выполнения тестов, который для начала нужно
 // создать.
@@ -55,6 +51,9 @@ tasks {
             // classes because bootstrap classpath has been appended".
             "-Xshare:off",
 
+            // Чтобы избежать "WARNING: A terminally deprecated method in sun.misc.Unsafe has been called ...".
+            "--sun-misc-unsafe-memory-access=allow",
+
             // В более старших версиях Mockito требуется явно указывать "javaagent" для выполнения тестов.
             "-javaagent:${mockitoAgent.asPath}"
         )
@@ -65,10 +64,6 @@ tasks {
         // Создание новой ВМ после выполнения очередных 100 тестов. Уменьшать значение не рекомендуется. Оно должно быть
         // достаточно большим, потому что создание дополнительных ВМ довольно "трудоёмкое" занятие.
         forkEvery = 100
-
-        // Отключение отчётов о тестировании.
-        reports.html.required = false
-        reports.junitXml.required = false
     }
 }
 
@@ -76,3 +71,7 @@ tasks {
 kotlin {
     jvmToolchain(24)
 }
+
+// Общая информация о подмодуле.
+group = "tech.ruslo"
+version = "0.0.1-SNAPSHOT"

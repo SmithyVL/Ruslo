@@ -1,0 +1,4 @@
+ruslo:
+  user-service:
+    client:
+      url: ${USER_SERVICE_CLIENT_URL:http://localhost:8080/ruslo/user-service}
