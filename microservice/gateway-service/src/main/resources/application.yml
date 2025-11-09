@@ -3,7 +3,7 @@ server:
   port: ${GATEWAY_SERVICE_PORT:8083}
 
 # Количество логов. При "true" будет отображено больше логов.
-debug: ${RUSLO_FULL_DEBUG:false}
+debug: ${RUSLO_FULL_DEBUG:true}
 
 # Общее логирование.
 logging:
@@ -14,7 +14,7 @@ logging:
 spring:
   # Настройки реактивности.
   webflux:
-    base-path: /ruslo/gateway
+    base-path: /ruslo/gateway-service
 
   # Общие настройки Spring.
   main:

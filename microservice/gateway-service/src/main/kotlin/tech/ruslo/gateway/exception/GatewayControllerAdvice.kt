@@ -4,8 +4,10 @@ import kotlinx.coroutines.reactor.awaitSingle
 import org.springframework.http.HttpStatus
 import org.springframework.http.HttpStatus.CONFLICT
 import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.http.HttpStatus.UNAUTHORIZED
 import org.springframework.http.ProblemDetail.forStatusAndDetail
 import org.springframework.http.ResponseEntity
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.reactive.function.client.WebClientResponseException.Conflict
@@ -36,6 +38,16 @@ class DefaultControllerAdvice : ResponseEntityExceptionHandler() {
     @ExceptionHandler
     suspend fun handleConflict(ex: Conflict, exchange: ServerWebExchange): ResponseEntity<in Any> =
         transformException(ex, CONFLICT, exchange)
+
+    /**
+     * Возвращает преобразованный [exchange] с информацией о перехваченной ошибке [ex], указывающей на то, что
+     * пользователь не авторизован.
+     */
+    @ExceptionHandler
+    suspend fun handleUnAuthorized(
+        ex: AccessDeniedException,
+        exchange: ServerWebExchange,
+    ): ResponseEntity<in Any> = transformException(ex, UNAUTHORIZED, exchange)
 
     /**
      * Возвращает преобразованное в ответ со [status] исключение - [ex], для [exchange].

@@ -1,5 +1,6 @@
 package tech.ruslo.gateway.security.access
 
+import org.springframework.security.access.AccessDeniedException
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import tech.ruslo.gateway.security.AccessErrors.INCORRECT_PASSWORD
@@ -18,10 +19,11 @@ class AccessServiceImpl(
     private val tokenService: TokenService,
     private val encoder: PasswordEncoder,
 ) : AccessService {
-    override fun checkPassword(checkPassword: String, password: String) =
-        require(encoder.matches(checkPassword, password)) {
-            INCORRECT_PASSWORD.msg.format(checkPassword)
+    override fun checkPassword(checkPassword: String, password: String) {
+        if (!encoder.matches(checkPassword, password)) {
+            throw AccessDeniedException(INCORRECT_PASSWORD.msg.format(checkPassword))
         }
+    }
 
     override fun encodePassword(password: String): String =
         encoder.encode(password)!!
