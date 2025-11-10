@@ -2,8 +2,12 @@ import {SignUpDto} from "@/api/dto/request/auth/SignUpDto"
 import {SignInDto} from "@/api/dto/request/auth/SignInDto"
 import fetchWrapper from "@/api/fetchWrapper"
 
+// Префикс API запросов для авторизации/аутентификации пользователя.
 const authPrefix = "auth"
 
+/**
+ * Методы для обращений к API авторизации/аутентификации пользователей.
+ */
 export default {
   /**
    * Регистрирует нового пользователя.

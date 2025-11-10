@@ -1,3 +1,4 @@
+// Базовый адрес шлюза.
 const baseUrl = "http://localhost:8083/ruslo/gateway-service/"
 
 /**
@@ -25,6 +26,5 @@ export default {
    * @param body тело запроса.
    * @return токен авторизации.
    */
-  post: (path: string, body: any) =>
-    fetch(`${baseUrl}${path}`, initParams("POST", body)),
+  post: (path: string, body: any) => fetch(`${baseUrl}${path}`, initParams("POST", body)),
 }

@@ -3,6 +3,9 @@ import WelcomeView from "@/components/pages/public/WelcomeView.vue"
 import SignUpView from "@/components/pages/public/SignUpView.vue"
 import SignInView from "@/components/pages/public/SignInView.vue"
 
+/**
+ * Создание плагина Router.
+ */
 const router = createRouter({
   history: createWebHistory(),
   routes: [
