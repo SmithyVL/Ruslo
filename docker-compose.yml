@@ -9,7 +9,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - user_db_data:/var/lib/postgresql/data
+      - user_db_data:/var/lib/postgresql
     networks:
       - ruslo_network
 
@@ -23,7 +23,7 @@ services:
     ports:
       - "5433:5432"
     volumes:
-      - channel_db_data:/var/lib/postgresql/data
+      - channel_db_data:/var/lib/postgresql
     networks:
       - ruslo_network
 
@@ -37,7 +37,7 @@ services:
     ports:
       - "5434:5432"
     volumes:
-      - server_db_data:/var/lib/postgresql/data
+      - server_db_data:/var/lib/postgresql
     networks:
       - ruslo_network
 
