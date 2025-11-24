@@ -1,89 +1,54 @@
 <script lang="ts" setup>
 import {ref} from "vue"
-import {useSnackbarStore} from "@/store/snackbarStore"
-import authApi from "@/api/authApi"
-import customRules from "@/util/rules"
+import RusloTextField from "@/components/form/RusloTextField.vue"
+import RusloSubmitBtn from "@/components/containment/button/RusloSubmitBtn.vue"
+import RusloPlainBtn from "@/components/containment/button/RusloPlainBtn.vue"
+import RusloSignForm from "@/components/form/RusloSignForm.vue"
 import {SignInDto} from "@/api/dto/request/auth/SignInDto"
+import rules from "@/util/rules"
+import authApi from "@/api/authApi"
 
-const snackbars = useSnackbarStore()
-const form = ref(false)
+const form = ref()
+const loading = ref()
+const errMsg = ref()
 const signInDto = ref(new SignInDto())
-const showPassword = ref(false)
 
 function signIn() {
   if (!form.value) {
     return
   }
 
+  loading.value = true
   authApi.signIn(signInDto.value)
-    .then(() => snackbars.addSuccess(`Выполнен вход`))
-    .catch(error => snackbars.addError(error.message))
+    .then(() => console.log(`Выполнен вход`))
+    .catch((error) => errMsg.value = error.message)
+    .finally(() => loading.value = false)
 }
 </script>
 
 <template>
-  <v-container class="fill-height">
-    <v-responsive class="mx-auto" max-width="450">
-      <v-form v-model="form" @submit.prevent="signIn">
-        <v-card prepend-icon="mdi-account" subtitle="С возвращением! Мы так рады видеть вас снова!">
-          <template v-slot:prepend>
-            <v-icon color="green-darken-2" size="x-large"/>
-          </template>
+  <ruslo-sign-form v-model="form" :errorMessage="errMsg" @submit="signIn">
+    <ruslo-text-field
+      v-model="signInDto.username"
+      :rules="[rules.required]"
+      label="Имя пользователя"
+      required
+    />
 
-          <template v-slot:title>
-            <span class="font-weight-black">РУСЛО</span>
-          </template>
+    <ruslo-text-field
+      v-model="signInDto.password"
+      :rules="[rules.required]"
+      label="Пароль"
+      password
+      required
+    />
 
-          <v-card-item class="pb-0 pt-0 pl-2 pr-2">
-            <span class="text-subtitle-1">
-              Имя пользователя <span class="text-red-lighten-1">*</span>
-            </span>
-            <v-text-field
-              v-model="signInDto.username"
-              :rules="[customRules.required]"
-              clearable
-              density="compact"
-            />
+    <template #submitAction>
+      <ruslo-submit-btn :loading="loading" text="Вход"/>
+    </template>
 
-            <span class="text-subtitle-1">
-              Пароль <span class="text-red-lighten-1">*</span>
-            </span>
-            <v-text-field
-              v-model="signInDto.password"
-              :append-inner-icon="showPassword ? 'mdi-eye-off' : 'mdi-eye'"
-              :rules="[customRules.required]"
-              :type="showPassword ? 'text' : 'password'"
-              clearable
-              density="compact"
-              @click:append-inner="showPassword = !showPassword"
-            />
-          </v-card-item>
-
-          <v-card-actions>
-            <v-col>
-              <v-row>
-                <v-btn
-                  block
-                  color="green-darken-2"
-                  text="Вход"
-                  type="submit"
-                  variant="flat"
-                />
-              </v-row>
-
-              <v-row class="mt-4">
-                <v-btn
-                  color="blue-lighten-1"
-                  size="small"
-                  text="Зарегистрироваться"
-                  to="sign-up"
-                  variant="plain"
-                />
-              </v-row>
-            </v-col>
-          </v-card-actions>
-        </v-card>
-      </v-form>
-    </v-responsive>
-  </v-container>
+    <template #anotherAction>
+      <ruslo-plain-btn text="Зарегистрироваться" to="sign-up"/>
+    </template>
+  </ruslo-sign-form>
 </template>

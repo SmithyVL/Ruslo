@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import tech.ruslo.gateway.controller.auth.dto.SignInDto
 import tech.ruslo.gateway.controller.auth.dto.SignUpDto
+import tech.ruslo.gateway.controller.auth.dto.UsernameDto
 
 /**
  * REST API контроллер для работы с авторизацией/аутентификацией пользователей.
@@ -31,4 +32,10 @@ class AuthController(private val authHandler: AuthHandler) {
     @Operation(summary = "Авторизовать существующего пользователя")
     @PostMapping("/sign-in")
     suspend fun signIn(@Valid @RequestBody signInDto: SignInDto) = authHandler.signIn(signInDto)
+
+    @SecurityRequirements
+    @Operation(summary = "Проверить уникальность вводимого имени нового пользователя")
+    @PostMapping("/unique-username")
+    suspend fun isUniqueUsername(@Valid @RequestBody usernameDto: UsernameDto) =
+        authHandler.isUniqueUsername(usernameDto)
 }
