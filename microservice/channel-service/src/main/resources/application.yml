@@ -3,7 +3,7 @@ server:
   port: ${CHANNEL_SERVICE_PORT:8081}
 
 # Количество логов. При "true" будет отображено больше логов.
-debug: ${RUSLO_FULL_DEBUG:false}
+debug: ${RUSLO_FULL_DEBUG:true}
 
 # Логирование запросов к БД.
 logging:

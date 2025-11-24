@@ -18,6 +18,6 @@ class ChannelClientAutoConfigurationTests {
 
     @Test
     fun `context loads`() {
-        assertEquals(channelServiceUrl, "http://localhost:8081")
+        assertEquals(channelServiceUrl, "http://localhost:8081/ruslo/channel-service")
     }
 }
