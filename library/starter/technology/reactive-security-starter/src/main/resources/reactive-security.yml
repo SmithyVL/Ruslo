@@ -6,6 +6,5 @@ security:
   permitAllPaths:
     - "/swagger-ui/**"
     - "/v3/api-docs/**"
-    - "/auth/sign-up"
-    - "/auth/sign-in"
+    - "/auth/**"
     - "/ws/**"

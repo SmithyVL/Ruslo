@@ -18,6 +18,6 @@ class ServerClientAutoConfigurationTests {
 
     @Test
     fun `context loads`() {
-        assertEquals(serverServiceUrl, "http://localhost:8082")
+        assertEquals(serverServiceUrl, "http://localhost:8083")
     }
 }

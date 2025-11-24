@@ -17,7 +17,7 @@ plugins {
 
 // В более старших версиях Mockito требуется явно указывать "javaagent" для выполнения тестов, который для начала нужно
 // создать.
-val mockitoAgent = configurations.create("mockitoAgent")
+val mockitoAgent: Configuration = configurations.create("mockitoAgent")
 
 // Общие зависимости для подмодулей.
 dependencies {

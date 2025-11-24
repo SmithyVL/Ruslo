@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: init_server_tables_0
+      id: init_tables_0
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -44,7 +44,7 @@ databaseChangeLog:
                   constraints:
                     nullable: false
   - changeSet:
-      id: init_server_tables_1
+      id: init_tables_1
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -96,7 +96,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: server
   - changeSet:
-      id: init_server_tables_2
+      id: init_tables_2
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -150,7 +150,7 @@ databaseChangeLog:
             referencedColumnNames: id
             referencedTableName: server
   - changeSet:
-      id: init_server_tables_3
+      id: init_tables_3
       preConditions:
         - onFail: MARK_RAN
         - not:

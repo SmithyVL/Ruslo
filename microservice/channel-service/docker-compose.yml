@@ -1,0 +1,36 @@
+services:
+  postgres:
+    container_name: channel-postgres
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      POSTGRES_DB: channel_service
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    networks:
+      - channel_network
+
+  microservice:
+    container_name: channel-microservice
+    depends_on:
+      - postgres
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      SERVICE_DB_HOST: channel-postgres
+      SERVICE_DB_PORT: 5432
+    ports:
+      - "8081:8080"
+    networks:
+      - channel_network
+
+volumes:
+  postgres_data:
+
+networks:
+  channel_network:
+    driver: bridge

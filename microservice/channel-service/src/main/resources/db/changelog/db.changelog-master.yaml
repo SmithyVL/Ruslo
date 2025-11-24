@@ -1,4 +1,4 @@
 databaseChangeLog:
   - include:
-      file: db.init-channel-tables.yaml
+      file: db.init-tables.yaml
       relativeToChangelogFile: true

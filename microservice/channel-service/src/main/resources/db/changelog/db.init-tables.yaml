@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: init_channel_tables_0
+      id: init_tables_0
       preConditions:
         - onFail: MARK_RAN
         - not:
@@ -44,7 +44,7 @@ databaseChangeLog:
                   type: bigint
                   remarks: Порядковый номер канала на сервере
   - changeSet:
-      id: init_channel_tables_1
+      id: init_tables_1
       preConditions:
         - onFail: MARK_RAN
         - not:

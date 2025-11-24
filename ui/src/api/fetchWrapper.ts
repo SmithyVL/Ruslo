@@ -1,5 +1,5 @@
 // Базовый адрес шлюза.
-const baseUrl = "http://localhost:8083/ruslo/gateway-service/"
+const baseUrl = "http://localhost:8082/ruslo/gateway-service/"
 
 /**
  * Инициализирует параметры инициализации запроса API.

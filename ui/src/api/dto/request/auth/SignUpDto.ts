@@ -6,6 +6,11 @@
  */
 export class SignUpDto {
   /**
+   * Электронная почта нового пользователя.
+   */
+  email: string = ""
+
+  /**
    * Логин нового пользователя.
    */
   username: string = ""
@@ -14,4 +19,19 @@ export class SignUpDto {
    * Пароль нового пользователя.
    */
   password: string = ""
+
+  /**
+   * День рождения пользователя.
+   */
+  day: number | undefined = undefined
+
+  /**
+   * Месяц рождения пользователя.
+   */
+  month: number | undefined = undefined
+
+  /**
+   * Год рождения пользователя.
+   */
+  year: number | undefined = undefined
 }

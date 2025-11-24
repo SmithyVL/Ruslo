@@ -1,8 +1,8 @@
 [versions]
-springBoot = "4.0.0-RC1"
-kotlin = "2.2.21"
+springBoot = "4.0.1"
+kotlin = "2.3.0"
 jwt = "0.13.0"
-springDoc = "3.0.0-RC1"
+springDoc = "3.0.0"
 
 [libraries]
 # Spring Boot.

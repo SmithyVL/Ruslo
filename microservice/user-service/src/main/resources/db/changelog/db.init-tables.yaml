@@ -1,6 +1,6 @@
 databaseChangeLog:
   - changeSet:
-      id: init_user_tables_0
+      id: init_tables_0
       preConditions:
         - onFail: MARK_RAN
         - not:
